@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Cisco China GDC Engineering Blog</title>
+  <title>openstack</title>
   <meta name="description" content="Cisco China GDC Engineering Blog.
 ">
   
@@ -46,7 +46,7 @@
 " />
   <meta property="og:url" content="http://ciscochina.github.io" />
   <meta property="og:site_name" content="Cisco China GDC Engineering Blog" />
-  <meta property="og:title" content="Cisco China GDC Engineering Blog" />
+  <meta property="og:title" content="openstack" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
   <meta property="og:image:type" content="image/png" />
@@ -57,7 +57,7 @@
   
   <!-- Twitter: card tags -->
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Cisco China GDC Engineering Blog">
+  <meta name="twitter:title" content="openstack">
   <meta name="twitter:description" content="Cisco China GDC Engineering Blog.
 ">
   <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
@@ -68,7 +68,7 @@
 
   <!-- Site styles -->
   <link rel="stylesheet" href="/engineering/css/main.css">
-  <link rel="canonical" href="http://ciscochina.github.io/engineering/">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/category/openstack/">
   <link rel="alternate" type="application/rss+xml" title="Cisco China GDC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
 </head>
 
@@ -113,111 +113,30 @@
 
 
     <div class="page-content">
-        <div class="home">
+        <div class="wrapper">
+<div class="page">
 
-<div class="site-header-container has-cover" style="background-image: url(/engineering/assets/header_image.jpg);">
-  <div class="scrim has-cover">
-    <header class="site-header">
-      <h1 class="title">Cisco China GDC Engineering Blog</h1>
-      <p class="subtitle">Never stop learning and sharing</p>
-    </header>
-  </div>
-</div>
+  <header class="post-header">
+    <h1 class="post-title">Posts in "Openstack"</h1>
+  </header>
 
-<div class="wrapper">
-<ul class="post-list">
-  
-  <li>
-    <h2>
-      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-wsgi.html">How to read OpenStack code - wsgi</a>
-    </h2>
-    <section class="post-excerpt" itemprop="description">
-      <p>要读懂本篇，你至少得写过一个python的web程序，并且把它部署到web服务器上过。 什么是wsgi 假设你写了一个python的web程序，并部署到了nginx上，那么你应该知道一个http request的处理流程一般是下面这样： client/浏览器（发送请求） - - - - &gt; web服务器(转发该请求) - - - - &gt; 你的程序（1. 处理请求。2.生成结果。3.返回结果） | | V client/浏览器（收到结果） &lt;- - - -web服务器（接受你的程序返回的结果，并返回给浏览器） 问题是，开发web程序的人和开发web服务器的人并没有沟通，为什么web application 能够部署在web 服务器上呢？ 这是因为他们都遵循了相同的规则 – WSGI。 WSGI 全名叫 web server gateway interface， 是python 中web程序和web服务器沟通的标准。 简单的说，只要你写的web application 遵守这个规则，另一个人开发的web 服务器也遵循这个规则，那么你写的程序就能运行在他开发的web服务器上。 wsgi application WSGI对application和server做出了不同的规定，大部分人不需要写server,因此我们只了解一下application的规定即可。首先看一个标准的WSGI application。该application的功能是，返回client所使用的http method(GET/POST等)：...</p>
-    </section>
-    <section class="post-meta">
-      <div class="post-date">July 12, 2017</div>
-      <div class="post-categories">
-      in 
-        
-        <a href="/engineering/category/openstack">Openstack</a>
-        
+  <span class="page-divider">
+  <span class="one"></span>
+  <span class="two"></span>
+</span>
+
+
+  <article class="post-content">
+    <ul class="posts-list">
       
-      </div>
-    </section>
-  </li>
-  
-  <hr>
-  
-  
-  <li>
-    <h2>
-      <a class="post-link" href="/engineering/database/2017/07/08/mongo.html">MongoDB HA Test with Pymongo</a>
-    </h2>
-    <section class="post-excerpt" itemprop="description">
-      <p>1 Environment Setup One CentOS 7 machine $ more /etc/redhat-release CentOS Linux release 7.2.1511 (Core) Mongodb version $ mongod --version db version v3.2.6 git version: 05552b562c7a0b3143a729aaa0838e558dc49b25 OpenSSL version: OpenSSL 1.0.1e-fips 11 Feb 2013 allocator: tcmalloc modules: none build environment: distmod: rhel70 distarch: x86_64 target_arch: x86_64 Pymongo version &gt;&gt;&gt; import pymongo...</p>
-    </section>
-    <section class="post-meta">
-      <div class="post-date">July 8, 2017</div>
-      <div class="post-categories">
-      in 
-        
-        <a href="/engineering/category/database">Database</a>
-        
+      <li><strong><a class="post-link" href="/engineering/openstack/2017/07/12/openstack-wsgi.html">How to read OpenStack code - wsgi</a></strong><span class="post-date"> - July 12, 2017</span></li>
       
-      </div>
-    </section>
-  </li>
-  
-  <hr>
-  
-  
-  <li>
-    <h2>
-      <a class="post-link" href="/engineering/test/2017/07/08/helloworld.html">Hello World</a>
-    </h2>
-    <section class="post-excerpt" itemprop="description">
-      <p>Hello world!
-
-print 'hello world'
-
-
-</p>
-    </section>
-    <section class="post-meta">
-      <div class="post-date">July 8, 2017</div>
-      <div class="post-categories">
-      in 
-        
-        <a href="/engineering/category/test">Test</a>
-        
-      
-      </div>
-    </section>
-  </li>
-  
-  
-</ul>
-
-<nav class="pagination" role="navigation">
-	<p>
-    
-		<span class="fa-stack fa-lg">
-      <i class="fa fa-square fa-stack-2x"></i>
-      <i class="fa fa-angle-double-left fa-stack-1x fa-inverse"></i>
-    </span>
-		
-		<span class="page-number">Page 1 of 1</span>
-		
-		<span class="fa-stack fa-lg">
-      <i class="fa fa-square fa-stack-2x"></i>
-      <i class="fa fa-angle-double-right fa-stack-1x fa-inverse"></i>
-    </span>
-		
-	</p>
-</nav>
+    </ul>
+  </article>
 
 </div>
 </div>
+<br>
 
     </div>
 
