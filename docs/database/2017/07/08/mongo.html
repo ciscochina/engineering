@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>MongoDB HA Test with Pymongo</title>
+  <meta name="description" content="1 Environment Setup">
+  
+  <meta name="author" content="Peng Xiao">
+  <meta name="copyright" content="&copy; Peng Xiao 2017">
+  
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/engineering/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/engineering/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/engineering/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/engineering/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/engineering/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/engineering/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/engineering/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/engineering/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/engineering/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/engineering/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/engineering/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/engineering/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/engineering/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/engineering/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/engineering/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+  <!-- Facebook OGP cards -->
+  <meta property="og:description" content="1 Environment Setup" />
+  <meta property="og:url" content="http://ciscochina.github.io" />
+  <meta property="og:site_name" content="Cisco China GDC Engineering Blog" />
+  <meta property="og:title" content="MongoDB HA Test with Pymongo" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="612" />
+  <meta property="og:image:height" content="605" />
+  
+
+  
+  <!-- Twitter: card tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="MongoDB HA Test with Pymongo">
+  <meta name="twitter:description" content="1 Environment Setup">
+  <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
+  <meta name="twitter:url" content="http://ciscochina.github.io">
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/engineering/css/main.css">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/database/2017/07/08/mongo.html">
+  <link rel="alternate" type="application/rss+xml" title="Cisco China GDC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/engineering/" class="logo">
+      
+      <img src="/engineering/assets/logo.png" alt="Cisco China GDC Engineering Blog">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/posts/">Posts</a>
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container " >
+  <div class="scrim ">
+    <header class="post-header">
+      <h1 class="title">MongoDB HA Test with Pymongo</h1>
+      <p class="info">by <strong>Peng Xiao</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+ <span class="page-divider">
+  <span class="one"></span>
+  <span class="two"></span>
+</span>
+ 
+
+<section class="post-meta">
+  <div class="post-date">July 8, 2017</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/engineering/category/database">Database</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <h2 id="environment-setup">1 Environment Setup</h2>
+
+<p>One CentOS 7 machine</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>more /etc/redhat-release 
+CentOS Linux release 7.2.1511 <span class="o">(</span>Core<span class="o">)</span>
+</code></pre>
+</div>
+
+<p>Mongodb version</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>mongod --version
+db version v3.2.6
+git version: 05552b562c7a0b3143a729aaa0838e558dc49b25
+OpenSSL version: OpenSSL 1.0.1e-fips 11 Feb 2013
+allocator: tcmalloc
+modules: none
+build environment:
+    distmod: rhel70
+    distarch: x86_64
+    target_arch: x86_64
+</code></pre>
+</div>
+
+<p>Pymongo version</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">&gt;&gt;&gt; </span>import pymongo
+<span class="gp">&gt;&gt;&gt; </span>pymongo.version
+<span class="s1">'3.2'</span>
+<span class="gp">&gt;&gt;&gt; </span>
+</code></pre>
+</div>
+
+<h3 id="install-mongodb">1.1 Install mongodb</h3>
+
+<p>Please see https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/</p>
+
+<h3 id="configure-mongodb">1.2 Configure mongodb</h3>
+
+<p>We will configure three nodes replication in one machine，like:</p>
+
+<p><img src="http://ciscochina.github.io/assets/topo.png" alt="topo" /></p>
+
+<p>1) Prepare three mongodb config file</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>ls /etc/ | grep mongo
+mongod1.conf
+mongod2.conf
+mongod3.conf
+</code></pre>
+</div>
+
+<p>Each config file is:</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>more /etc/mongod1.conf 
+<span class="c"># mongod.conf</span>
+
+systemLog:
+  destination: file
+  logAppend: <span class="nb">true
+  </span>path: /var/log/mongodb1/mongod.log
+
+storage:
+  dbPath: /var/lib/mongo1
+  journal:
+    enabled: <span class="nb">true
+    
+</span>processManagement:
+  fork: <span class="nb">true</span>  <span class="c"># fork and run in background</span>
+  pidFilePath: /var/run/mongodb1/mongod.pid  <span class="c"># location of pidfile</span>
+
+net:
+  port: 27017
+
+replication:
+  replSetName: rs0
+
+<span class="gp">$ </span>more /etc/mongod2.conf 
+<span class="c"># mongod.conf</span>
+
+systemLog:
+  destination: file
+  logAppend: <span class="nb">true
+  </span>path: /var/log/mongodb2/mongod.log
+
+storage:
+  dbPath: /var/lib/mongo2
+  journal:
+    enabled: <span class="nb">true
+    
+</span>processManagement:
+  fork: <span class="nb">true</span>  <span class="c"># fork and run in background</span>
+  pidFilePath: /var/run/mongodb2/mongod.pid  <span class="c"># location of pidfile</span>
+
+net:
+  port: 27018
+
+replication:
+  replSetName: rs0
+
+<span class="gp">$ </span>more /etc/mongod3.conf 
+<span class="c"># mongod.conf</span>
+
+systemLog:
+  destination: file
+  logAppend: <span class="nb">true
+  </span>path: /var/log/mongodb3/mongod.log
+
+storage:
+  dbPath: /var/lib/mongo3
+  journal:
+    enabled: <span class="nb">true
+    
+</span>processManagement:
+  fork: <span class="nb">true</span>  <span class="c"># fork and run in background</span>
+  pidFilePath: /var/run/mongodb3/mongod.pid  <span class="c"># location of pidfile</span>
+
+net:
+  port: 27019
+
+replication:
+  replSetName: rs0
+</code></pre>
+</div>
+
+<h3 id="start-3-mongodb-instances-and-init-them">1.3 Start 3 mongodb instances and init them</h3>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>sudo /usr/bin/mongod -f /etc/mongod1.conf
+<span class="gp">$ </span>sudo /usr/bin/mongod -f /etc/mongod2.conf
+<span class="gp">$ </span>sudo /usr/bin/mongod -f /etc/mongod3.conf
+
+</code></pre>
+</div>
+
+<p>Connect to one of your mongod instances through the mongo shell. MongoDB initiates a set that consists of the current member and that uses the default replica set configuration.</p>
+
+<h3 id="add-the-remaining-members-to-the-replica-set">1.4 Add the remaining members to the replica set.</h3>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>rs.add<span class="o">(</span><span class="s2">"127.0.0.1:27018"</span><span class="o">)</span>
+rs.add<span class="o">(</span><span class="s2">"127.0.0.1:27019"</span><span class="o">)</span>
+</code></pre>
+</div>
+
+<p>through <code class="highlighter-rouge">rs.status</code> we can see the status of the replica set</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">rs0:PRIMARY&gt; </span>rs.status<span class="o">()</span>
+<span class="o">{</span>
+        <span class="s2">"set"</span> : <span class="s2">"rs0"</span>,
+        <span class="s2">"date"</span> : ISODate<span class="o">(</span><span class="s2">"2016-05-22T04:45:22.195Z"</span><span class="o">)</span>,
+        <span class="s2">"myState"</span> : 1,
+        <span class="s2">"term"</span> : NumberLong<span class="o">(</span>3<span class="o">)</span>,
+        <span class="s2">"heartbeatIntervalMillis"</span> : NumberLong<span class="o">(</span>2000<span class="o">)</span>,
+        <span class="s2">"members"</span> : <span class="o">[</span>
+                <span class="o">{</span>
+                        <span class="s2">"_id"</span> : 0,
+                        <span class="s2">"name"</span> : <span class="s2">"127.0.0.1:27017"</span>,
+                        <span class="s2">"health"</span> : 1,
+                        <span class="s2">"state"</span> : 1,
+                        <span class="s2">"stateStr"</span> : <span class="s2">"PRIMARY"</span>,
+                        <span class="s2">"uptime"</span> : 166805,
+                        <span class="s2">"optime"</span> : <span class="o">{</span>
+                                <span class="s2">"ts"</span> : Timestamp<span class="o">(</span>1463737764, 8<span class="o">)</span>,
+                                <span class="s2">"t"</span> : NumberLong<span class="o">(</span>3<span class="o">)</span>
+                        <span class="o">}</span>,
+                        <span class="s2">"optimeDate"</span> : ISODate<span class="o">(</span><span class="s2">"2016-05-20T09:49:24Z"</span><span class="o">)</span>,
+                        <span class="s2">"electionTime"</span> : Timestamp<span class="o">(</span>1463725527, 1<span class="o">)</span>,
+                        <span class="s2">"electionDate"</span> : ISODate<span class="o">(</span><span class="s2">"2016-05-20T06:25:27Z"</span><span class="o">)</span>,
+                        <span class="s2">"configVersion"</span> : 3,
+                        <span class="s2">"self"</span> : <span class="nb">true</span>
+                <span class="o">}</span>,
+                <span class="o">{</span>
+                        <span class="s2">"_id"</span> : 1,
+                        <span class="s2">"name"</span> : <span class="s2">"127.0.0.1:27018"</span>,
+                        <span class="s2">"health"</span> : 1,
+                        <span class="s2">"state"</span> : 2,
+                        <span class="s2">"stateStr"</span> : <span class="s2">"SECONDARY"</span>,
+                        <span class="s2">"uptime"</span> : 166799,
+                        <span class="s2">"optime"</span> : <span class="o">{</span>
+                                <span class="s2">"ts"</span> : Timestamp<span class="o">(</span>1463737764, 8<span class="o">)</span>,
+                                <span class="s2">"t"</span> : NumberLong<span class="o">(</span>3<span class="o">)</span>
+                        <span class="o">}</span>,
+                        <span class="s2">"optimeDate"</span> : ISODate<span class="o">(</span><span class="s2">"2016-05-20T09:49:24Z"</span><span class="o">)</span>,
+                        <span class="s2">"lastHeartbeat"</span> : ISODate<span class="o">(</span><span class="s2">"2016-05-22T04:45:20.570Z"</span><span class="o">)</span>,
+                        <span class="s2">"lastHeartbeatRecv"</span> : ISODate<span class="o">(</span><span class="s2">"2016-05-22T04:45:20.570Z"</span><span class="o">)</span>,
+                        <span class="s2">"pingMs"</span> : NumberLong<span class="o">(</span>0<span class="o">)</span>,
+                        <span class="s2">"syncingTo"</span> : <span class="s2">"127.0.0.1:27019"</span>,
+                        <span class="s2">"configVersion"</span> : 3
+                <span class="o">}</span>,
+                <span class="o">{</span>
+                        <span class="s2">"_id"</span> : 2,
+                        <span class="s2">"name"</span> : <span class="s2">"127.0.0.1:27019"</span>,
+                        <span class="s2">"health"</span> : 1,
+                        <span class="s2">"state"</span> : 2,
+                        <span class="s2">"stateStr"</span> : <span class="s2">"SECONDARY"</span>,
+                        <span class="s2">"uptime"</span> : 166794,
+                        <span class="s2">"optime"</span> : <span class="o">{</span>
+                                <span class="s2">"ts"</span> : Timestamp<span class="o">(</span>1463737764, 8<span class="o">)</span>,
+                                <span class="s2">"t"</span> : NumberLong<span class="o">(</span>3<span class="o">)</span>
+                        <span class="o">}</span>,
+                        <span class="s2">"optimeDate"</span> : ISODate<span class="o">(</span><span class="s2">"2016-05-20T09:49:24Z"</span><span class="o">)</span>,
+                        <span class="s2">"lastHeartbeat"</span> : ISODate<span class="o">(</span><span class="s2">"2016-05-22T04:45:21.356Z"</span><span class="o">)</span>,
+                        <span class="s2">"lastHeartbeatRecv"</span> : ISODate<span class="o">(</span><span class="s2">"2016-05-22T04:45:21.356Z"</span><span class="o">)</span>,
+                        <span class="s2">"pingMs"</span> : NumberLong<span class="o">(</span>0<span class="o">)</span>,
+                        <span class="s2">"syncingTo"</span> : <span class="s2">"127.0.0.1:27017"</span>,
+                        <span class="s2">"configVersion"</span> : 3
+                <span class="o">}</span>
+        <span class="o">]</span>,
+        <span class="s2">"ok"</span> : 1
+<span class="o">}</span>
+<span class="gp">rs0:PRIMARY&gt; </span>
+</code></pre>
+</div>
+
+<h3 id="add-authentication">1.5 Add authentication</h3>
+
+<p>1) Create the keyfile your deployment will use to authenticate to members to each other.</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>openssl rand -base64 741 &gt; /home/mongodb/mongodb-keyfile
+<span class="gp">$ </span>chmod 600 mongodb-keyfile
+</code></pre>
+</div>
+
+<p>2)Enable authentication for each member of the sharded cluster or replica set.</p>
+
+<p>In each replica member’s configure file, please add this:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>security:
+  keyFile: /home/mongodb/mongodb-keyfile
+</code></pre>
+</div>
+<p>If the replica members are in different machines, Pleas copy the key file to the host machine where the replica member located in.</p>
+
+<p>3) Create user administrator</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>use admin
+db.createUser(
+  {
+    user: "myUserAdmin",
+    pwd: "abc123",
+    roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
+  }
+)
+</code></pre>
+</div>
+
+<p>4) Restart all mongodb instances</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ mongo
+MongoDB shell version: 3.2.6
+connecting to: test
+rs0:PRIMARY&gt; rs.status()
+{
+        "ok" : 0,
+        "errmsg" : "not authorized on admin to execute command { replSetGetStatus: 1.0 }",
+        "code" : 13
+}
+rs0:PRIMARY&gt; use admin
+switched to db admin
+rs0:PRIMARY&gt; db.auth("myUserAdmin","abc123")
+1
+</code></pre>
+</div>
+
+<h2 id="testing">2 Testing</h2>
+
+<h3 id="test-case-1-basic-operations">2.1 Test case 1: Basic operations</h3>
+
+<p>We use <a href="http://api.mongodb.org/python/current/examples/high_availability.html">pymongo</a> to do some basic testing.</p>
+
+<p><img src="http://ciscochina.github.io/assets/election.png" alt="Failover" /></p>
+
+<p>Connecting to a Replica Set</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">MongoClient</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">MongoClient</span><span class="p">(</span><span class="s">"10.75.44.10"</span><span class="p">,</span> <span class="n">replicaset</span><span class="o">=</span><span class="s">'rs1'</span><span class="p">)</span>
+<span class="n">MongoClient</span><span class="p">([</span><span class="s">u'mongodb2:27017'</span><span class="p">,</span> <span class="s">u'mongodb1:27017'</span><span class="p">,</span> <span class="s">u'mongodb3:27017'</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> 
+</code></pre>
+</div>
+
+<p>Write operation：</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">MongoClient</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">db</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span><span class="s">"127.0.0.1"</span><span class="p">,</span> <span class="n">replicaset</span><span class="o">=</span><span class="s">'rs1'</span><span class="p">)</span><span class="o">.</span><span class="n">demo</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">db</span>
+<span class="n">Database</span><span class="p">(</span><span class="n">MongoClient</span><span class="p">([</span><span class="s">u'mongodb2:27017'</span><span class="p">,</span> <span class="s">u'mongodb1:27017'</span><span class="p">,</span> <span class="s">u'mongodb3:27017'</span><span class="p">]),</span> <span class="s">u'demo'</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">host</span>
+<span class="s">'10.75.44.10'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">port</span>
+<span class="mi">27017</span>
+<span class="o">&gt;&gt;&gt;</span>
+</code></pre>
+</div>
+
+<p>看到目前对于数据库的操作是<code class="highlighter-rouge">PRIMARY</code>，也就是host <code class="highlighter-rouge">mongodb1</code>。 然后对数据库写入一条record：</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">insert</span><span class="p">({</span><span class="s">'x'</span><span class="p">:</span><span class="mi">1</span><span class="p">})</span>
+<span class="n">ObjectId</span><span class="p">(</span><span class="s">'54b8b1a1c77b3b3b354869a3'</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">find_one</span><span class="p">()</span>
+<span class="p">{</span><span class="s">u'x'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">u'_id'</span><span class="p">:</span> <span class="n">ObjectId</span><span class="p">(</span><span class="s">'54b8b1a1c77b3b3b354869a3'</span><span class="p">)}</span>
+<span class="o">&gt;&gt;&gt;</span> 
+</code></pre>
+</div>
+
+<p>此时，把<code class="highlighter-rouge">mongodb1</code>的mongod stop掉。</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">find_one</span><span class="p">()</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="n">File</span> <span class="s">"&lt;stdin&gt;"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">1</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python2.7/dist-packages/pymongo/collection.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">713</span><span class="p">,</span> <span class="ow">in</span> <span class="n">find_one</span>
+    <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python2.7/dist-packages/pymongo/cursor.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">1038</span><span class="p">,</span> <span class="ow">in</span> <span class="nb">next</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_refresh</span><span class="p">():</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python2.7/dist-packages/pymongo/cursor.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">982</span><span class="p">,</span> <span class="ow">in</span> <span class="n">_refresh</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__uuid_subtype</span><span class="p">))</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python2.7/dist-packages/pymongo/cursor.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">906</span><span class="p">,</span> <span class="ow">in</span> <span class="n">__send_message</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">_send_message_with_response</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python2.7/dist-packages/pymongo/mongo_client.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">1186</span><span class="p">,</span> <span class="ow">in</span> <span class="n">_send_message_with_response</span>
+    <span class="n">sock_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="p">(</span><span class="n">member</span><span class="p">)</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python2.7/dist-packages/pymongo/mongo_client.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">913</span><span class="p">,</span> <span class="ow">in</span> <span class="n">__socket</span>
+    <span class="s">"</span><span class="si">%</span><span class="s">s </span><span class="si">%</span><span class="s">s"</span> <span class="o">%</span> <span class="p">(</span><span class="n">host_details</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">why</span><span class="p">)))</span>
+<span class="n">pymongo</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">AutoReconnect</span><span class="p">:</span> <span class="n">could</span> <span class="ow">not</span> <span class="n">connect</span> <span class="n">to</span> <span class="mf">10.75</span><span class="o">.</span><span class="mf">44.10</span><span class="p">:</span><span class="mi">27017</span><span class="p">:</span> <span class="p">[</span><span class="n">Errno</span> <span class="mi">111</span><span class="p">]</span> <span class="n">Connection</span> <span class="n">refused</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">find_one</span><span class="p">()</span>
+<span class="p">{</span><span class="s">u'x'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">u'_id'</span><span class="p">:</span> <span class="n">ObjectId</span><span class="p">(</span><span class="s">'54b8b1a1c77b3b3b354869a3'</span><span class="p">)}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">host</span>
+<span class="s">u'mongodb3'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">port</span>
+<span class="mi">27017</span>
+<span class="o">&gt;&gt;&gt;</span> 
+</code></pre>
+</div>
+
+<p>发现有个<code class="highlighter-rouge">pymongo.errors.AutoReconnect</code>的异常，不过马上恢复了，而且此时的操作数据库变成了<code class="highlighter-rouge">mongodb3</code>，也就是现在的<code class="highlighter-rouge">PRIMARY</code>.</p>
+
+<p>如果需要从Secondary读取数据，可以设置<code class="highlighter-rouge">ReadPreference</code>.</p>
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">pymongo.read_preferences</span> <span class="kn">import</span> <span class="n">ReadPreference</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">find_one</span><span class="p">()</span>
+<span class="p">{</span><span class="s">u'x'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">u'_id'</span><span class="p">:</span> <span class="n">ObjectId</span><span class="p">(</span><span class="s">'54b8b1a1c77b3b3b354869a3'</span><span class="p">)}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">find_one</span><span class="p">(</span><span class="n">read_preference</span><span class="o">=</span><span class="n">ReadPreference</span><span class="o">.</span><span class="n">SECONDARY</span><span class="p">)</span>
+<span class="p">{</span><span class="s">u'x'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">u'_id'</span><span class="p">:</span> <span class="n">ObjectId</span><span class="p">(</span><span class="s">'54b8b1a1c77b3b3b354869a3'</span><span class="p">)}</span>
+<span class="o">&gt;&gt;&gt;</span> 
+</code></pre>
+</div>
+
+<h3 id="test-case-2-primary-lost-connection-with-all-secondary">2.2 Test case 2: PRIMARY lost connection with all SECONDARY</h3>
+
+<p>假如PRIMARY和其它所有的SECONDARY失去联系了，那么PRIMARY就无法进行读写操作了。</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">insert</span><span class="p">({</span><span class="s">'x'</span><span class="p">:</span><span class="mi">3</span><span class="p">})</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="n">File</span> <span class="s">"&lt;stdin&gt;"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">1</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python2.7/dist-packages/pymongo/collection.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">402</span><span class="p">,</span> <span class="ow">in</span> <span class="n">insert</span>
+    <span class="n">gen</span><span class="p">(),</span> <span class="n">check_keys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid_subtype</span><span class="p">,</span> <span class="n">client</span><span class="p">)</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python2.7/dist-packages/pymongo/mongo_client.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">1125</span><span class="p">,</span> <span class="ow">in</span> <span class="n">_send_message</span>
+    <span class="k">raise</span> <span class="n">AutoReconnect</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+<span class="n">pymongo</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">AutoReconnect</span><span class="p">:</span> <span class="ow">not</span> <span class="n">master</span>
+<span class="o">&gt;&gt;&gt;</span> 
+<span class="o">&gt;&gt;&gt;</span> 
+<span class="o">&gt;&gt;&gt;</span> 
+<span class="o">&gt;&gt;&gt;</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">insert</span><span class="p">({</span><span class="s">'x'</span><span class="p">:</span><span class="mi">3</span><span class="p">})</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="n">File</span> <span class="s">"&lt;stdin&gt;"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">1</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python2.7/dist-packages/pymongo/collection.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">363</span><span class="p">,</span> <span class="ow">in</span> <span class="n">insert</span>
+    <span class="n">client</span><span class="o">.</span><span class="n">_ensure_connected</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python2.7/dist-packages/pymongo/mongo_client.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">924</span><span class="p">,</span> <span class="ow">in</span> <span class="n">_ensure_connected</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__ensure_member</span><span class="p">()</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python2.7/dist-packages/pymongo/mongo_client.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">797</span><span class="p">,</span> <span class="ow">in</span> <span class="n">__ensure_member</span>
+    <span class="n">member</span><span class="p">,</span> <span class="n">nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__find_node</span><span class="p">()</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python2.7/dist-packages/pymongo/mongo_client.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">888</span><span class="p">,</span> <span class="ow">in</span> <span class="n">__find_node</span>
+    <span class="k">raise</span> <span class="n">AutoReconnect</span><span class="p">(</span><span class="s">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">errors</span><span class="p">))</span>
+<span class="n">pymongo</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">AutoReconnect</span><span class="p">:</span> <span class="p">[</span><span class="n">Errno</span> <span class="mi">111</span><span class="p">]</span> <span class="n">Connection</span> <span class="n">refused</span><span class="p">,</span> <span class="p">[</span><span class="n">Errno</span> <span class="mi">111</span><span class="p">]</span> <span class="n">Connection</span> <span class="n">refused</span><span class="p">,</span> <span class="n">mongodb3</span><span class="p">:</span><span class="mi">27017</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">primary</span> <span class="ow">or</span> <span class="n">master</span>
+<span class="o">&gt;&gt;&gt;</span> 
+</code></pre>
+</div>
+
+<p>直到有至少两个Replica Set的host连接，然后选出新的PRIMARY。</p>
+
+<h3 id="test-case-3-write-concern">2.3 Test case 3: Write Concern</h3>
+
+<p>根据<a href="http://docs.mongodb.org/manual/core/replica-set-write-concern/">Write Concern for Replica Sets</a>的介绍：</p>
+
+<p><img src="http://ciscochina.github.io/assets/writeconcern.png" alt="WriteConcern" /></p>
+
+<p><a href="http://api.mongodb.org/python/current/api/pymongo/database.html#pymongo.database.Database.write_concern">pymongo write concern</a></p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">db</span>
+<span class="n">Database</span><span class="p">(</span><span class="n">MongoClient</span><span class="p">([</span><span class="s">u'mongodb2:27017'</span><span class="p">,</span> <span class="s">u'mongodb1:27017'</span><span class="p">,</span> <span class="s">u'mongodb3:27017'</span><span class="p">]),</span> <span class="s">u'demo'</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">write_concern</span>
+<span class="p">{}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">write_concern</span> <span class="o">=</span> <span class="p">{</span><span class="s">'w'</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="s">'wtimeout'</span><span class="p">:</span><span class="mi">5000</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">write_concern</span>
+<span class="p">{</span><span class="s">'wtimeout'</span><span class="p">:</span> <span class="mi">5000</span><span class="p">,</span> <span class="s">'w'</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">insert</span><span class="p">({</span><span class="s">'y'</span><span class="p">:</span><span class="mi">2</span><span class="p">})</span>
+<span class="n">ObjectId</span><span class="p">(</span><span class="s">'54b8b89dc77b3b3b354869a4'</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>默认的write concern是空的配置。write concern有四个参数：<code class="highlighter-rouge">w</code>,<code class="highlighter-rouge">wtimeout</code>,<code class="highlighter-rouge">j</code>, <code class="highlighter-rouge">fsync</code>。</p>
+
+<p>其中比较重要的是<code class="highlighter-rouge">w</code>和<code class="highlighter-rouge">wtimeout</code>。</p>
+
+<p><code class="highlighter-rouge">w</code>: (integer or string)If this is a replica set, write operations will block until they have been replicated to the specified 
+number or tagged set of servers. w=<int> always includes the replica set primary (e.g. w=3 means write to 
+the primary and wait until replicated to two secondaries). Setting w=0 disables write acknowledgement and 
+all other write concern options.</int></p>
+
+<p><code class="highlighter-rouge">wtimeout</code>: (integer) Used in conjunction with w. Specify a value in milliseconds to control how long to wait for write 
+propagation to complete. If replication does not complete in the given timeframe, a timeout exception is raised.</p>
+
+<h2 id="reference">Reference</h2>
+
+<p><a href="http://docs.mongodb.org/manual/core/replica-set-architecture-three-members/">Three Member Replica Sets from mongodb.org</a></p>
+
+<p><a href="http://docs.mongodb.org/manual/replication/">http://docs.mongodb.org/manual/replication/</a></p>
+
+<p><a href="http://www.thegeekstuff.com/2014/02/mongodb-replication/">How to Setup MongoDB Replication Using Replica Set and Arbiters</a></p>
+
+<p><a href="http://api.mongodb.org/python/current/api/">pymongo documentation</a></p>
+
+</article>
+
+
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">Cisco China GDC Engineering Blog</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/posts/">Posts</a>
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:no-reply@cisco.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">no-reply@cisco.com</span>
+          </a>
+        </li>
+
+        
+          
+          <li>
+            <a href="https://github.com/ciscochina" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">ciscochina</span>
+            </a>
+          </li>
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+      <p class="text">Cisco China GDC Engineering Blog.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+
+
+  </body>
+
+</html>
