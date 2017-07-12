@@ -108,6 +108,8 @@
         
           
         
+          
+        
       </ul>
     </nav>
   </div>
@@ -133,9 +135,9 @@
     <h2>
       <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-wsgi.html">How to read OpenStack code part 1 - wsgi</a>
     </h2>
-    <section class="post-excerpt" itemprop="description">
-      <p>要读懂本篇，你至少得写过一个python的web程序，并且把它部署到web服务器上过。 什么是wsgi 假设你写了一个python的web程序，并部署到了nginx上，那么你应该知道一个http request的处理流程一般是下面这样： client/浏览器（发送请求） - - - - &gt; web服务器(转发该请求) - - - - &gt; 你的程序（1. 处理请求。2.生成结果。3.返回结果） | | V client/浏览器（收到结果） &lt;- - - -web服务器（接受你的程序返回的结果，并返回给浏览器） 问题是，开发web程序的人和开发web服务器的人并没有沟通，为什么web application 能够部署在web 服务器上呢？ 这是因为他们都遵循了相同的规则 – WSGI。 WSGI 全名叫 web server gateway interface， 是python 中web程序和web服务器沟通的标准。 简单的说，只要你写的web application 遵守这个规则，另一个人开发的web 服务器也遵循这个规则，那么你写的程序就能运行在他开发的web服务器上。 wsgi application WSGI对application和server做出了不同的规定，大部分人不需要写server,因此我们只了解一下application的规定即可。首先看一个标准的WSGI application。该application的功能是，返回client所使用的http method(GET/POST等)：...</p>
-    </section>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p>要读懂本篇，你至少得写过一个python的web程序，并且把它部署到web服务器上过。</p> <h2 id="wsgi">什么是wsgi</h2> <p>假设你写了一个python的web程序，并部署到了nginx上，那么你应该知道一个http request的处理流程一般是下面这样：</p> <div class="highlighter-rouge"><pre class="highlight"><code>client/浏览器（发送请求） - - - - &gt; web服务器(转发该请求) - - - - &gt; 你的程序（1. 处理请求。2.生成结果。3.返回结果） | | V client/浏览器（收到结果） &lt;- - - -web服务器（接受你的程序返回的结果，并返回给浏览器） </code></pre> </div> <p>问题是，开发web程序的人和开发web服务器的人并没有沟通，为什么web application 能够部署在web 服务器上呢？ 这是因为他们都遵循了相同的规则 – WSGI。 WSGI 全名叫 web server gateway interface， 是python 中web程序和web服务器沟通的标准。 简单的说，只要你写的web application 遵守这个规则，另一个人开发的web 服务器也遵循这个规则，那么你写的程序就能运行在他开发的web服务器上。</p>...</p>
+    </section> -->
     <section class="post-meta">
       <div class="post-date">July 12, 2017</div>
       <div class="post-categories">
@@ -155,9 +157,9 @@
     <h2>
       <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-stevedore.html">How to read OpenStack code part 3 - stevedore</a>
     </h2>
-    <section class="post-excerpt" itemprop="description">
-      <p>学习了WSGI/Paste deploy后，还需要对一些在openstack中一些package有一些了解，才能更好的理解openstack的代码 What is stevedore 我们在写代码的时候通常把一个一个的功能块独立编写，甚至发布一定的规则和接口由第三方编写，然后在运行时根据实际情况来选择加载哪些功能模块。这样的好处是松耦合，灵活，而且便于协作。 stevedore就是一个很好的帮助动态加载代码的工具，openstack中很多plugin就是通过stevedore加载的。 下面通过一些应用场景看一下如何使用stevedore。 Driver 场景 假设我们有一个开源系统，我们不希望限定用户对数据库的选择。用户可以选择mysql/oracle/mongo等任意数据库。这就意味着我们需要对很多种数据库提供接口。这个工作量很大，并且要求开发人员对每一种数据库非常熟悉。最好的做法就是把数据库的接口设计成driver，并发布出该driver所需要实现的接口。这样任何第三方的组织或个人都可以参与开发。 比如，我们定义下面的接口。任何开发者，只要编写一个实现了下列接口的class，就可以实现一个driver @six.add_metaclass(abc.ABCMeta) class Base(object): """ The Base class for db driver """ @abc.abstractmethod def create_user(self, user_name): """ :param user_name: The name of user :return: A user object """ 基于上述接口，我们尝试开发一个mysql的driver如下： # mysql_driver.py import base class MysqlDriver(base.Base): def create_user(self, user_name): return...</p>
-    </section>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p>学习了WSGI/Paste deploy后，还需要对一些在openstack中一些package有一些了解，才能更好的理解openstack的代码</p> <h1 id="what-is-stevedore">What is stevedore</h1> <p>我们在写代码的时候通常把一个一个的功能块独立编写，甚至发布一定的规则和接口由第三方编写，然后在运行时根据实际情况来选择加载哪些功能模块。这样的好处是松耦合，灵活，而且便于协作。</p> <p>stevedore就是一个很好的帮助动态加载代码的工具，openstack中很多plugin就是通过stevedore加载的。</p> <p>下面通过一些应用场景看一下如何使用stevedore。</p> <h1 id="driver-">Driver 场景</h1> <p>假设我们有一个开源系统，我们不希望限定用户对数据库的选择。用户可以选择mysql/oracle/mongo等任意数据库。这就意味着我们需要对很多种数据库提供接口。这个工作量很大，并且要求开发人员对每一种数据库非常熟悉。最好的做法就是把数据库的接口设计成driver，并发布出该driver所需要实现的接口。这样任何第三方的组织或个人都可以参与开发。</p> <p>比如，我们定义下面的接口。任何开发者，只要编写一个实现了下列接口的class，就可以实现一个driver</p> <div class="highlighter-rouge"><pre class="highlight"><code>@six.add_metaclass(abc.ABCMeta) class Base(object): """ The Base class for db driver """ @abc.abstractmethod def create_user(self, user_name): """ :param user_name: The name of user :return: A user object """ </code></pre> </div> <p>基于上述接口，我们尝试开发一个mysql的driver如下：</p> <div class="highlighter-rouge"><pre class="highlight"><code># mysql_driver.py...</p>
+    </section> -->
     <section class="post-meta">
       <div class="post-date">July 12, 2017</div>
       <div class="post-categories">
@@ -177,9 +179,9 @@
     <h2>
       <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-service-plugin.html">How to read OpenStack code part 7 - service plugin</a>
     </h2>
-    <section class="post-excerpt" itemprop="description">
-      <p>We have learned core plugin, service plugin and extension in last post. Now let`s review: Core Plugin Core plugin manage core resources which are network, subnet, port and subnetpool. Service Plugin Service plugin manage higher services. extension Extensions are called API Extensions. There are three types of extension resource extension...</p>
-    </section>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p>We have learned core plugin, service plugin and extension in last post. Now let`s review:</p> <p><strong>Core Plugin</strong></p> <p>Core plugin manage core resources which are network, subnet, port and subnetpool.</p> <p><strong>Service Plugin</strong></p> <p>Service plugin manage higher services.</p> <p><strong>extension</strong></p> <p>Extensions are called API Extensions. There are three types of extension</p> <blockquote> <ul>...</p>
+    </section> -->
     <section class="post-meta">
       <div class="post-date">July 12, 2017</div>
       <div class="post-categories">
@@ -199,9 +201,9 @@
     <h2>
       <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-route.html">How to read OpenStack code part 4 - route</a>
     </h2>
-    <section class="post-excerpt" itemprop="description">
-      <p>When coding a web system, you have to think about an important problem, how to map urls to logic. Openstack use routes to solve this problem. What is routes Routes is a python package used to map urls to program logic. Normally this is the web framework`s responsibility, so besides...</p>
-    </section>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p>When coding a web system, you have to think about an important problem, how to map urls to logic.</p> <p>Openstack use routes to solve this problem.</p> <h1 id="what-is-routes">What is routes</h1> <p>Routes is a python package used to map urls to program logic. Normally this is the web framework`s responsibility, so...</p>
+    </section> -->
     <section class="post-meta">
       <div class="post-date">July 12, 2017</div>
       <div class="post-categories">
@@ -221,9 +223,9 @@
     <h2>
       <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-request-ext.html">How to read OpenStack code part 9 - request extension</a>
     </h2>
-    <section class="post-excerpt" itemprop="description">
-      <p>We have learned resource extension and action extension. This post we will write a request extension First see two API call curl -X POST http://liberty-controller01:9696/v2.0/networks.json -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Auth-Token: $token" -d '{"network": {"name": "net3", "admin_state_up": true}}' {"network": {"status": "ACTIVE", "subnets": [], "name": "net3", "provider:physical_network": "physnet1", "admin_state_up":...</p>
-    </section>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p>We have learned resource extension and action extension. This post we will write a request extension</p> <p>First see two API call</p> <div class="highlighter-rouge"><pre class="highlight"><code>curl -X POST http://liberty-controller01:9696/v2.0/networks.json -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Auth-Token: $token" -d '{"network": {"name": "net3", "admin_state_up": true}}' {"network": {"status": "ACTIVE", "subnets": [], "name": "net3", "provider:physical_network":...</p>
+    </section> -->
     <section class="post-meta">
       <div class="post-date">July 12, 2017</div>
       <div class="post-categories">
@@ -247,7 +249,7 @@
       <i class="fa fa-angle-double-left fa-stack-1x fa-inverse"></i>
     </span>
 		
-		<span class="page-number">Page 1 of 2</span>
+		<span class="page-number">Page 1 of 3</span>
 		
 		<a class="newer-posts" href="/engineering/page2">
       <span class="fa-stack fa-lg">
@@ -295,6 +297,8 @@
         
         
         
+        
+        
       </ul>
     </div>
 
@@ -303,9 +307,9 @@
       <p><strong>Contact</strong></p>
       <ul class="social-media-list">
         <li>
-          <a href="mailto:no-reply@cisco.com">
+          <a href="mailto:penxiao@cisco.com">
             <i class="fa fa-envelope-o"></i>
-            <span class="username">no-reply@cisco.com</span>
+            <span class="username">penxiao@cisco.com</span>
           </a>
         </li>
 

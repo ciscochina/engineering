@@ -6,9 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>About</title>
-  <meta name="description" content="Cisco China GDC Engineering Blog.
-">
+  <title>rsync tutorial</title>
+  <meta name="description" content="Install">
   
   <meta name="author" content="Peng Xiao">
   <meta name="copyright" content="&copy; Peng Xiao 2017">
@@ -42,11 +41,10 @@
 
   
   <!-- Facebook OGP cards -->
-  <meta property="og:description" content="Cisco China GDC Engineering Blog.
-" />
+  <meta property="og:description" content="Install" />
   <meta property="og:url" content="http://ciscochina.github.io" />
   <meta property="og:site_name" content="Cisco China GDC Engineering Blog" />
-  <meta property="og:title" content="About" />
+  <meta property="og:title" content="rsync tutorial" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
   <meta property="og:image:type" content="image/png" />
@@ -57,9 +55,8 @@
   
   <!-- Twitter: card tags -->
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="About">
-  <meta name="twitter:description" content="Cisco China GDC Engineering Blog.
-">
+  <meta name="twitter:title" content="rsync tutorial">
+  <meta name="twitter:description" content="Install">
   <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
   <meta name="twitter:url" content="http://ciscochina.github.io">
   
@@ -68,7 +65,7 @@
 
   <!-- Site styles -->
   <link rel="stylesheet" href="/engineering/css/main.css">
-  <link rel="canonical" href="http://ciscochina.github.io/engineering/about/">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/linux/2017/07/06/rsync.html">
   <link rel="alternate" type="application/rss+xml" title="Cisco China GDC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
 </head>
 
@@ -117,67 +114,185 @@
 
 
     <div class="page-content">
-        <div class="wrapper">
-<div class="page">
+        <div class="post">
 
-  <header class="post-header">
-    <h1 class="post-title">About</h1>
-  </header>
+<div class="post-header-container " >
+  <div class="scrim ">
+    <header class="post-header">
+      <h1 class="title">rsync tutorial</h1>
+      <p class="info">by <strong>Peng Xiao</strong></p>
+    </header>
+  </div>
+</div>
 
-  <span class="page-divider">
+<div class="wrapper">
+
+ <span class="page-divider">
   <span class="one"></span>
   <span class="two"></span>
 </span>
+ 
 
+<section class="post-meta">
+  <div class="post-date">July 6, 2017</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/engineering/category/linux">Linux</a>
+    
+  
+  </div>
+</section>
 
-  <article class="post-content">
-    <h2 id="welcome-to-cisco-china-gdc-engineering-blog">Welcome to Cisco China GDC Engineering Blog</h2>
+<article class="post-content">
+  <h2 id="install">Install</h2>
 
-<p>This blog is maintained by Cisco China Dalian GDC team.</p>
+<p>Rsync is installed in many linux systems by default.</p>
 
-<h3 id="section">如何提交一篇新的博客</h3>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>rsync --version
+rsync  version 3.0.9  protocol version 30
+Copyright <span class="o">(</span>C<span class="o">)</span> 1996-2011 by Andrew Tridgell, Wayne Davison, and others.
+Web site: http://rsync.samba.org/
+Capabilities:
+    64-bit files, 64-bit inums, 64-bit timestamps, 64-bit long ints,
+    socketpairs, hardlinks, symlinks, IPv6, batchfiles, inplace,
+    append, ACLs, xattrs, iconv, symtimes
 
-<h4 id="fork-repository">fork repository</h4>
-
-<p>把本代码库fork到自己的GitHub账号</p>
-
-<h4 id="create-a-new-post">create a new post</h4>
-
-<p>把源码clone到本地后，在 <code class="highlighter-rouge">_posts</code>文件夹里创建一个新的markdown格式文件，命名规则按照 <code class="highlighter-rouge">yy-mm-dd-name.md</code>.比如 <code class="highlighter-rouge">2012-12-02-linux-bridge.md</code>.</p>
-
-<h4 id="format-header">format header</h4>
-
-<p>每一个markdown的post文件，在正文前面必须包括下面的内容（也可参考<code class="highlighter-rouge">_posts</code>文件夹里其它文件）：</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>---
-layout: post
-title:  "xxx xxx xxxx xxxx xxxx"
-date:   2017-07-08 08:43:59
-author: Peng Xiao
-categories: database
----
+rsync comes with ABSOLUTELY NO WARRANTY.  This is free software, and you
+are welcome to redistribute it under certain conditions.  See the GNU
+General Public Licence <span class="k">for </span>details.
 </code></pre>
 </div>
 
-<p><code class="highlighter-rouge">title</code> 标题， <code class="highlighter-rouge">date</code> 创建日期， <code class="highlighter-rouge">author</code> 作者名称，<code class="highlighter-rouge">categories</code> 分类。</p>
+<h2 id="usage-example">Usage Example</h2>
 
-<p>目前可用的分类有<code class="highlighter-rouge">network</code>, <code class="highlighter-rouge">linux</code>, <code class="highlighter-rouge">openstack</code>, <code class="highlighter-rouge">python</code>. 如果有新的分类需求，请开issue。</p>
+<p>We want to sync folders from one host to another host, so there are a source host and a target host.</p>
 
-<p>接下来是blog的正文，请用标准的markdown格式编写。</p>
+<h3 id="target-host">Target host</h3>
 
-<h4 id="preview-locally">preview locally</h4>
+<p>In target host we will start a rsync daemon process, it will listen on port 873 by default, and wait connection from the source host.
+Once the connection is established, the source host will sync the folder/file to the target host.</p>
 
-<p>本地预览，请参考https://help.github.com/articles/setting-up-your-github-pages-site-locally-with-jekyll/，主要参考requirement和step2，step4.</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>/usr/bin/rsync --daemon --config<span class="o">=</span>/etc/rsyncd/rsyncd.conf
+</code></pre>
+</div>
 
-<h4 id="commit-push-and-merge-request">commit, push and merge request</h4>
+<p>Before that we should prepare some files located under <code class="highlighter-rouge">/etc/rsyncd/</code></p>
 
-<p>本地预览没有问题，请commit，push代码到GitHub，然后创建merge request。</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span><span class="nb">pwd</span>
+/etc/rsyncd
+<span class="gp">$ </span>ls -l
+total 48
+-rw-r--r-- 1 root root   664 Nov  2 13:41 rsyncd.conf
+-rw------- 1 root root    17 Nov  2 13:41 rsyncd.password
+</code></pre>
+</div>
+<p>For <code class="highlighter-rouge">rsyncd.password</code>, please make sure the read/write access only for the current user, and it contains the SSH user/password which will be used by
+the source host.</p>
 
-<h4 id="review-and-merge">review and merge</h4>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>more rsyncd.password
+demo:demo
+</code></pre>
+</div>
+<p>For <code class="highlighter-rouge">rsyncd.conf</code></p>
 
-<p>管理员做review，最后merge。</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>more rsyncd.conf
+uid <span class="o">=</span> root
+gid <span class="o">=</span> root
+user chroot <span class="o">=</span> no
+max connections <span class="o">=</span> 50
+timeout <span class="o">=</span> 180
+pid file <span class="o">=</span> /etc/rsyncd/rsyncd.pid
+lock <span class="nv">file</span><span class="o">=</span> /etc/rsyncd/rsyncd.lock
+log file <span class="o">=</span> /etc/rsyncd/rsyncd.log
+user chroot <span class="o">=</span> no
+max connections <span class="o">=</span> 50
+timeout <span class="o">=</span> 180
 
-  </article>
+transfer logging <span class="o">=</span> yes
+log format <span class="o">=</span> %t %a %m %f %b
+syslog facility <span class="o">=</span> local3
+secrets file <span class="o">=</span> /etc/rsyncd/rsyncd.password
+
+<span class="o">[</span>target_folder]
+<span class="nv">path</span><span class="o">=</span>/home/demo/target_folder/
+ignore errors
+hosts allow <span class="o">=</span>1.1.1.1
+hosts deny <span class="o">=</span> <span class="k">*</span>
+secrets file <span class="o">=</span> /etc/rsyncd/rsyncd.password
+<span class="nb">read </span>only <span class="o">=</span> no
+list <span class="o">=</span> no
+auth users <span class="o">=</span> demo
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">hosts allow</code> is the source host ip address</p>
+
+<h3 id="source-host">Source host</h3>
+
+<p>Prepare two files:</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>ls -l
+total 8
+-rwxr-xr-x. 1 root root 175 Nov  2 13:51 rsync.sh
+-rw-------. 1 root root   9 Nov  2 13:47 rsyncpass
+</code></pre>
+</div>
+
+<p>For the shell script:</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>more rsync.sh
+<span class="c">#!/bin/bash</span>
+<span class="nv">src</span><span class="o">=</span>/home/demo/source_folder/
+<span class="nv">user</span><span class="o">=</span>demo
+<span class="nv">ip</span><span class="o">=</span>2.2.2.2
+/usr/bin/rsync -zr --append-verify --delete --password-file<span class="o">=</span>/home/demo/rsyncpass <span class="nv">$src</span> <span class="nv">$user</span>@<span class="nv">$ip</span>::rib
+<span class="c">#</span>
+</code></pre>
+</div>
+
+<p>For the <code class="highlighter-rouge">rsyncpass</code>, please make sure the read/write access only for the current user. It only contains the password.</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>more rsyncpass
+demo
+</code></pre>
+</div>
+
+<p>Now we can put the <code class="highlighter-rouge">rsync.sh</code> to the crontab, done!</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>crontab -l
+<span class="k">*</span> <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> //home/demo/rsync.sh
+</code></pre>
+</div>
+
+<p>You can check the results from the target host in the target folder.</p>
+
+</article>
+
+
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
 
 </div>
 </div>

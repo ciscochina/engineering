@@ -6,9 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>About</title>
-  <meta name="description" content="Cisco China GDC Engineering Blog.
-">
+  <title>Python实现命令行程序</title>
+  <meta name="description" content="使用Python写命令行程序，以argparse是基础，但是有两个更好的工具可以选择，click和oslo.config">
   
   <meta name="author" content="Peng Xiao">
   <meta name="copyright" content="&copy; Peng Xiao 2017">
@@ -42,11 +41,10 @@
 
   
   <!-- Facebook OGP cards -->
-  <meta property="og:description" content="Cisco China GDC Engineering Blog.
-" />
+  <meta property="og:description" content="使用Python写命令行程序，以argparse是基础，但是有两个更好的工具可以选择，click和oslo.config" />
   <meta property="og:url" content="http://ciscochina.github.io" />
   <meta property="og:site_name" content="Cisco China GDC Engineering Blog" />
-  <meta property="og:title" content="About" />
+  <meta property="og:title" content="Python实现命令行程序" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
   <meta property="og:image:type" content="image/png" />
@@ -57,9 +55,8 @@
   
   <!-- Twitter: card tags -->
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="About">
-  <meta name="twitter:description" content="Cisco China GDC Engineering Blog.
-">
+  <meta name="twitter:title" content="Python实现命令行程序">
+  <meta name="twitter:description" content="使用Python写命令行程序，以argparse是基础，但是有两个更好的工具可以选择，click和oslo.config">
   <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
   <meta name="twitter:url" content="http://ciscochina.github.io">
   
@@ -68,7 +65,7 @@
 
   <!-- Site styles -->
   <link rel="stylesheet" href="/engineering/css/main.css">
-  <link rel="canonical" href="http://ciscochina.github.io/engineering/about/">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/python/2017/07/07/python-cli.html">
   <link rel="alternate" type="application/rss+xml" title="Cisco China GDC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
 </head>
 
@@ -117,67 +114,159 @@
 
 
     <div class="page-content">
-        <div class="wrapper">
-<div class="page">
+        <div class="post">
 
-  <header class="post-header">
-    <h1 class="post-title">About</h1>
-  </header>
+<div class="post-header-container " >
+  <div class="scrim ">
+    <header class="post-header">
+      <h1 class="title">Python实现命令行程序</h1>
+      <p class="info">by <strong>Peng Xiao</strong></p>
+    </header>
+  </div>
+</div>
 
-  <span class="page-divider">
+<div class="wrapper">
+
+ <span class="page-divider">
   <span class="one"></span>
   <span class="two"></span>
 </span>
+ 
 
+<section class="post-meta">
+  <div class="post-date">July 7, 2017</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/engineering/category/python">Python</a>
+    
+  
+  </div>
+</section>
 
-  <article class="post-content">
-    <h2 id="welcome-to-cisco-china-gdc-engineering-blog">Welcome to Cisco China GDC Engineering Blog</h2>
+<article class="post-content">
+  <p>使用Python写命令行程序，以argparse是基础，但是有两个更好的工具可以选择，click和oslo.config</p>
 
-<p>This blog is maintained by Cisco China Dalian GDC team.</p>
+<h3 id="click">click</h3>
 
-<h3 id="section">如何提交一篇新的博客</h3>
+<p>click可以用于简单的命令行程序，下面是我写的一个demo</p>
 
-<h4 id="fork-repository">fork repository</h4>
+<p>https://github.com/xiaopeng163/click-demo</p>
 
-<p>把本代码库fork到自己的GitHub账号</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ cd click-demo
+$ python setup.py install
+$ clickctl
+Usage: clickctl [OPTIONS] COMMAND [ARGS]...
 
-<h4 id="create-a-new-post">create a new post</h4>
+  Click Demo Command Line Interface
 
-<p>把源码clone到本地后，在 <code class="highlighter-rouge">_posts</code>文件夹里创建一个新的markdown格式文件，命名规则按照 <code class="highlighter-rouge">yy-mm-dd-name.md</code>.比如 <code class="highlighter-rouge">2012-12-02-linux-bridge.md</code>.</p>
+Options:
+  -v, --verbose  show debug message.
+  --help         Show this message and exit.
 
-<h4 id="format-header">format header</h4>
+Commands:
+  init    Initializes a controller cluster on master node.
+  join    join the controller cluster as agent node
+  status  Get cluster node list
+$ clickctl init --help
+Usage: clickctl init [OPTIONS]
 
-<p>每一个markdown的post文件，在正文前面必须包括下面的内容（也可参考<code class="highlighter-rouge">_posts</code>文件夹里其它文件）：</p>
+Options:
+  --advertise-addr TEXT  The REST Server advertise address  [required]
+  --help                 Show this message and exit.
 
-<div class="highlighter-rouge"><pre class="highlight"><code>---
-layout: post
-title:  "xxx xxx xxxx xxxx xxxx"
-date:   2017-07-08 08:43:59
-author: Peng Xiao
-categories: database
----
+$ clickctl init --advertise-addr=1.1.1.1:80
+Try to initialized the cluster
+$ clickctl -v init --advertise-addr=1.1.1.1:80
+Try to initialized the cluster
+The REST Server advertise address: 1.1.1.1:80
 </code></pre>
 </div>
 
-<p><code class="highlighter-rouge">title</code> 标题， <code class="highlighter-rouge">date</code> 创建日期， <code class="highlighter-rouge">author</code> 作者名称，<code class="highlighter-rouge">categories</code> 分类。</p>
+<h3 id="osloconfig">oslo.config</h3>
 
-<p>目前可用的分类有<code class="highlighter-rouge">network</code>, <code class="highlighter-rouge">linux</code>, <code class="highlighter-rouge">openstack</code>, <code class="highlighter-rouge">python</code>. 如果有新的分类需求，请开issue。</p>
+<p>可以用于大型复杂命令行程序的开发，特别是命令行参数和ini格式配置文件同时结合使用的命令行程序
+我在yabgp/yabmp里使用了oslo.config, 命令行的效果如下：</p>
 
-<p>接下来是blog的正文，请用标准的markdown格式编写。</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>python bin/yabmpd -h
+usage: yabmpd [-h] [--config-dir DIR] [--config-file PATH]
+              [--log-backup-count LOG_BACKUP_COUNT]
+              [--log-config-file LOG_CONFIG_FILE] [--log-dir LOG_DIR]
+              [--log-file LOG_FILE] [--log-file-mode LOG_FILE_MODE]
+              [--nouse-stderr] [--noverbose] [--use-stderr] [--verbose]
+              [--version] [--bmp-bind_host BMP_BIND_HOST]
+              [--bmp-bind_port BMP_BIND_PORT] [--bmp-write_dir BMP_WRITE_DIR]
+              [--bmp-write_msg_max_size BMP_WRITE_MSG_MAX_SIZE]
 
-<h4 id="preview-locally">preview locally</h4>
+optional arguments:
+  -h, --help            show this help message and exit
+  --config-dir DIR      Path to a config directory to pull *.conf files from.
+                        This file set is sorted, so as to provide a
+                        predictable parse order if individual options are
+                        over-ridden. The set is parsed after the file(s)
+                        specified via previous --config-file, arguments hence
+                        over-ridden options in the directory take precedence.
+  --config-file PATH    Path to a config file to use. Multiple config files
+                        can be specified, with values in later files taking
+                        precedence. Defaults to None.
+  --log-backup-count LOG_BACKUP_COUNT
+                        the number of backup log file
+  --log-config-file LOG_CONFIG_FILE
+                        Path to a logging config file to use
+  --log-dir LOG_DIR     log file directory
+  --log-file LOG_FILE   log file name
+  --log-file-mode LOG_FILE_MODE
+                        default log file permission
+  --nouse-stderr        The inverse of --use-stderr
+  --noverbose           The inverse of --verbose
+  --use-stderr          log to standard error
+  --verbose             show debug output
+  --version             show program's version number and exit
 
-<p>本地预览，请参考https://help.github.com/articles/setting-up-your-github-pages-site-locally-with-jekyll/，主要参考requirement和step2，step4.</p>
+bmp options:
+  --bmp-bind_host BMP_BIND_HOST
+                        Address to bind the BMP server to
+  --bmp-bind_port BMP_BIND_PORT
+                        Port the bind the BMP server to
+  --bmp-write_dir BMP_WRITE_DIR
+                        The BMP messages storage path
+</code></pre>
+</div>
 
-<h4 id="commit-push-and-merge-request">commit, push and merge request</h4>
+<h3 id="section">环境变量</h3>
 
-<p>本地预览没有问题，请commit，push代码到GitHub，然后创建merge request。</p>
+<p>另外因为如今容器非常流行，对于容器应用程序的配置，命令行不是很方便，一般采用环境变量的传递方式，如</p>
 
-<h4 id="review-and-merge">review and merge</h4>
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">'MONGODB_URL'</span><span class="p">,</span> <span class="s">'mongodb://127.0.0.1:27017'</span><span class="p">)</span>
+</code></pre>
+</div>
 
-<p>管理员做review，最后merge。</p>
+</article>
 
-  </article>
+
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
 
 </div>
 </div>

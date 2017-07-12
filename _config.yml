@@ -13,7 +13,7 @@ destination: docs
 # Site settings
 title: Cisco China GDC Engineering Blog
 subtitle: "Never stop learning and sharing"
-email: no-reply@cisco.com
+email: penxiao@cisco.com
 name: Peng Xiao
 description: >
   Cisco China GDC Engineering Blog.
@@ -50,14 +50,12 @@ jekyll-archives:
 
 # Category descriptions (for archive pages)
 descriptions:
+  - cat: database
   - cat: linux
-    desc: "linux"
   - cat: network
     desc: "network"
   - cat: openstack
-    desc: "openstack"
   - cat: python
-    desc: "python"
 
 social:
 
