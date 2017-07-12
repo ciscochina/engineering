@@ -6,12 +6,12 @@
 </description>
     <link>http://ciscochina.github.io/engineering/</link>
     <atom:link href="http://ciscochina.github.io/engineering/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 12 Jul 2017 16:56:04 +0800</pubDate>
-    <lastBuildDate>Wed, 12 Jul 2017 16:56:04 +0800</lastBuildDate>
+    <pubDate>Wed, 12 Jul 2017 17:31:50 +0800</pubDate>
+    <lastBuildDate>Wed, 12 Jul 2017 17:31:50 +0800</lastBuildDate>
     <generator>Jekyll v3.2.1</generator>
     
       <item>
-        <title>How to read OpenStack code - wsgi</title>
+        <title>How to read OpenStack code part 1 - wsgi</title>
         <description>&lt;p&gt;要读懂本篇，你至少得写过一个python的web程序，并且把它部署到web服务器上过。&lt;/p&gt;
 
 &lt;h2 id=&quot;wsgi&quot;&gt;什么是wsgi&lt;/h2&gt;
@@ -260,7 +260,1250 @@ httpd.serve_forever()
       </item>
     
       <item>
-        <title>How to read OpenStack code - pastedeploy</title>
+        <title>How to read OpenStack code part 3 - stevedore</title>
+        <description>&lt;p&gt;学习了WSGI/Paste deploy后，还需要对一些在openstack中一些package有一些了解，才能更好的理解openstack的代码&lt;/p&gt;
+
+&lt;h1 id=&quot;what-is-stevedore&quot;&gt;What is stevedore&lt;/h1&gt;
+
+&lt;p&gt;我们在写代码的时候通常把一个一个的功能块独立编写，甚至发布一定的规则和接口由第三方编写，然后在运行时根据实际情况来选择加载哪些功能模块。这样的好处是松耦合，灵活，而且便于协作。&lt;/p&gt;
+
+&lt;p&gt;stevedore就是一个很好的帮助动态加载代码的工具，openstack中很多plugin就是通过stevedore加载的。&lt;/p&gt;
+
+&lt;p&gt;下面通过一些应用场景看一下如何使用stevedore。&lt;/p&gt;
+
+&lt;h1 id=&quot;driver-&quot;&gt;Driver 场景&lt;/h1&gt;
+
+&lt;p&gt;假设我们有一个开源系统，我们不希望限定用户对数据库的选择。用户可以选择mysql/oracle/mongo等任意数据库。这就意味着我们需要对很多种数据库提供接口。这个工作量很大，并且要求开发人员对每一种数据库非常熟悉。最好的做法就是把数据库的接口设计成driver，并发布出该driver所需要实现的接口。这样任何第三方的组织或个人都可以参与开发。&lt;/p&gt;
+
+&lt;p&gt;比如，我们定义下面的接口。任何开发者，只要编写一个实现了下列接口的class，就可以实现一个driver&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@six.add_metaclass(abc.ABCMeta)
+class Base(object):
+    &quot;&quot;&quot;
+    The Base class for db driver
+    &quot;&quot;&quot;
+
+    @abc.abstractmethod
+    def create_user(self, user_name):
+        &quot;&quot;&quot;
+
+        :param user_name:
+            The name of user
+        :return:
+            A user object
+        &quot;&quot;&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;基于上述接口，我们尝试开发一个mysql的driver如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# mysql_driver.py
+import base
+
+
+class MysqlDriver(base.Base):
+    def create_user(self, user_name):
+        return &quot;create user %s in mysql&quot; % user_name
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;该package的目录结构如下&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[root@controller POTUS]# tree MysqlDriver/
+MysqlDriver/
+├── mysql_driver
+│   ├── __init__.py
+│   └── mysql_driver.py
+└── setup.py
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;要注意在mysql_driver/&lt;strong&gt;init&lt;/strong&gt;.py中要有 import mysql_driver这句话&lt;/p&gt;
+
+&lt;p&gt;setup.py的内容如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from setuptools import setup, find_packages
+
+setup(
+    name='mysql_driver',
+    version='1.0',
+
+    packages=find_packages(),
+
+    entry_points={
+        'my_system.db_driver': [
+            'mysql = mysql_driver.mysql_driver:MysqlDriver',
+        ],
+    },
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;运行python setup.py install 后，会在系统目录中安装mysql_driver这个egg包，egg中有entry_point文件中记录了如下内容：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[my_system.db_driver]
+
+mysql = mysql_driver.mysql_driver:MysqlDriver
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;my_system.db_driver是操作系统全局唯一的namespace。mysql是entry point的名字。通过这两个组合，可以定位到需要加载的代码，也就是我们的driver。&lt;/p&gt;
+
+&lt;p&gt;我们同样的再开发一个oracle_driver，如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[root@controller POTUS]# tree OracleDriver/
+OracleDriver/
+├── oracle_driver
+│   ├── __init__.py
+│   └── oracle_driver.py
+└── setup.py
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;oracle_driver.py内容如下&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# mysql_driver.py
+import base
+
+
+class OracleDriver(base.Base):
+    def create_user(self, user_name):
+        return &quot;create user %s in oracle&quot; % user_name
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;setup.py内容如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from setuptools import setup, find_packages
+
+setup(
+    name='oracle_driver',
+    version='1.0',
+    packages=find_packages(),
+    entry_points={
+        'my_system.db_driver': [
+            'oracle = oracle_driver.oracle_driver:OracleDriver',
+        ],
+    },
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;不要忘了在__init__.py中加上 import oracle_driver。&lt;/p&gt;
+
+&lt;p&gt;ok， 在python setup.py install 后，我们的系统中有了mysql_driver 和 oracle_driver 下面就是应用了。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; from stevedore import driver
+&amp;gt;&amp;gt;&amp;gt; mgr = driver.DriverManager(namespace = &quot;my_system.db_driver&quot;, name = &quot;mysql&quot;, invoke_on_load = True, invoke_args = ())
+&amp;gt;&amp;gt;&amp;gt; mgr.driver.create_user('Tom')
+'create user Tom in mysql'
+&amp;gt;&amp;gt;&amp;gt; mgr = driver.DriverManager(namespace = &quot;my_system.db_driver&quot;, name = &quot;oracle&quot;, invoke_on_load = True, invoke_args = ())
+&amp;gt;&amp;gt;&amp;gt; mgr.driver.create_user('Tom')
+'create user Tom in oracle'
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;可以看到，当name=mysql时，调用的是mysql_driver, 当name=oracle时，调用的是oracle_driver&lt;/p&gt;
+
+&lt;p&gt;Driver的方式，让不同的driver开发过程相互独立，调用也更加灵活&lt;/p&gt;
+
+&lt;h1 id=&quot;hook&quot;&gt;Hook场景&lt;/h1&gt;
+
+&lt;p&gt;Hook 顾名思义，钩子。就像window开发中的hook一样，每一个hook都是一个功能组件，会被一定的事件驱动。一个事件可以驱动一个hook，也可以驱动多个hook。同一个hook可以被多个不同的事件驱动。&lt;/p&gt;
+
+&lt;p&gt;假设我们开发了一个IDE工具，在鼠标点击关闭按钮的时候，会产生CLOSE_WINDOW EVENT， 这时候需要save_content组件保存内容。在鼠标点击commit按钮的时候，会产生COMMIT EVENT，这时候需要save_content发挥作用，也需要upload_content组件把内容上传到服务器。&lt;/p&gt;
+
+&lt;p&gt;这种场景下，我们可以开发save_content, upload_content两个组件，并且把save_content注册在CLOSE_WINDOW 和 COMMIT 两个event下，把upload_content注册在COMMIT event下。开发过程如下：&lt;/p&gt;
+
+&lt;p&gt;首先是save_content,&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[root@controller POTUS]# tree IDE_HOOKA/
+IDE_HOOKA/
+├── save_content
+│   ├── __init__.py
+│   └── save_content.py
+└── setup.py
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;save_content 内容如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;class SaveContent(object):
+    def __call__(self, *args, **kwargs):
+        return &quot;content are saved&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;setup.py 内容如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from setuptools import setup, find_packages
+
+setup(
+    name='save_content',
+    version='1.0',
+
+    packages=find_packages(),
+
+    entry_points={
+        'ide.hooks': [
+            'CLOSE_WINDOW = save_content.save_content:SaveContent',
+            'COMMIT = save_content.save_content:SaveContent'
+        ],
+    },
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;init&lt;/strong&gt;.py中有import save_content这句不要落下。&lt;/p&gt;
+
+&lt;p&gt;在python setup.py install 后，save_content.save_content:SaveContent 会被注册到CLOSE_WINDOW 和 COMMIT这两个event下。&lt;/p&gt;
+
+&lt;p&gt;我们再开发一个upload_content 组件如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[root@controller POTUS]# tree IDE_HOOKB/
+IDE_HOOKB/
+├── setup.py
+└── upload_content
+	├── __init__.py
+	└── upload_content.py
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;主要看一下setup.py 
+    from setuptools import setup, find_packages&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;setup(
+    name='upload_content',
+    version='1.0',
+
+    packages=find_packages(),
+
+    entry_points={
+        'ide.hooks': [
+            'COMMIT = upload_content.upload_content:UploadContent'
+        ],
+    },
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这次，我们只注册了upload_content到COMMIT下。&lt;/p&gt;
+
+&lt;p&gt;在安装后，我们有了save_content 注册在CLOSE_WINDOW 和 COMMIT下， upload_content注册在COMMIT下。这样，当COMMIT事件发生，系统会保存内容并upload内容到服务器，当CLOSE_WINDOW事件发生，会保存内容。&lt;/p&gt;
+
+&lt;p&gt;运行如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# import hookmanager
+# 定义运行hook的函数
+&amp;gt;&amp;gt;&amp;gt; from stevedore import HookManager
+&amp;gt;&amp;gt;&amp;gt; def run(hook):
+...     return (hook.name, hook.obj())
+... 
+
+# 根据Close Window调用hook
+&amp;gt;&amp;gt;&amp;gt; mgr = HookManager(namespace = &quot;ide.hooks&quot;, name = &quot;CLOSE_WINDOW&quot;, invoke_on_load = True, invoke_args = ())
+&amp;gt;&amp;gt;&amp;gt; mgr.map(run)
+[('CLOSE_WINDOW', 'content are saved')]
+
+# 根据commit调用hook 
+&amp;gt;&amp;gt;&amp;gt; mgr = HookManager(namespace = &quot;ide.hooks&quot;, name = &quot;COMMIT&quot;, invoke_on_load = True, invoke_args = ())
+&amp;gt;&amp;gt;&amp;gt; mgr.map(run)
+[('COMMIT', 'content are saved'), ('COMMIT', 'content are uploaded')]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;extension-&quot;&gt;extension 场景&lt;/h1&gt;
+
+&lt;p&gt;对比driver hook，他们都是通过setuptools的entry point来调用代码。driver是根据一个名字加载一个driver， hook是根据一个名字加载多个组件，而extension则是不根据名字，把namespace下所有的组件加载。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[root@controller POTUS]# tree EXT/
+EXT/
+├── ext
+│   ├── ext1.py
+│   ├── ext2.py
+│   ├── ext3.py
+│   └── __init__.py
+└── setup.py
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;ext1的内容如下&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;class EXT1(object):
+    def __call__(self, *args, **kwargs):
+        return &quot;ext1 is called&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;setup.py内容如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from setuptools import setup, find_packages
+
+setup(
+    name='ext',
+    version='1.0',
+
+    packages=find_packages(),
+
+    entry_points={
+        'my_namespace': [
+            'ext1 = ext.ext1:EXT1',
+            'ext2 = ext.ext2:EXT2',
+            'ext3 = ext.ext3:EXT3'
+        ],
+    },
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;按照完成后，ext1/ext2/ext3都被注册到my_namespace下。 调用方式如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; from stevedore import ExtensionManager
+&amp;gt;&amp;gt;&amp;gt; mgr=ExtensionManager(namespace='my_namespace', invoke_on_load=True, invoke_args=())
+&amp;gt;&amp;gt;&amp;gt; def run(hook):
+...     return (hook.name, hook.obj)
+... 
+&amp;gt;&amp;gt;&amp;gt; mgr.map(run)
+[('ext3', &amp;lt;ext.ext3.EXT3 object at 0xd62a50&amp;gt;), ('ext2', &amp;lt;ext.ext2.EXT2 object at 0x102b6d0&amp;gt;), ('ext1', &amp;lt;ext.ext1.EXT1 object at 0x1034c10&amp;gt;)]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;调用方式可以看到，通过namespace可以把其下所有组件加载&lt;/p&gt;
+
+&lt;p&gt;以上是stevedore的主要用法，下一篇讲展示routes的用法&lt;/p&gt;
+</description>
+        <pubDate>Wed, 12 Jul 2017 16:43:59 +0800</pubDate>
+        <link>http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-stevedore.html</link>
+        <guid isPermaLink="true">http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-stevedore.html</guid>
+        
+        
+        <category>openstack</category>
+        
+      </item>
+    
+      <item>
+        <title>How to read OpenStack code part 7 - service plugin</title>
+        <description>&lt;p&gt;We have learned core plugin, service plugin and extension in last post. Now let`s review:&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Core Plugin&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Core plugin manage core resources which are network, subnet, port and subnetpool.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Service Plugin&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Service plugin manage higher services.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;extension&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Extensions are called API Extensions. There are three types of extension&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;ul&gt;
+    &lt;li&gt;resource extension which define new resources&lt;/li&gt;
+    &lt;li&gt;action extension which define actions for resource&lt;/li&gt;
+    &lt;li&gt;request extension which can add more parameter to request&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Normally a new feature will be implemented by extension first. When the feature is stable, the community will move it to official api and may implement it in plugin.&lt;/p&gt;
+
+&lt;p&gt;We write our core plugin in the previous post now we are going to write our service plugin.&lt;/p&gt;
+
+&lt;h1 id=&quot;what-is-the-difference-between-core-plugin-and-service-plugin&quot;&gt;What is the difference between core plugin and service plugin&lt;/h1&gt;
+
+&lt;p&gt;Core plugin manage core resource in neutron. The code structure is different from service plugin. But the community are considering transfer core plugin into one kind of service plugin. You will see the trend in code&lt;/p&gt;
+
+&lt;h1 id=&quot;design-our-service-plugin&quot;&gt;Design our service plugin&lt;/h1&gt;
+
+&lt;p&gt;Our service plugin is called “ZOO”. This plugin will manage some resource like “tiger”. We are going to do API call like CREATE/UPDATE/DELETE/GET tiger with this service plugin.&lt;/p&gt;
+
+&lt;h1 id=&quot;write-our-service-plugin&quot;&gt;Write our service plugin&lt;/h1&gt;
+
+&lt;p&gt;Service plugin must be inherited from the class neutron.services.service_base.ServicePluginBase&lt;/p&gt;
+
+&lt;p&gt;Below are my service plugin&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from neutron.services import service_base
+
+
+class ZooPlugin(service_base.ServicePluginBase):
+	supported_extension_aliases = [&quot;zoo&quot;]
+
+	def __init__(self):
+		super(ZooPlugin, self).__init__()
+
+	def get_plugin_name(self):
+		return &quot;ZOO&quot;
+
+	def get_plugin_type(self):
+		# should be under neutron/plugins/common/constants.py
+		return &quot;ZOO&quot;
+
+	def get_plugin_description(self):
+		return (&quot;ZOO&quot;)
+
+	def create_tiger(self, context, tiger):
+		return &quot;tiger created&quot;
+
+	def get_tigers(self, context, filters, fields):
+		return {}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;supported_extension_aliases is necessary since we need an extension to generate the resource.&lt;/p&gt;
+
+&lt;p&gt;We only support get_tigers and create_tiger here for simplicity purpose.&lt;/p&gt;
+
+&lt;p&gt;Because the plugin is third-party code, so we have to register it under certain entry point so neutron can load it. So our code structure will be like :&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[root@liberty-controller01 tmp]# tree zooServicePlugin
+zooServicePlugin/
+├── setup.py
+└── zoo
+	├── __init__.py
+	├── zoo_plugin.py
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The content of setup.py is like&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from setuptools import setup, find_packages
+
+setup(
+	name='zoo',
+	version='1.0',
+
+	packages=find_packages(),
+
+	entry_points={
+		'neutron.service_plugins': [
+			'zoo = zoo.zoo_plugin:ZooPlugin',
+		],
+	},
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The key point here is to register the plugin under neutron.service_plugins namespace.&lt;/p&gt;
+
+&lt;h1 id=&quot;write-the-extension&quot;&gt;Write the extension&lt;/h1&gt;
+
+&lt;p&gt;We have service plugin ready to manage the tiger resource. But we do not have the tiger resource yet. One option is to modify the neutron/api/v2/attribute.py which is not suggested. The recommended way is to generate the resource by extension like below&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from neutron.api import extensions
+from neutron.api.v2 import base
+from neutron import manager
+
+
+EXT_PREFIX = '/zoo'
+RESOURCE_NAME = 'tiger'
+COLLECTION_NAME = '%ss' % RESOURCE_NAME
+RESOURCE_ATTRIBUTE_MAP = {
+    'tiger': {
+        'id': {'allow_post': False, 'allow_put': False,
+               'validate': {'type:uuid': None},
+               'is_visible': True,
+               'primary_key': True},
+        'name': {'allow_post': True,
+                 'allow_put': False,
+                 'is_visible': True,
+                 'default': ''},
+        'tenant_id': {'allow_post': True, 'allow_put': False,
+                      'required_by_policy': True,
+                      'validate': {'type:string': None},
+                      'is_visible': True}
+    }
+}
+
+
+class Zoo(extensions.ExtensionDescriptor):
+    @classmethod
+    def get_name(cls):
+        return &quot;zoo&quot;
+
+    @classmethod
+    def get_alias(cls):
+        return 'zoo'
+
+    @classmethod
+    def get_description(cls):
+        return &quot;zoo&quot;
+
+    @classmethod
+    def get_updated(cls):
+        return &quot;2017-02-08T10:00:00-00:00&quot;
+
+    @classmethod
+    def get_resources(cls):
+        # This method registers the URL and the dictionary  of
+        # attributes on the neutron-server.
+        exts = list()
+        plugin = manager.NeutronManager.get_service_plugins()['ZOO']
+        resource_name = RESOURCE_NAME
+        collection_name = COLLECTION_NAME
+        params = RESOURCE_ATTRIBUTE_MAP.get(resource_name)
+        controller = base.create_resource(collection_name, resource_name,
+                                          plugin, params, allow_bulk=False)
+        ex = extensions.ResourceExtension(collection_name, controller, path_prefix=EXT_PREFIX)
+        exts.append(ex)
+        return exts
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The RESOURCE_ATTRIBUTE_MAP is used for define resource tiger. The tenant_id attribute is necessary for auth.&lt;/p&gt;
+
+&lt;p&gt;An extension must inherited from extensions.ExtensionDescriptor&lt;/p&gt;
+
+&lt;p&gt;get_alias method is really important because plugin will use this value to find the extension. This value must be in the supported_extension_alias of plugin&lt;/p&gt;
+
+&lt;p&gt;The get_resources method is necessary for an extension who define new resource. We will see the detail in later post.&lt;/p&gt;
+
+&lt;h1 id=&quot;config&quot;&gt;Config&lt;/h1&gt;
+
+&lt;p&gt;Now we have our service plugin and extension we need to install our service plugin by python setup.py install and put the extension under neutron/extensions&lt;/p&gt;
+
+&lt;p&gt;Also config the /etc/neutron/neutron.conf&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;service_plugins = ...,zoo
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Restart your neutron server and run below API&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl -g -i  &quot;http://liberty-controller01:9696/v2.0/zoo/tigers&quot; -H &quot;Content-Type: application/json&quot; -H &quot;Accept: application/json&quot; -H &quot;X-Auth-Token:$token&quot;
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Content-Length: 14
+X-Openstack-Request-Id: req-82ed8ccc-da9d-46d9-8fd9-beb01a24385b
+Date: Wed, 08 Feb 2017 11:09:13 GMT
+
+{&quot;tigers&quot;: []}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;It work&lt;/p&gt;
+</description>
+        <pubDate>Wed, 12 Jul 2017 16:43:59 +0800</pubDate>
+        <link>http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-service-plugin.html</link>
+        <guid isPermaLink="true">http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-service-plugin.html</guid>
+        
+        
+        <category>openstack</category>
+        
+      </item>
+    
+      <item>
+        <title>How to read OpenStack code part 4 - route</title>
+        <description>&lt;p&gt;When coding a web system, you have to think about an important problem, how to map urls to logic.&lt;/p&gt;
+
+&lt;p&gt;Openstack use routes to solve this problem.&lt;/p&gt;
+
+&lt;h1 id=&quot;what-is-routes&quot;&gt;What is routes&lt;/h1&gt;
+
+&lt;p&gt;Routes is a python package used to map urls to program logic. Normally this is the web framework`s responsibility, so besides openstack, routes is also used in several other python web frameworks.&lt;/p&gt;
+
+&lt;h1 id=&quot;quick-start&quot;&gt;Quick start&lt;/h1&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; from routes import Mapper
+&amp;gt;&amp;gt;&amp;gt; map = Mapper()
+&amp;gt;&amp;gt;&amp;gt; map.connect('route_name_update_net', '/nets/{net_id}', controller='nets_controller', conditions=dict(method=['PUT']), self_defined_key='self_defined_value')
+    # Above code created a route named &quot;route_name_update_net&quot;
+    # It match any two component urls started with /nets
+    # Controller which will process the request is nets_controller
+    # Conditions parameter restrict the route only accept PUT request
+
+&amp;gt;&amp;gt;&amp;gt; map.match('/nets/123')
+{'controller': u'nets_controller', 'net_id': u'123', &quot;self_defined_key&quot;:&quot;self_defined_value&quot;}
+    # As you can see, the url which match the route will return a dict. The dict contains the controller information and necessary var
+    # The self_defined_key and self_defined_value also included. 
+
+&amp;gt;&amp;gt;&amp;gt; print map
+Route name            Methods Path          
+route_name_update_net PUT     /nets/{net_id}
+&amp;gt;&amp;gt;&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;basic-usage&quot;&gt;Basic usage&lt;/h1&gt;
+
+&lt;h2 id=&quot;requirements&quot;&gt;Requirements&lt;/h2&gt;
+
+&lt;p&gt;Some times you want to restrict the path var, you can use the requirements parameter in below ways&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;map.connect(R&quot;/download/{platform:windows|mac}/{filename}&quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This line restrict the platform var could only be windows or mac. You can also write it in below way&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;map.connect(&quot;/download/{platform}/{filename}&quot;, requirements={&quot;platform&quot;: R&quot;windows|mac&quot;})
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The R char here is very important. Without it you may need to double your slash in your url.&lt;/p&gt;
+
+&lt;p&gt;Once you restrict your route, you can try it like below:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# The platform must be windows or mac so below url match
+&amp;gt;&amp;gt;&amp;gt; map.match('/download/windows/myfile')
+{'platform': u'windows', 'filename': u'myfile'}
+# The linux is not valid here so does not match
+&amp;gt;&amp;gt;&amp;gt; map.match('/download/linux/myfile')
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;pathinfo&quot;&gt;PATH_INFO&lt;/h2&gt;
+
+&lt;p&gt;In WSIG env, the url information is stored in the environ dict with key PATH_INFO. 
+Routes treat the path_info specially. When the “path_info” variable is used at the end of the URL, Routes moves everything preceding it into the “SCRIPT_NAME” environment variable. This is useful when delegating to another WSGI application that does its own routing: the subapplication will route on the remainder of the URL rather than the entire URL&lt;/p&gt;
+
+&lt;p&gt;For example&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; from routes import Mapper
+&amp;gt;&amp;gt;&amp;gt; map=Mapper()
+&amp;gt;&amp;gt;&amp;gt; map.connect('/classes/{path_info:.*}')
+&amp;gt;&amp;gt;&amp;gt; map.match('/classes/students/tom')
+{'path_info': 'students/tom'}
+&amp;gt;&amp;gt;&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The subsequent system will see PATH_INFO: /students/tom and SCRIPT_NAME:classes. So the sub system can use its own route system.&lt;/p&gt;
+
+&lt;h2 id=&quot;format-extensions&quot;&gt;Format extensions&lt;/h2&gt;
+
+&lt;p&gt;Consider to design a url /neutron/networks/{network_id} which will used to access the network resource. The network can be returned in JSON format or XML format. So we can do it in routes like this:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; from routes import Mapper
+&amp;gt;&amp;gt;&amp;gt; map=Mapper()
+&amp;gt;&amp;gt;&amp;gt; 
+&amp;gt;&amp;gt;&amp;gt; map.connect('/neutron/networks/{network_id}{.format:json|xml}')
+&amp;gt;&amp;gt;&amp;gt; map.match('/neutron/networks/123.json')
+{'network_id': u'123', 'format': u'json'}
+&amp;gt;&amp;gt;&amp;gt; map.match('/neutron/networks/123.xml')
+{'network_id': u'123', 'format': u'xml'}
+&amp;gt;&amp;gt;&amp;gt; map.match('/neutron/networks/123.html')
+{'network_id': u'123.html', 'format': None}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Use the format parameter to specify the resource format&lt;/p&gt;
+
+&lt;h1 id=&quot;restful&quot;&gt;RESTful&lt;/h1&gt;
+
+&lt;p&gt;Use routes can generate restful routes very conveniently&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; from routes import Mapper
+&amp;gt;&amp;gt;&amp;gt; map=Mapper()
+&amp;gt;&amp;gt;&amp;gt; map.resource('net','nets')
+&amp;gt;&amp;gt;&amp;gt; print map
+Route name         Methods Path                      
+				   POST    /nets.:(format)           
+				   POST    /nets                     
+formatted_nets     GET     /nets.:(format)           
+nets               GET     /nets                     
+formatted_new_net  GET     /nets/new.:(format)       
+new_net            GET     /nets/new                 
+				   PUT     /nets/:(id).:(format)     
+				   PUT     /nets/:(id)               
+				   DELETE  /nets/:(id).:(format)     
+				   DELETE  /nets/:(id)               
+formatted_edit_net GET     /nets/:(id)/edit.:(format)
+edit_net           GET     /nets/:(id)/edit          
+formatted_net      GET     /nets/:(id).:(format)     
+net                GET     /nets/:(id)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The first parameter is resource name also called member in RESTful 
+The second is the plural of resource name which is also called collection in RESTful&lt;/p&gt;
+
+&lt;p&gt;the resource function have several parameters and we will learn them one by one&lt;/p&gt;
+
+&lt;h2 id=&quot;controller&quot;&gt;controller&lt;/h2&gt;
+
+&lt;p&gt;This parameter specify the controller to handle the request. For example:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; map=Mapper()
+&amp;gt;&amp;gt;&amp;gt; map.resource('net','nets', controller='net_controller')
+&amp;gt;&amp;gt;&amp;gt; map.match('/nets/123')
+{'action': u'update', 'controller': u'net_controller', 'id': u'123'}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;collection&quot;&gt;collection&lt;/h2&gt;
+
+&lt;p&gt;This parameter add more additional urls for the collection operations. For example:&lt;/p&gt;
+
+&lt;p&gt;Before use the parameter the map is like below&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; map=Mapper()
+&amp;gt;&amp;gt;&amp;gt; map.resource('net','nets', controller='net_controller')
+&amp;gt;&amp;gt;&amp;gt; print map
+Route name         Methods Path                      
+				   POST    /nets.:(format)           
+				   POST    /nets                     
+formatted_nets     GET     /nets.:(format)           
+nets               GET     /nets                     
+formatted_new_net  GET     /nets/new.:(format)       
+new_net            GET     /nets/new                 
+				   PUT     /nets/:(id).:(format)     
+				   PUT     /nets/:(id)               
+				   DELETE  /nets/:(id).:(format)     
+				   DELETE  /nets/:(id)               
+formatted_edit_net GET     /nets/:(id)/edit.:(format)
+edit_net           GET     /nets/:(id)/edit          
+formatted_net      GET     /nets/:(id).:(format)     
+net                GET     /nets/:(id)               
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;After we add the collection parameter&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; map.resource('net','nets', controller='net_controller', collection={'subnets':'POST'})
+&amp;gt;&amp;gt;&amp;gt; print map
+Route name             Methods Path                      
+formatted_subnets_nets POST    /nets/subnets.:(format)   
+subnets_nets           POST    /nets/subnets             
+					   POST    /nets.:(format)           
+					   POST    /nets                     
+formatted_nets         GET     /nets.:(format)           
+nets                   GET     /nets                     
+formatted_new_net      GET     /nets/new.:(format)       
+new_net                GET     /nets/new                 
+					   PUT     /nets/:(id).:(format)     
+					   PUT     /nets/:(id)               
+					   DELETE  /nets/:(id).:(format)     
+					   DELETE  /nets/:(id)               
+formatted_edit_net     GET     /nets/:(id)/edit.:(format)
+edit_net               GET     /nets/:(id)/edit          
+formatted_net          GET     /nets/:(id).:(format)     
+net                    GET     /nets/:(id)            
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The collection operation can mathc /nets/subnets on POST method.&lt;/p&gt;
+
+&lt;h2 id=&quot;member&quot;&gt;member&lt;/h2&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; map=Mapper()
+&amp;gt;&amp;gt;&amp;gt; map.resource('net','nets', controller='net_controller', member={'subnets':'POST'})
+&amp;gt;&amp;gt;&amp;gt; print map
+Route name            Methods Path                         
+					  POST    /nets.:(format)              
+					  POST    /nets                        
+formatted_nets        GET     /nets.:(format)              
+nets                  GET     /nets                        
+formatted_new_net     GET     /nets/new.:(format)          
+new_net               GET     /nets/new                    
+					  PUT     /nets/:(id).:(format)        
+					  PUT     /nets/:(id)                  
+formatted_subnets_net POST    /nets/:(id)/subnets.:(format)
+subnets_net           POST    /nets/:(id)/subnets          
+					  DELETE  /nets/:(id).:(format)        
+					  DELETE  /nets/:(id)                  
+formatted_edit_net    GET     /nets/:(id)/edit.:(format)   
+edit_net              GET     /nets/:(id)/edit             
+formatted_net         GET     /nets/:(id).:(format)        
+net                   GET     /nets/:(id)                  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;After use member parameter, the member operation can match /nets/{id}/subnets&lt;/p&gt;
+
+&lt;h2 id=&quot;pathprefix-and-nameprefix&quot;&gt;path_prefix and name_prefix&lt;/h2&gt;
+
+&lt;p&gt;This two parameter are used together. For example:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; map=Mapper()
+&amp;gt;&amp;gt;&amp;gt; map.resource(&quot;message&quot;, &quot;messages&quot;, controller=&quot;categories&quot;, path_prefix=&quot;/category/{category_id}&quot;, name_prefix=&quot;category_&quot;)
+&amp;gt;&amp;gt;&amp;gt; print map
+Route name                      Methods Path                                                 
+								POST    /category/{category_id}/messages.:(format)           
+								POST    /category/{category_id}/messages                     
+formatted_category_messages     GET     /category/{category_id}/messages.:(format)           
+category_messages               GET     /category/{category_id}/messages                     
+formatted_category_new_message  GET     /category/{category_id}/messages/new.:(format)       
+category_new_message            GET     /category/{category_id}/messages/new                 
+								PUT     /category/{category_id}/messages/:(id).:(format)     
+								PUT     /category/{category_id}/messages/:(id)               
+								DELETE  /category/{category_id}/messages/:(id).:(format)     
+								DELETE  /category/{category_id}/messages/:(id)               
+formatted_category_edit_message GET     /category/{category_id}/messages/:(id)/edit.:(format)
+category_edit_message           GET     /category/{category_id}/messages/:(id)/edit          
+formatted_category_message      GET     /category/{category_id}/messages/:(id).:(format)     
+category_message                GET     /category/{category_id}/messages/:(id)           
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The path_prefix add a url prefix to the urls that can be matched. The name_prefix is the prefix of route name.&lt;/p&gt;
+
+&lt;p&gt;They actually are parent resource of message.&lt;/p&gt;
+
+&lt;h2 id=&quot;parent-resource&quot;&gt;Parent resource&lt;/h2&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; from routes import Mapper
+&amp;gt;&amp;gt;&amp;gt; map=Mapper()
+&amp;gt;&amp;gt;&amp;gt; map.resource('location', 'locations', parent_resource=dict(member_name='region', collection_name='regions'))
+&amp;gt;&amp;gt;&amp;gt; print map
+Route name                     Methods Path                                              
+							   POST    /regions/:region_id/locations.:(format)           
+							   POST    /regions/:region_id/locations                     
+formatted_region_locations     GET     /regions/:region_id/locations.:(format)           
+region_locations               GET     /regions/:region_id/locations                     
+formatted_region_new_location  GET     /regions/:region_id/locations/new.:(format)       
+region_new_location            GET     /regions/:region_id/locations/new                 
+							   PUT     /regions/:region_id/locations/:(id).:(format)     
+							   PUT     /regions/:region_id/locations/:(id)               
+							   DELETE  /regions/:region_id/locations/:(id).:(format)     
+							   DELETE  /regions/:region_id/locations/:(id)               
+formatted_region_edit_location GET     /regions/:region_id/locations/:(id)/edit.:(format)
+region_edit_location           GET     /regions/:region_id/locations/:(id)/edit          
+formatted_region_location      GET     /regions/:region_id/locations/:(id).:(format)     
+region_location                GET     /regions/:region_id/locations/:(id)               
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This is the same as path_prefix and name_prefix. The path_prefix here is /regions/{region_id} and name_prefix is region_&lt;/p&gt;
+
+&lt;p&gt;openstack use routes to map url to controller, so it is necessary to know about routes. Routes are came from Ruby on rails. It is rewritten in python. So docs about routes are not very clear might because the author think we should learn Ruby on rails routes first.&lt;/p&gt;
+
+&lt;h2 id=&quot;submapper&quot;&gt;Submapper&lt;/h2&gt;
+
+&lt;p&gt;submapper is a lazy way to write code. See examples below:&lt;/p&gt;
+
+&lt;p&gt;You want to generate a series route， they have common attributes like&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;controller: common_controller
+action: index
+path_prefix: api/v2
+conditions: {'method':'GET'}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;You can write the code in this way&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; from routes import Mapper
+&amp;gt;&amp;gt;&amp;gt; map = Mapper()
+&amp;gt;&amp;gt;&amp;gt; with map.submapper(controller='common_controller', action='index', path_prefix='api/v2/', contidions={'method':'GET'}) as submapper:
+...     submapper.connect('api/v2/'+'nets', 'nets')
+...     submapper.connect('api/v2/'+'subnets', 'subnets')
+... 
+&amp;gt;&amp;gt;&amp;gt; print map
+Route name     Methods Path          
+api/v2/nets            api/v2/nets   
+api/v2/subnets         api/v2/subnets
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;In this way you can put the common attributes in submapper.&lt;/p&gt;
+</description>
+        <pubDate>Wed, 12 Jul 2017 16:43:59 +0800</pubDate>
+        <link>http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-route.html</link>
+        <guid isPermaLink="true">http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-route.html</guid>
+        
+        
+        <category>openstack</category>
+        
+      </item>
+    
+      <item>
+        <title>How to read OpenStack code part 9 - request extension</title>
+        <description>&lt;p&gt;We have learned resource extension and action extension. This post we will write a request extension&lt;/p&gt;
+
+&lt;p&gt;First see two API call&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl -X POST http://liberty-controller01:9696/v2.0/networks.json -H &quot;Content-Type: application/json&quot; -H &quot;Accept: application/json&quot; -H &quot;X-Auth-Token: $token&quot; -d '{&quot;network&quot;: {&quot;name&quot;: &quot;net3&quot;, &quot;admin_state_up&quot;: true}}'
+
+{&quot;network&quot;: {&quot;status&quot;: &quot;ACTIVE&quot;, &quot;subnets&quot;: [], &quot;name&quot;: &quot;net3&quot;, &quot;provider:physical_network&quot;: &quot;physnet1&quot;, &quot;admin_state_up&quot;: true, &quot;tenant_id&quot;: &quot;8c5f13ee6a404759839e48537bdf69ac&quot;, &quot;mtu&quot;: 0, &quot;router:external&quot;: false, &quot;shared&quot;: false, &quot;port_security_enabled&quot;: true, &quot;provider:network_type&quot;: &quot;vlan&quot;, &quot;id&quot;: &quot;95c955ac-c963-4f53-ab4a-d721fa0cda51&quot;, &quot;provider:segmentation_id&quot;: 490}}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;It run successful. Nothing to say. Then this one&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl -X POST http://liberty-controller01:9696/v2.0/networks.json -H &quot;Content-Type: application/json&quot; -H &quot;Accept: application/json&quot; -H &quot;X-Auth-Token: $token&quot; -d '{&quot;network&quot;: {&quot;name&quot;: &quot;net3&quot;, &quot;admin_state_up&quot;: true, &quot;some_attr&quot;:&quot;some_value&quot;}}'
+
+{&quot;NeutronError&quot;: {&quot;message&quot;: &quot;Unrecognized attribute(s) 'some_attr'&quot;, &quot;type&quot;: &quot;HTTPBadRequest&quot;, &quot;detail&quot;: &quot;&quot;}}[root@liberty-controller01 myPluginPKG]# 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This one is bad request. But the only difference is the POST body. Neutron think the some_attr is not a attribute of network and it is right. Because this is a core resource and the attribute map of this resource do not have some_attr&lt;/p&gt;
+
+&lt;p&gt;To solve this we need an request extension which actually update the resource attribute map of network. Below are the code&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from neutron.api import extensions
+
+EXTENDED_ATTRIBUTES_2_0 = {
+    'networks': {
+        'some_attr': {'allow_post': True,
+                 'allow_put': False,
+                 'is_visible': True,
+                 'default': ''}
+    }
+}
+
+
+class Myreq(extensions.ExtensionDescriptor):
+    @classmethod
+    def get_name(cls):
+        return &quot;myreq&quot;
+
+    @classmethod
+    def get_alias(cls):
+        return 'myreq'
+
+    @classmethod
+    def get_description(cls):
+        return &quot;myreq&quot;
+
+    @classmethod
+    def get_updated(cls):
+        return &quot;2017-02-08T10:00:00-00:00&quot;
+
+    def get_extended_resources(self, *args, **kwargs):
+        return EXTENDED_ATTRIBUTES_2_0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;You can see we defined a dict in the extension and return it with method get_extended_resources.&lt;/p&gt;
+
+&lt;p&gt;So to implement an request extension is very easy. Define a method called get_extended_resources and return some attributes that you want to added to the original reosurce&lt;/p&gt;
+</description>
+        <pubDate>Wed, 12 Jul 2017 16:43:59 +0800</pubDate>
+        <link>http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-request-ext.html</link>
+        <guid isPermaLink="true">http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-request-ext.html</guid>
+        
+        
+        <category>openstack</category>
+        
+      </item>
+    
+      <item>
+        <title>How to read OpenStack code part 6 - core plugin and extension</title>
+        <description>&lt;p&gt;本章我们将写一个自己的core plugin 和一个resource extension来加深理解。(阅读本文的前提是你已经理解了restful以及stevedore等内容)&lt;/p&gt;
+
+&lt;h1 id=&quot;core-plugin&quot;&gt;什么是 core plugin&lt;/h1&gt;
+
+&lt;p&gt;neutron的plugin有core和service两种。core plugin实现core resource的增删改查，service plugin我们在本文暂不讨论。&lt;/p&gt;
+
+&lt;p&gt;core resource 有network/subnet/port/subnet-pool。每种资源对应CURD和index5种操作。以network资源为例，相关操作和HTTP请求的对应关系如下&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;create_network    POST networks
+delete_network    DELETE networks/network_id
+update_network    PUT networks/network_id
+get_network       GET networks/network_id
+get_networks      GET networks
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;因此，core plugin中对各种核心资源都有如下的函数对应：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;create_{resource_name}
+update_{resource_name}
+delete_{resource_name}
+get_{resource_name}
+get_{resource_names}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;how-to-write-core-plugin&quot;&gt;how to write core plugin&lt;/h1&gt;
+
+&lt;p&gt;既然是plugin，也就是我们前面说过的third-party code，那就应该定义一些接口，好让第三方的组织可以参与开发。&lt;/p&gt;
+
+&lt;p&gt;neutron中定义的接口在neutron.neutron_plugin_base_v2.NeutronPluginBaseV2。要实现一个core plugin，你需要实现这个class。&lt;/p&gt;
+
+&lt;p&gt;下面是我写的一个core plugin 代码&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from neutron import neutron_plugin_base_v2
+from oslo_log import log
+LOG = log.getLogger(__name__)
+
+
+class MyNeutronPlugin(neutron_plugin_base_v2.NeutronPluginBaseV2):
+	supported_extension_aliases = ['gold']
+	def __init__(self):
+		super(MyNeutronPlugin,self).__init__()
+	#### network ####
+	def create_network(self, context, network):
+		LOG.info(&quot;network is %s&quot; %network)
+		return network
+	def update_network(self, context, id, network):
+		return network
+	def get_network(self, context, id, fields=None):
+		network = {}
+		return network
+	def get_networks(self, context, filters=None, fields=None):
+		network = {}
+		LOG.info(&quot;return network %s&quot; %network)
+		return network
+	def delete_network(self, context, id):
+		return id
+            ...
+            #### gold ####
+	def create_gold(self, context, gold):
+		LOG.info(&quot;gold is %s&quot; %gold)
+		return gold
+	def update_gold(self, context, id, gold):
+		return gold
+	def get_gold(self, context, id, fields=None):
+		gold = {}
+		return gold
+	def get_golds(self, context, filters=None, fields=None):
+		gold = {}
+		LOG.info(&quot;return gold %s&quot; %gold)
+		return gold
+	def delete_gold(self, context, id):
+		return id
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;请注意，除了network等核心资源，我们还实现了一个gold资源。 上面粘贴的内容省略了subnet/port/subnet-pool的相关代码。 既然是thirty-party code,就应该可以独立安装。所以我们的代码结构如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;myPlugin/
+├── myPluginPKG
+│   ├── __init__.py
+│   └── myPluginModule.py
+└── setup.py
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;init&lt;/strong&gt;.py的内容为&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import myPluginModule
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;setup.py内容如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from setuptools import setup, find_packages
+
+setup(
+	name='myPluginPKG',
+	version='1.0',
+
+	packages=find_packages(),
+
+	entry_points={
+		'neutron.core_plugins': [
+			'myNeutronPlugin = myPluginPKG.myPluginModule:MyNeutronPlugin',
+		],
+	},
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这样在运行python setup.py install 后，我们的plugin就注册到了neutron.core_plugins这个namespace下。这部分内容其实就是前面stevedore中driver开发的内容。neutron通过stevedore在这个namespace下加载core_plugin&lt;/p&gt;
+
+&lt;p&gt;OK。在python setup.py install 后，我们的core plugin安装完成了，这时要修改/etc/neutron/neutron.conf，让neutron使用我们的core plugin。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[default]
+core_plugin = myNeutronPlugin
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;然后重启neutron服务&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;systemctl restart neutron-server
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;接下来你就可以通过API 尝试了， 我们创建一个network 如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl -g -i -X POST &quot;http://liberty-controller01:9696/v2.0/networks&quot; -H &quot;Content-Type: application/json&quot; -H &quot;Accept: application/json&quot; -H &quot;X-Auth-Token:$token&quot; -d '{&quot;network&quot;: {&quot;name&quot;: &quot;n2&quot;, &quot;admin_state_up&quot;: true}}'
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=UTF-8
+Content-Length: 15
+X-Openstack-Request-Id: req-a8cfde05-6425-42fe-b516-0bb2d264cf61
+Date: Tue, 07 Feb 2017 08:01:47 GMT
+
+    {&quot;network&quot;: {}}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;可以看到成功返回，因为我们的plugin中什么也没做，所以返回的其实是一个空的字典。但至少证明该api成功了。&lt;/p&gt;
+
+&lt;p&gt;之前我们还在plugin中增加了gold资源对应的函数，我们试试访问gold资源：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl -g -i  &quot;http://liberty-controller01:9696/v2.0/golds&quot; -H &quot;Content-Type: application/json&quot; -H &quot;Accept: application/json&quot; -H &quot;X-Auth-Token:$token&quot; 
+HTTP/1.1 404 NOT FOUND
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;为什么gold资源的API不好使呢。这是因为要想在neutron core plugin中定义一个资源，不仅要提供该资源的CURD 函数，还要有对应的RESOURCE_ATTRIBUTE_MAP.&lt;/p&gt;
+
+&lt;h1 id=&quot;resourceattributemap&quot;&gt;RESOURCE_ATTRIBUTE_MAP&lt;/h1&gt;
+
+&lt;p&gt;RESOURCE_ATTRIBUTE_MAP是neutron/api/v2/attribute.py中的一个字典，其结构大概如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;RESOURCE_ATTRIBUTE_MAP = {
+	NETWORKS: {
+		'id': {'allow_post': False, 'allow_put': False,
+			   'validate': {'type:uuid': None},
+			   'is_visible': True,
+			   'primary_key': True},
+		'name': {'allow_post': True, 'allow_put': True,
+				 'validate': {'type:string': NAME_MAX_LEN},
+				 'default': '', 'is_visible': True},
+		'subnets': {'allow_post': False, 'allow_put': False,
+					'default': [],
+					'is_visible': True},
+		'admin_state_up': {'allow_post': True, 'allow_put': True,
+						   'default': True,
+						   'convert_to': convert_to_boolean,
+						   'is_visible': True},
+		'status': {'allow_post': False, 'allow_put': False,
+				   'is_visible': True},
+		'tenant_id': {'allow_post': True, 'allow_put': False,
+					  'validate': {'type:string': TENANT_ID_MAX_LEN},
+					  'required_by_policy': True,
+					  'is_visible': True},
+		SHARED: {'allow_post': True,
+				 'allow_put': True,
+				 'default': False,
+				 'convert_to': convert_to_boolean,
+				 'is_visible': True,
+				 'required_by_policy': True,
+				 'enforce_policy': True},
+	},
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;该字典定义了资源以及资源对应的属性，我们这里只列出了network。所以，要想定义gold资源，除了在core plugin中添加对应的函数，还有在这个attribute map中添加相关的信息。不过，我们不建议直接修改这里的代码，正确的方法是通过resource extension来实现。&lt;/p&gt;
+
+&lt;h1 id=&quot;how-to-code-an-extension-resource-extension&quot;&gt;how to code an extension (resource extension)&lt;/h1&gt;
+
+&lt;p&gt;之前提到了extension有3种类型，resource，action，request。我们这里要实现一个新的资源，就是用resource extension。无论是哪种extension 都要遵守一些特定的规则，或者说接口，这些规则如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1. extension应该放在neutron/extensions文件夹下，或者在配置文件中设置api_extensions_path
+2. extension的class名应该和文件同名，当然首字母应该大写
+3. 应该实现neutron.api.extensions.py中ExtensionDescriptor定义的接口
+4. 在对应的plugin的supported_extension_aliases 中增加我们extension的别名。前面我们写的core plugin就有这个属性，当时没有做说明，其实是这里应该添加的。所谓别名是该extension要实现的一个接口，后面会看到。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;另外很重要的一点是，因为我们要实现的是resource extension，所以还要实现&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;get_resources 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这个接口。&lt;/p&gt;
+
+&lt;p&gt;下面我们实现一个自己的resource extension来增加 gold 资源。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from neutron.api import extensions
+from neutron import manager
+from neutron.api.v2 import base
+
+# You have to specify the attributes neutron-server should expect when
+# someone invokes this plugin. Let's say you want
+# 'name', 'priority', 'credential' for your extension /golds
+# then following dictionary must be declared.
+# I am following the naming convention used by other extensions.
+
+RESOURCE_ATTRIBUTE_MAP = {
+	'golds': {
+	'name': {'allow_post': True, 'allow_put': True,
+				 'is_visible': True},
+	'priority': {'allow_post': True, 'allow_put': True,
+				 'is_visible': True},
+	'credential': {'allow_post': True, 'allow_put': True,
+				 'is_visible': True},
+	# tenant_id is the user id used by keystone for authorisation
+	# It's good to use the following as it is and it is necessary
+	# for every extension 
+	'tenant_id': {'allow_post': True, 'allow_put': False,
+				  'required_by_policy': True,
+				  'validate': {'type:string': None},
+				  'is_visible': True}
+	}
+}
+
+# Great! Now you have the defined the attributes that you need for your
+# extensions. You need to store this dictionary in the neutron-server
+# by the following class
+
+class Golds(extensions.ExtensionDescriptor):
+	# The name of this class should be the same as the file name
+	# There are a couple of methods and their properties defined in the
+	# parent class of this class, ExtensionDescriptor you can check them
+
+	@classmethod
+	def get_name(cls):
+		# You can coin a name for this extension
+		return &quot;Name of golds&quot;
+
+	@classmethod
+	def get_alias(cls):
+		# This alias will be used by your core_plugin class to load
+		# the extension
+		return &quot;gold&quot;
+
+	@classmethod
+	def get_description(cls):
+		# A small description about this extension
+		return &quot;A quick brown fox jumped over a lazy dog&quot;
+
+	@classmethod
+	def get_namespace(cls):
+		# The XML namespace for this extension
+		# but as we move on to use JSON over XML based request
+		# this is not that important, correct me if I am wrong.
+		return &quot;namespace of xml&quot;
+
+	@classmethod
+	def get_updated(cls):
+		# Specify when was this extension last updated,
+		# good for management when there are changes in the design
+		return &quot;2017-02-07T10:00:00-00:00&quot;
+
+	@classmethod
+	def get_resources(cls):
+		# This method registers the URL and the dictionary  of
+		# attributes on the neutron-server.
+		exts = list()
+		plugin = manager.NeutronManager.get_plugin()
+		resource_name = 'gold'
+		collection_name = resource_name + 's'
+		params = RESOURCE_ATTRIBUTE_MAP.get(resource_name + 's', dict())
+		controller = base.create_resource(collection_name, resource_name,
+										  plugin, params, allow_bulk=False)
+		ex = extensions.ResourceExtension(collection_name, controller)
+		exts.append(ex)
+
+		return exts
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;代码的大部分解释都包含在注释里，因此请详细阅读每一行。这里只重点说一下RESOURCE_ATTRIBUTE_MAP 和 get_resources。 我们的extension就是通过这个函数来在resource attribute map中增加了gold资源。
+另外要注意的是get_alias，该函数返回extension的别名，plugin的supported_extension_alias中用该别名来找extension。&lt;/p&gt;
+
+&lt;p&gt;ok，我们现在尝试一下访问gold 资源&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl -g -i http://liberty-controller01:9696/v2.0/golds.json -H &quot;Content-Type: application/json&quot; -H &quot;Accept: application/json&quot; -H &quot;X-Auth-Token:$token&quot;
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Content-Length: 13
+X-Openstack-Request-Id: req-7b925f97-4df0-49ee-bb6a-fd7c86fda9aa
+Date: Tue, 07 Feb 2017 08:29:34 GMT
+
+{&quot;golds&quot;: []}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这次成功了。 以上就是core plugin和resource extension&lt;/p&gt;
+</description>
+        <pubDate>Wed, 12 Jul 2017 16:43:59 +0800</pubDate>
+        <link>http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-plugin.html</link>
+        <guid isPermaLink="true">http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-plugin.html</guid>
+        
+        
+        <category>openstack</category>
+        
+      </item>
+    
+      <item>
+        <title>How to read OpenStack code part 2 - pastedeploy</title>
         <description>&lt;p&gt;本篇分为以下几个部分&lt;/p&gt;
 
 &lt;blockquote&gt;
@@ -547,6 +1790,248 @@ paste.app_factory = neutron.api.v2.router:APIRouter.factory
         <pubDate>Wed, 12 Jul 2017 16:43:59 +0800</pubDate>
         <link>http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-pastedeploy.html</link>
         <guid isPermaLink="true">http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-pastedeploy.html</guid>
+        
+        
+        <category>openstack</category>
+        
+      </item>
+    
+      <item>
+        <title>How to read OpenStack code part 5 - neutron architecture</title>
+        <description>&lt;p&gt;今天这一章节非常重要。我们知道neutron是一个非常复杂的系统，由很多组件构成。研究这样一个复杂的系统，正确的顺序应该是现在宏观上对其整体结构有所了解，然后再由针对性的对其组件进行深入了解。本章要做的事情就是介绍neutron 宏观上的架构。&lt;/p&gt;
+
+&lt;p&gt;首先看一下下图：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;人 - - &amp;gt;  Neutron Server - - &amp;gt; Plugin - -&amp;gt; message queue - -&amp;gt; Agent
+                              (Extension)
+                                   
+                                   |
+                                   |
+                                   
+                                  MySQL database
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;因为是markdown 编辑，所以没办法把图画的太复杂，不过其实也够了。上面就是Neutron的大致结构。&lt;/p&gt;
+
+&lt;p&gt;首先，是人发起API请求给Neutron Server。这个过程没什么好说的，就是HTTP restful请求&lt;/p&gt;
+
+&lt;p&gt;然后，Neutron Server 接受到请求后，会根据route规则把请求转发给相应的Plugin。这里的route规则，也就是route map是由之前介绍过的route package生成的&lt;/p&gt;
+
+&lt;p&gt;Plugin接受到请求后主要做两件事，在DB中创建对象和调用Agent做响应配置。比如创建一个subnet请求，plugin会现在db创建subnet的数据对象，然后调用agent在openvswitch或者linuxbridge创建具体的配置信息。Plugin和db交互用的是sqlalchemy orm package，跟agent交互是通过message queue。&lt;/p&gt;
+
+&lt;p&gt;由此可见Plugin是Neutron的核心。不过从图中还可以看到一个叫extension的东西，这里的extension跟我们之前在stevedore中提到的extension不是一回事儿，但在neutron中也非常重要，下面我们大概了解一下plugin 和 extension。&lt;/p&gt;
+
+&lt;h1 id=&quot;plugin-&quot;&gt;Plugin 发展历史&lt;/h1&gt;
+
+&lt;p&gt;Neutron是所谓pluggable结构的，就是说它的很多组件应该可以像积木一样随意插拔使用。&lt;/p&gt;
+
+&lt;p&gt;Plugin 和 driver（plugin的底层结构）在neutron社区中被称作third-party code。Kilo版本之前，这些third-party code虽然可以由第三方组织或个人开发，但还是包含在Neutron的代码树中，统一管理在Neutron的代码库中。&lt;/p&gt;
+
+&lt;p&gt;Kilo版本中Plugin 和 driver等代码进入了decomposition阶段。这一阶段大部分Plugin和driver的代码把主要的逻辑剥离出来存入了独立的repository。&lt;/p&gt;
+
+&lt;p&gt;到了Liberty版本，Plugin等代码基本就可以独立存在于Neutron的代码库之外了。&lt;/p&gt;
+
+&lt;p&gt;所以后面的文章我们会尝试编写一个独立的python plugin。所谓独立，即是说该plugin可以由我们自己独立管理，安装和发布。&lt;/p&gt;
+
+&lt;h1 id=&quot;core-plugin--service-plugin&quot;&gt;Core plugin 和 Service Plugin&lt;/h1&gt;
+
+&lt;p&gt;Neutron早期的功能很有限，只是支持network/subnet/port/subnet-pool等资源。所以当时的Plugin主要就是管理这些资源（subnet-pool资源是后来引入的），这些Plugin叫做Core Plugin。&lt;/p&gt;
+
+&lt;p&gt;Core Plugin主要涉及的都是二层的技术，比如在linuxbridge/openvswitch上配置一些二层网络。但二层上的具体实现技术有很多种，除了linuxbridge，openvswitch之外还有如cisco自己的交换机，huawei，juniper，edison等。各个厂商为了让neutron能够在自己的产品上配置二层网络开发了很多自己的core plugin，所以就出现了很多不同的core plugin。&lt;/p&gt;
+
+&lt;p&gt;不过你现在去安装部署neutron会发现大部分时候用的core plugin都是一个叫ml2的core plugin。这是因为社区发现，没必要为每种二层技术开发一个plugin。core plugin要做两件事：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1.在数据库中创建网络对象。这部分工作不论用哪种二层技术（openvswitch还是linuxbridge）区别都不打，所以单独提炼出来一个type driver来做这件事儿
+2.用具体的二层技术如openvswitch或者linuxbridge来配置二层网络。这部分工作依据二层技术的不同会有较大不同，所以交给mechanism  driver来做
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;现在不同的二层技术只需要实现具体的mechnisam driver即可。&lt;/p&gt;
+
+&lt;p&gt;再后来随着neutron的发展，它可以支持更丰富的内容，如创建router，firewall，loadbalance等。这部分工作在neutron中叫做service。这些service neutron也和之前的资源一样用plugin来管理。不过这部分plugin不叫core plugin叫做service plugin。代码通常放在neutron/services下面，如l3_router。&lt;/p&gt;
+
+&lt;p&gt;所以，neutron中的plugin主要分为core plugin 和 service plugin。core plugin用来管理核心资源network/subnet/port/subnet-pool，而service plugin用来管理高层的服务如router。&lt;/p&gt;
+
+&lt;p&gt;不过，从neutron的代码中可以发现，其实neutron社区是想把这两种plugin合并成一种的。主要是把core plugin变成 service plugin的一种。neutron/manage.py中有这么一段注释很清楚的阐述了这一发展趋势：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    # core plugin as a part of plugin collection simplifies
+    # checking extensions
+    # TODO(enikanorov): make core plugin the same as
+    # the rest of service plugins
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;extension&quot;&gt;extension&lt;/h1&gt;
+
+&lt;p&gt;上面主要再聊plugin，那么什么是extension呢？extension主要用于丰富和扩展现有的API功能，有时新增的功能也用extension来实现，这些新功能不会放入正式的API列表，只有在测试使用过一段时间后，才会放入正是API列表，并且这些extension也会慢慢转为plugin。&lt;/p&gt;
+
+&lt;p&gt;目前有下面三种extension&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;ul&gt;
+    &lt;li&gt;Resources extension introduce a new “entity” to the API. 所谓entity就是neutron中的资源，核心的资源有network/subnet/port/subnet-pool，当你想引入一个新的资源的时候，可以先用extension来实现&lt;/li&gt;
+    &lt;li&gt;Action extensions tend to be “verbs” that act on a resource.举个例子，tiger是一种资源，但是eat是动作，neutron中通常的做法是用action extension来处理这个动作&lt;/li&gt;
+    &lt;li&gt;Request extensions allow one to add new values to existing requests objects. 比如port本来是个很稳定的资源，API也很稳定。但是现在你想在创建PORT的时候添加一个属性，叫description或者area，那么可以通过extension来实现。&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;下一篇文章我们将看一下core plugin以及extension。&lt;/p&gt;
+</description>
+        <pubDate>Wed, 12 Jul 2017 16:43:59 +0800</pubDate>
+        <link>http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-neutron-arh.html</link>
+        <guid isPermaLink="true">http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-neutron-arh.html</guid>
+        
+        
+        <category>openstack</category>
+        
+      </item>
+    
+      <item>
+        <title>How to read OpenStack code part 8 - action extension</title>
+        <description>&lt;p&gt;之前我们看过了core plugin， service plugin 还有resource extension。&lt;/p&gt;
+
+&lt;p&gt;resource extension的作用是定义新的资源。而我们说过还有两种extension： action extension 跟 request extension。这一章我们将写一个action extension。&lt;/p&gt;
+
+&lt;h1 id=&quot;action-in-restful&quot;&gt;action in RESTful&lt;/h1&gt;
+
+&lt;p&gt;openstack中所有的网络服务都是RESTful风格的。但RESTful风格的URL有一个问题，如何表示动作。&lt;/p&gt;
+
+&lt;p&gt;像 network，tiger 这些单词都是名词，用在URL中以HTTP的POST/GET/DELETE/PUT来对应create get delete update没有任何问题。但有的时候我们需要在url中表示一些动词。比如，router是一个名词，但router中添加一个端口是一个动词。这时候我们有三种选择：&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;把增加端口变成update router的一个分支功能&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;这是一个好办法，但很多时候由于种种原因并不适用，比如这需要修改原来的update逻辑，需要修改原来的router数据结构，可能这个动作及其复杂，把它放入update不合适等等等等&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;把这个动作变成一个独立的资源&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;比如原来的url是api/v2/routers, 但现在我们用下面的URL表示这个动作&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;api/v2/routers/{router id}/add_router_interface
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这个方法也很不错。事实上，neutron中大多数情况下都是用的这个方法。不过，如果这么做的话，动作变成了资源，那么就不用action extension而用resource extension了。所以这种方法不是我们这里要讨论的&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;用一个action资源来处理所有的动作&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;比如原来的url是api/v2/routers,现在我们用下面的url&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;api/v2/routers/action POST
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;既然是POST 那么肯定有body， body可能是&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;'{&quot;add_router_interface&quot;：&quot;some value&quot;}'
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这样就可以通过一个action url处理所有的动作请求了。这正是neutron action extension所做的事。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;不过，奇妙的是，搜索遍了neutron的代码，没有看到一个功能是用这种extension来实现的。也许neutron正在努力用第二种方式替代第三种方式。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;write-action-extension&quot;&gt;write action extension&lt;/h1&gt;
+
+&lt;p&gt;虽然neutron中没有用这种extension，但它还是支持的。并且我们也很有必要了解这种extension，因为在neutron的启动加载过程中会尝试处理它，如果我们不了解，那么看到了这种代码会很懵&lt;/p&gt;
+
+&lt;p&gt;之前我们写过一个zoo plugin和zoo extension。并且实现了一个tiger资源。这里我们写一个action extension来为tiger增加一个动作:eat_wolf。&lt;/p&gt;
+
+&lt;p&gt;要实现action extension非常简单，只需要提供get_actions函数如下&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from neutron.api import extensions
+from neutron.api.v2 import attributes
+from neutron.api.v2 import base
+from neutron import manager
+from neutron.api.v2 import resource_helper
+from neutron.plugins.common import constants
+
+EXT_PREFIX = '/zoo'
+RESOURCE_NAME = 'tiger'
+COLLECTION_NAME = '%ss' % RESOURCE_NAME
+
+RESOURCE_ATTRIBUTE_MAP = {
+	'tiger': {
+		'id': {'allow_post': False, 'allow_put': False,
+			   'validate': {'type:uuid': None},
+			   'is_visible': True,
+			   'primary_key': True},
+		'name': {'allow_post': True,
+				 'allow_put': False,
+				 'is_visible': True,
+				 'default': ''},
+	# tenant_id is the user id used by keystone for authorisation
+	# It's good to use the following as it is and it is necessary
+	# for every extension
+	'tenant_id': {'allow_post': True, 'allow_put': False,
+				  'required_by_policy': True,
+				  'validate': {'type:string': None},
+				  'is_visible': True}
+
+	}
+}
+
+
+class Zoo(extensions.ExtensionDescriptor):
+	#   path_prefix = &quot;zoo&quot;
+	@classmethod
+	def get_name(cls):
+		return &quot;zoo&quot;
+
+	@classmethod
+	def get_alias(cls):
+		return 'zoo'
+
+	@classmethod
+	def get_description(cls):
+		return &quot;zoo&quot;
+
+	@classmethod
+	def get_updated(cls):
+		return &quot;2017-02-08T10:00:00-00:00&quot;
+
+	@classmethod
+	def get_resources(cls):
+		# This method registers the URL and the dictionary  of
+		# attributes on the neutron-server.
+		exts = list()
+		plugin = manager.NeutronManager.get_service_plugins()['ZOO']
+		resource_name = RESOURCE_NAME
+		collection_name = COLLECTION_NAME
+		params = RESOURCE_ATTRIBUTE_MAP.get(resource_name)
+		controller = base.create_resource(collection_name, resource_name,
+										  plugin, params, allow_bulk=False)
+		ex = extensions.ResourceExtension(collection_name, controller, path_prefix=EXT_PREFIX)
+		exts.append(ex)
+		return exts
+
+	def get_actions(self):
+		eat_wolf_action = extensions.ActionExtension('tigers', 'eat_wolf', self._eat_wolf_handler)
+		return [eat_wolf_action]
+		
+	def _eat_wolf_handler(self, *args, **kwargs):
+		return 'The tiger eat a wolf'
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;我们这里贴出了所有的代码。但实际上只需要 get_action函数和 _eat_wolf_handler函数。实现了第一个函数就是action extension，第二个函数只是为了处理action的逻辑。重启neutron server后我们访问一下&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl -g -i -X POST http://liberty-controller01:9696/v2.0/tigers/40/action -H &quot;Content-Type: application/json&quot; -H &quot;Accept: application/json&quot; -H &quot;X-Auth-Token: $token&quot; -d '{&quot;eat_wolf&quot;: &quot;0730d3b8-9f1a-47e4-8d8b-365aef954160&quot;}'
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=UTF-8
+Content-Length: 20
+X-Openstack-Request-Id: req-d28c6e78-d8da-49fe-8fe8-deaac591a076
+Date: Thu, 09 Feb 2017 09:58:36 GMT
+
+The tiger eat a wolf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;OK， 上面就是我们的action extension了&lt;/p&gt;
+</description>
+        <pubDate>Wed, 12 Jul 2017 16:43:59 +0800</pubDate>
+        <link>http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-action-exten.html</link>
+        <guid isPermaLink="true">http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-action-exten.html</guid>
         
         
         <category>openstack</category>
@@ -981,23 +2466,6 @@ propagation to complete. If replication does not complete in the given timeframe
         
         
         <category>database</category>
-        
-      </item>
-    
-      <item>
-        <title>Hello World</title>
-        <description>&lt;p&gt;Hello world!&lt;/p&gt;
-
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'hello world'&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-</description>
-        <pubDate>Sat, 08 Jul 2017 16:43:59 +0800</pubDate>
-        <link>http://ciscochina.github.io/engineering/test/2017/07/08/helloworld.html</link>
-        <guid isPermaLink="true">http://ciscochina.github.io/engineering/test/2017/07/08/helloworld.html</guid>
-        
-        
-        <category>test</category>
         
       </item>
     

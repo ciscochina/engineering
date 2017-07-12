@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>How to read OpenStack code part 3 - stevedore</title>
+  <meta name="description" content="学习了WSGI/Paste deploy后，还需要对一些在openstack中一些package有一些了解，才能更好的理解openstack的代码">
+  
+  <meta name="author" content="Peng Xiao">
+  <meta name="copyright" content="&copy; Peng Xiao 2017">
+  
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/engineering/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/engineering/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/engineering/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/engineering/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/engineering/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/engineering/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/engineering/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/engineering/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/engineering/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/engineering/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/engineering/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/engineering/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/engineering/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/engineering/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/engineering/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+  <!-- Facebook OGP cards -->
+  <meta property="og:description" content="学习了WSGI/Paste deploy后，还需要对一些在openstack中一些package有一些了解，才能更好的理解openstack的代码" />
+  <meta property="og:url" content="http://ciscochina.github.io" />
+  <meta property="og:site_name" content="Cisco China GDC Engineering Blog" />
+  <meta property="og:title" content="How to read OpenStack code part 3 - stevedore" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="612" />
+  <meta property="og:image:height" content="605" />
+  
+
+  
+  <!-- Twitter: card tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="How to read OpenStack code part 3 - stevedore">
+  <meta name="twitter:description" content="学习了WSGI/Paste deploy后，还需要对一些在openstack中一些package有一些了解，才能更好的理解openstack的代码">
+  <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
+  <meta name="twitter:url" content="http://ciscochina.github.io">
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/engineering/css/main.css">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-stevedore.html">
+  <link rel="alternate" type="application/rss+xml" title="Cisco China GDC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/engineering/" class="logo">
+      
+      <img src="/engineering/assets/logo.png" alt="Cisco China GDC Engineering Blog">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/posts/">Posts</a>
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+          
+        
+          
+        
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container " >
+  <div class="scrim ">
+    <header class="post-header">
+      <h1 class="title">How to read OpenStack code part 3 - stevedore</h1>
+      <p class="info">by <strong>Mingwei Li</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+ <span class="page-divider">
+  <span class="one"></span>
+  <span class="two"></span>
+</span>
+ 
+
+<section class="post-meta">
+  <div class="post-date">July 12, 2017</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/engineering/category/openstack">Openstack</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <p>学习了WSGI/Paste deploy后，还需要对一些在openstack中一些package有一些了解，才能更好的理解openstack的代码</p>
+
+<h1 id="what-is-stevedore">What is stevedore</h1>
+
+<p>我们在写代码的时候通常把一个一个的功能块独立编写，甚至发布一定的规则和接口由第三方编写，然后在运行时根据实际情况来选择加载哪些功能模块。这样的好处是松耦合，灵活，而且便于协作。</p>
+
+<p>stevedore就是一个很好的帮助动态加载代码的工具，openstack中很多plugin就是通过stevedore加载的。</p>
+
+<p>下面通过一些应用场景看一下如何使用stevedore。</p>
+
+<h1 id="driver-">Driver 场景</h1>
+
+<p>假设我们有一个开源系统，我们不希望限定用户对数据库的选择。用户可以选择mysql/oracle/mongo等任意数据库。这就意味着我们需要对很多种数据库提供接口。这个工作量很大，并且要求开发人员对每一种数据库非常熟悉。最好的做法就是把数据库的接口设计成driver，并发布出该driver所需要实现的接口。这样任何第三方的组织或个人都可以参与开发。</p>
+
+<p>比如，我们定义下面的接口。任何开发者，只要编写一个实现了下列接口的class，就可以实现一个driver</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>@six.add_metaclass(abc.ABCMeta)
+class Base(object):
+    """
+    The Base class for db driver
+    """
+
+    @abc.abstractmethod
+    def create_user(self, user_name):
+        """
+
+        :param user_name:
+            The name of user
+        :return:
+            A user object
+        """
+</code></pre>
+</div>
+
+<p>基于上述接口，我们尝试开发一个mysql的driver如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code># mysql_driver.py
+import base
+
+
+class MysqlDriver(base.Base):
+    def create_user(self, user_name):
+        return "create user %s in mysql" % user_name
+</code></pre>
+</div>
+
+<p>该package的目录结构如下</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[root@controller POTUS]# tree MysqlDriver/
+MysqlDriver/
+├── mysql_driver
+│   ├── __init__.py
+│   └── mysql_driver.py
+└── setup.py
+</code></pre>
+</div>
+
+<p>要注意在mysql_driver/<strong>init</strong>.py中要有 import mysql_driver这句话</p>
+
+<p>setup.py的内容如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>from setuptools import setup, find_packages
+
+setup(
+    name='mysql_driver',
+    version='1.0',
+
+    packages=find_packages(),
+
+    entry_points={
+        'my_system.db_driver': [
+            'mysql = mysql_driver.mysql_driver:MysqlDriver',
+        ],
+    },
+)
+</code></pre>
+</div>
+
+<p>运行python setup.py install 后，会在系统目录中安装mysql_driver这个egg包，egg中有entry_point文件中记录了如下内容：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[my_system.db_driver]
+
+mysql = mysql_driver.mysql_driver:MysqlDriver
+</code></pre>
+</div>
+
+<p>my_system.db_driver是操作系统全局唯一的namespace。mysql是entry point的名字。通过这两个组合，可以定位到需要加载的代码，也就是我们的driver。</p>
+
+<p>我们同样的再开发一个oracle_driver，如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[root@controller POTUS]# tree OracleDriver/
+OracleDriver/
+├── oracle_driver
+│   ├── __init__.py
+│   └── oracle_driver.py
+└── setup.py
+</code></pre>
+</div>
+
+<p>oracle_driver.py内容如下</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code># mysql_driver.py
+import base
+
+
+class OracleDriver(base.Base):
+    def create_user(self, user_name):
+        return "create user %s in oracle" % user_name
+</code></pre>
+</div>
+
+<p>setup.py内容如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>from setuptools import setup, find_packages
+
+setup(
+    name='oracle_driver',
+    version='1.0',
+    packages=find_packages(),
+    entry_points={
+        'my_system.db_driver': [
+            'oracle = oracle_driver.oracle_driver:OracleDriver',
+        ],
+    },
+)
+</code></pre>
+</div>
+
+<p>不要忘了在__init__.py中加上 import oracle_driver。</p>
+
+<p>ok， 在python setup.py install 后，我们的系统中有了mysql_driver 和 oracle_driver 下面就是应用了。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&gt;&gt;&gt; from stevedore import driver
+&gt;&gt;&gt; mgr = driver.DriverManager(namespace = "my_system.db_driver", name = "mysql", invoke_on_load = True, invoke_args = ())
+&gt;&gt;&gt; mgr.driver.create_user('Tom')
+'create user Tom in mysql'
+&gt;&gt;&gt; mgr = driver.DriverManager(namespace = "my_system.db_driver", name = "oracle", invoke_on_load = True, invoke_args = ())
+&gt;&gt;&gt; mgr.driver.create_user('Tom')
+'create user Tom in oracle'
+</code></pre>
+</div>
+
+<p>可以看到，当name=mysql时，调用的是mysql_driver, 当name=oracle时，调用的是oracle_driver</p>
+
+<p>Driver的方式，让不同的driver开发过程相互独立，调用也更加灵活</p>
+
+<h1 id="hook">Hook场景</h1>
+
+<p>Hook 顾名思义，钩子。就像window开发中的hook一样，每一个hook都是一个功能组件，会被一定的事件驱动。一个事件可以驱动一个hook，也可以驱动多个hook。同一个hook可以被多个不同的事件驱动。</p>
+
+<p>假设我们开发了一个IDE工具，在鼠标点击关闭按钮的时候，会产生CLOSE_WINDOW EVENT， 这时候需要save_content组件保存内容。在鼠标点击commit按钮的时候，会产生COMMIT EVENT，这时候需要save_content发挥作用，也需要upload_content组件把内容上传到服务器。</p>
+
+<p>这种场景下，我们可以开发save_content, upload_content两个组件，并且把save_content注册在CLOSE_WINDOW 和 COMMIT 两个event下，把upload_content注册在COMMIT event下。开发过程如下：</p>
+
+<p>首先是save_content,</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[root@controller POTUS]# tree IDE_HOOKA/
+IDE_HOOKA/
+├── save_content
+│   ├── __init__.py
+│   └── save_content.py
+└── setup.py
+</code></pre>
+</div>
+
+<p>save_content 内容如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>class SaveContent(object):
+    def __call__(self, *args, **kwargs):
+        return "content are saved"
+</code></pre>
+</div>
+
+<p>setup.py 内容如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>from setuptools import setup, find_packages
+
+setup(
+    name='save_content',
+    version='1.0',
+
+    packages=find_packages(),
+
+    entry_points={
+        'ide.hooks': [
+            'CLOSE_WINDOW = save_content.save_content:SaveContent',
+            'COMMIT = save_content.save_content:SaveContent'
+        ],
+    },
+)
+</code></pre>
+</div>
+
+<p><strong>init</strong>.py中有import save_content这句不要落下。</p>
+
+<p>在python setup.py install 后，save_content.save_content:SaveContent 会被注册到CLOSE_WINDOW 和 COMMIT这两个event下。</p>
+
+<p>我们再开发一个upload_content 组件如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[root@controller POTUS]# tree IDE_HOOKB/
+IDE_HOOKB/
+├── setup.py
+└── upload_content
+	├── __init__.py
+	└── upload_content.py
+</code></pre>
+</div>
+
+<p>主要看一下setup.py 
+    from setuptools import setup, find_packages</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>setup(
+    name='upload_content',
+    version='1.0',
+
+    packages=find_packages(),
+
+    entry_points={
+        'ide.hooks': [
+            'COMMIT = upload_content.upload_content:UploadContent'
+        ],
+    },
+)
+</code></pre>
+</div>
+
+<p>这次，我们只注册了upload_content到COMMIT下。</p>
+
+<p>在安装后，我们有了save_content 注册在CLOSE_WINDOW 和 COMMIT下， upload_content注册在COMMIT下。这样，当COMMIT事件发生，系统会保存内容并upload内容到服务器，当CLOSE_WINDOW事件发生，会保存内容。</p>
+
+<p>运行如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code># import hookmanager
+# 定义运行hook的函数
+&gt;&gt;&gt; from stevedore import HookManager
+&gt;&gt;&gt; def run(hook):
+...     return (hook.name, hook.obj())
+... 
+
+# 根据Close Window调用hook
+&gt;&gt;&gt; mgr = HookManager(namespace = "ide.hooks", name = "CLOSE_WINDOW", invoke_on_load = True, invoke_args = ())
+&gt;&gt;&gt; mgr.map(run)
+[('CLOSE_WINDOW', 'content are saved')]
+
+# 根据commit调用hook 
+&gt;&gt;&gt; mgr = HookManager(namespace = "ide.hooks", name = "COMMIT", invoke_on_load = True, invoke_args = ())
+&gt;&gt;&gt; mgr.map(run)
+[('COMMIT', 'content are saved'), ('COMMIT', 'content are uploaded')]
+</code></pre>
+</div>
+
+<h1 id="extension-">extension 场景</h1>
+
+<p>对比driver hook，他们都是通过setuptools的entry point来调用代码。driver是根据一个名字加载一个driver， hook是根据一个名字加载多个组件，而extension则是不根据名字，把namespace下所有的组件加载。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[root@controller POTUS]# tree EXT/
+EXT/
+├── ext
+│   ├── ext1.py
+│   ├── ext2.py
+│   ├── ext3.py
+│   └── __init__.py
+└── setup.py
+</code></pre>
+</div>
+
+<p>ext1的内容如下</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>class EXT1(object):
+    def __call__(self, *args, **kwargs):
+        return "ext1 is called"
+</code></pre>
+</div>
+
+<p>setup.py内容如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>from setuptools import setup, find_packages
+
+setup(
+    name='ext',
+    version='1.0',
+
+    packages=find_packages(),
+
+    entry_points={
+        'my_namespace': [
+            'ext1 = ext.ext1:EXT1',
+            'ext2 = ext.ext2:EXT2',
+            'ext3 = ext.ext3:EXT3'
+        ],
+    },
+)
+</code></pre>
+</div>
+
+<p>按照完成后，ext1/ext2/ext3都被注册到my_namespace下。 调用方式如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&gt;&gt;&gt; from stevedore import ExtensionManager
+&gt;&gt;&gt; mgr=ExtensionManager(namespace='my_namespace', invoke_on_load=True, invoke_args=())
+&gt;&gt;&gt; def run(hook):
+...     return (hook.name, hook.obj)
+... 
+&gt;&gt;&gt; mgr.map(run)
+[('ext3', &lt;ext.ext3.EXT3 object at 0xd62a50&gt;), ('ext2', &lt;ext.ext2.EXT2 object at 0x102b6d0&gt;), ('ext1', &lt;ext.ext1.EXT1 object at 0x1034c10&gt;)]
+</code></pre>
+</div>
+
+<p>调用方式可以看到，通过namespace可以把其下所有组件加载</p>
+
+<p>以上是stevedore的主要用法，下一篇讲展示routes的用法</p>
+
+</article>
+
+
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">Cisco China GDC Engineering Blog</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/posts/">Posts</a>
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+        
+        
+        
+        
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:no-reply@cisco.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">no-reply@cisco.com</span>
+          </a>
+        </li>
+
+        
+          
+          <li>
+            <a href="https://github.com/ciscochina" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">ciscochina</span>
+            </a>
+          </li>
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+      <p class="text">Cisco China GDC Engineering Blog.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+
+
+  </body>
+
+</html>

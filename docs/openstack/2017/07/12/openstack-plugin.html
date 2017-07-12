@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>How to read OpenStack code part 6 - core plugin and extension</title>
+  <meta name="description" content="本章我们将写一个自己的core plugin 和一个resource extension来加深理解。(阅读本文的前提是你已经理解了restful以及stevedore等内容)">
+  
+  <meta name="author" content="Peng Xiao">
+  <meta name="copyright" content="&copy; Peng Xiao 2017">
+  
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/engineering/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/engineering/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/engineering/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/engineering/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/engineering/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/engineering/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/engineering/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/engineering/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/engineering/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/engineering/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/engineering/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/engineering/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/engineering/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/engineering/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/engineering/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+  <!-- Facebook OGP cards -->
+  <meta property="og:description" content="本章我们将写一个自己的core plugin 和一个resource extension来加深理解。(阅读本文的前提是你已经理解了restful以及stevedore等内容)" />
+  <meta property="og:url" content="http://ciscochina.github.io" />
+  <meta property="og:site_name" content="Cisco China GDC Engineering Blog" />
+  <meta property="og:title" content="How to read OpenStack code part 6 - core plugin and extension" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="612" />
+  <meta property="og:image:height" content="605" />
+  
+
+  
+  <!-- Twitter: card tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="How to read OpenStack code part 6 - core plugin and extension">
+  <meta name="twitter:description" content="本章我们将写一个自己的core plugin 和一个resource extension来加深理解。(阅读本文的前提是你已经理解了restful以及stevedore等内容)">
+  <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
+  <meta name="twitter:url" content="http://ciscochina.github.io">
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/engineering/css/main.css">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-plugin.html">
+  <link rel="alternate" type="application/rss+xml" title="Cisco China GDC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/engineering/" class="logo">
+      
+      <img src="/engineering/assets/logo.png" alt="Cisco China GDC Engineering Blog">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/posts/">Posts</a>
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+          
+        
+          
+        
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container " >
+  <div class="scrim ">
+    <header class="post-header">
+      <h1 class="title">How to read OpenStack code part 6 - core plugin and extension</h1>
+      <p class="info">by <strong>Mingwei Li</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+ <span class="page-divider">
+  <span class="one"></span>
+  <span class="two"></span>
+</span>
+ 
+
+<section class="post-meta">
+  <div class="post-date">July 12, 2017</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/engineering/category/openstack">Openstack</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <p>本章我们将写一个自己的core plugin 和一个resource extension来加深理解。(阅读本文的前提是你已经理解了restful以及stevedore等内容)</p>
+
+<h1 id="core-plugin">什么是 core plugin</h1>
+
+<p>neutron的plugin有core和service两种。core plugin实现core resource的增删改查，service plugin我们在本文暂不讨论。</p>
+
+<p>core resource 有network/subnet/port/subnet-pool。每种资源对应CURD和index5种操作。以network资源为例，相关操作和HTTP请求的对应关系如下</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>create_network    POST networks
+delete_network    DELETE networks/network_id
+update_network    PUT networks/network_id
+get_network       GET networks/network_id
+get_networks      GET networks
+</code></pre>
+</div>
+
+<p>因此，core plugin中对各种核心资源都有如下的函数对应：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>create_{resource_name}
+update_{resource_name}
+delete_{resource_name}
+get_{resource_name}
+get_{resource_names}
+</code></pre>
+</div>
+
+<h1 id="how-to-write-core-plugin">how to write core plugin</h1>
+
+<p>既然是plugin，也就是我们前面说过的third-party code，那就应该定义一些接口，好让第三方的组织可以参与开发。</p>
+
+<p>neutron中定义的接口在neutron.neutron_plugin_base_v2.NeutronPluginBaseV2。要实现一个core plugin，你需要实现这个class。</p>
+
+<p>下面是我写的一个core plugin 代码</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>from neutron import neutron_plugin_base_v2
+from oslo_log import log
+LOG = log.getLogger(__name__)
+
+
+class MyNeutronPlugin(neutron_plugin_base_v2.NeutronPluginBaseV2):
+	supported_extension_aliases = ['gold']
+	def __init__(self):
+		super(MyNeutronPlugin,self).__init__()
+	#### network ####
+	def create_network(self, context, network):
+		LOG.info("network is %s" %network)
+		return network
+	def update_network(self, context, id, network):
+		return network
+	def get_network(self, context, id, fields=None):
+		network = {}
+		return network
+	def get_networks(self, context, filters=None, fields=None):
+		network = {}
+		LOG.info("return network %s" %network)
+		return network
+	def delete_network(self, context, id):
+		return id
+            ...
+            #### gold ####
+	def create_gold(self, context, gold):
+		LOG.info("gold is %s" %gold)
+		return gold
+	def update_gold(self, context, id, gold):
+		return gold
+	def get_gold(self, context, id, fields=None):
+		gold = {}
+		return gold
+	def get_golds(self, context, filters=None, fields=None):
+		gold = {}
+		LOG.info("return gold %s" %gold)
+		return gold
+	def delete_gold(self, context, id):
+		return id
+</code></pre>
+</div>
+
+<p>请注意，除了network等核心资源，我们还实现了一个gold资源。 上面粘贴的内容省略了subnet/port/subnet-pool的相关代码。 既然是thirty-party code,就应该可以独立安装。所以我们的代码结构如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>myPlugin/
+├── myPluginPKG
+│   ├── __init__.py
+│   └── myPluginModule.py
+└── setup.py
+</code></pre>
+</div>
+
+<p><strong>init</strong>.py的内容为</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>import myPluginModule
+</code></pre>
+</div>
+
+<p>setup.py内容如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>from setuptools import setup, find_packages
+
+setup(
+	name='myPluginPKG',
+	version='1.0',
+
+	packages=find_packages(),
+
+	entry_points={
+		'neutron.core_plugins': [
+			'myNeutronPlugin = myPluginPKG.myPluginModule:MyNeutronPlugin',
+		],
+	},
+)
+</code></pre>
+</div>
+
+<p>这样在运行python setup.py install 后，我们的plugin就注册到了neutron.core_plugins这个namespace下。这部分内容其实就是前面stevedore中driver开发的内容。neutron通过stevedore在这个namespace下加载core_plugin</p>
+
+<p>OK。在python setup.py install 后，我们的core plugin安装完成了，这时要修改/etc/neutron/neutron.conf，让neutron使用我们的core plugin。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[default]
+core_plugin = myNeutronPlugin
+</code></pre>
+</div>
+
+<p>然后重启neutron服务</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>systemctl restart neutron-server
+</code></pre>
+</div>
+
+<p>接下来你就可以通过API 尝试了， 我们创建一个network 如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>curl -g -i -X POST "http://liberty-controller01:9696/v2.0/networks" -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Auth-Token:$token" -d '{"network": {"name": "n2", "admin_state_up": true}}'
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=UTF-8
+Content-Length: 15
+X-Openstack-Request-Id: req-a8cfde05-6425-42fe-b516-0bb2d264cf61
+Date: Tue, 07 Feb 2017 08:01:47 GMT
+
+    {"network": {}}
+</code></pre>
+</div>
+
+<p>可以看到成功返回，因为我们的plugin中什么也没做，所以返回的其实是一个空的字典。但至少证明该api成功了。</p>
+
+<p>之前我们还在plugin中增加了gold资源对应的函数，我们试试访问gold资源：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>curl -g -i  "http://liberty-controller01:9696/v2.0/golds" -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Auth-Token:$token" 
+HTTP/1.1 404 NOT FOUND
+</code></pre>
+</div>
+
+<p>为什么gold资源的API不好使呢。这是因为要想在neutron core plugin中定义一个资源，不仅要提供该资源的CURD 函数，还要有对应的RESOURCE_ATTRIBUTE_MAP.</p>
+
+<h1 id="resourceattributemap">RESOURCE_ATTRIBUTE_MAP</h1>
+
+<p>RESOURCE_ATTRIBUTE_MAP是neutron/api/v2/attribute.py中的一个字典，其结构大概如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>RESOURCE_ATTRIBUTE_MAP = {
+	NETWORKS: {
+		'id': {'allow_post': False, 'allow_put': False,
+			   'validate': {'type:uuid': None},
+			   'is_visible': True,
+			   'primary_key': True},
+		'name': {'allow_post': True, 'allow_put': True,
+				 'validate': {'type:string': NAME_MAX_LEN},
+				 'default': '', 'is_visible': True},
+		'subnets': {'allow_post': False, 'allow_put': False,
+					'default': [],
+					'is_visible': True},
+		'admin_state_up': {'allow_post': True, 'allow_put': True,
+						   'default': True,
+						   'convert_to': convert_to_boolean,
+						   'is_visible': True},
+		'status': {'allow_post': False, 'allow_put': False,
+				   'is_visible': True},
+		'tenant_id': {'allow_post': True, 'allow_put': False,
+					  'validate': {'type:string': TENANT_ID_MAX_LEN},
+					  'required_by_policy': True,
+					  'is_visible': True},
+		SHARED: {'allow_post': True,
+				 'allow_put': True,
+				 'default': False,
+				 'convert_to': convert_to_boolean,
+				 'is_visible': True,
+				 'required_by_policy': True,
+				 'enforce_policy': True},
+	},
+</code></pre>
+</div>
+
+<p>该字典定义了资源以及资源对应的属性，我们这里只列出了network。所以，要想定义gold资源，除了在core plugin中添加对应的函数，还有在这个attribute map中添加相关的信息。不过，我们不建议直接修改这里的代码，正确的方法是通过resource extension来实现。</p>
+
+<h1 id="how-to-code-an-extension-resource-extension">how to code an extension (resource extension)</h1>
+
+<p>之前提到了extension有3种类型，resource，action，request。我们这里要实现一个新的资源，就是用resource extension。无论是哪种extension 都要遵守一些特定的规则，或者说接口，这些规则如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>1. extension应该放在neutron/extensions文件夹下，或者在配置文件中设置api_extensions_path
+2. extension的class名应该和文件同名，当然首字母应该大写
+3. 应该实现neutron.api.extensions.py中ExtensionDescriptor定义的接口
+4. 在对应的plugin的supported_extension_aliases 中增加我们extension的别名。前面我们写的core plugin就有这个属性，当时没有做说明，其实是这里应该添加的。所谓别名是该extension要实现的一个接口，后面会看到。
+</code></pre>
+</div>
+
+<p>另外很重要的一点是，因为我们要实现的是resource extension，所以还要实现</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>get_resources 
+</code></pre>
+</div>
+
+<p>这个接口。</p>
+
+<p>下面我们实现一个自己的resource extension来增加 gold 资源。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>from neutron.api import extensions
+from neutron import manager
+from neutron.api.v2 import base
+
+# You have to specify the attributes neutron-server should expect when
+# someone invokes this plugin. Let's say you want
+# 'name', 'priority', 'credential' for your extension /golds
+# then following dictionary must be declared.
+# I am following the naming convention used by other extensions.
+
+RESOURCE_ATTRIBUTE_MAP = {
+	'golds': {
+	'name': {'allow_post': True, 'allow_put': True,
+				 'is_visible': True},
+	'priority': {'allow_post': True, 'allow_put': True,
+				 'is_visible': True},
+	'credential': {'allow_post': True, 'allow_put': True,
+				 'is_visible': True},
+	# tenant_id is the user id used by keystone for authorisation
+	# It's good to use the following as it is and it is necessary
+	# for every extension 
+	'tenant_id': {'allow_post': True, 'allow_put': False,
+				  'required_by_policy': True,
+				  'validate': {'type:string': None},
+				  'is_visible': True}
+	}
+}
+
+# Great! Now you have the defined the attributes that you need for your
+# extensions. You need to store this dictionary in the neutron-server
+# by the following class
+
+class Golds(extensions.ExtensionDescriptor):
+	# The name of this class should be the same as the file name
+	# There are a couple of methods and their properties defined in the
+	# parent class of this class, ExtensionDescriptor you can check them
+
+	@classmethod
+	def get_name(cls):
+		# You can coin a name for this extension
+		return "Name of golds"
+
+	@classmethod
+	def get_alias(cls):
+		# This alias will be used by your core_plugin class to load
+		# the extension
+		return "gold"
+
+	@classmethod
+	def get_description(cls):
+		# A small description about this extension
+		return "A quick brown fox jumped over a lazy dog"
+
+	@classmethod
+	def get_namespace(cls):
+		# The XML namespace for this extension
+		# but as we move on to use JSON over XML based request
+		# this is not that important, correct me if I am wrong.
+		return "namespace of xml"
+
+	@classmethod
+	def get_updated(cls):
+		# Specify when was this extension last updated,
+		# good for management when there are changes in the design
+		return "2017-02-07T10:00:00-00:00"
+
+	@classmethod
+	def get_resources(cls):
+		# This method registers the URL and the dictionary  of
+		# attributes on the neutron-server.
+		exts = list()
+		plugin = manager.NeutronManager.get_plugin()
+		resource_name = 'gold'
+		collection_name = resource_name + 's'
+		params = RESOURCE_ATTRIBUTE_MAP.get(resource_name + 's', dict())
+		controller = base.create_resource(collection_name, resource_name,
+										  plugin, params, allow_bulk=False)
+		ex = extensions.ResourceExtension(collection_name, controller)
+		exts.append(ex)
+
+		return exts
+</code></pre>
+</div>
+
+<p>代码的大部分解释都包含在注释里，因此请详细阅读每一行。这里只重点说一下RESOURCE_ATTRIBUTE_MAP 和 get_resources。 我们的extension就是通过这个函数来在resource attribute map中增加了gold资源。
+另外要注意的是get_alias，该函数返回extension的别名，plugin的supported_extension_alias中用该别名来找extension。</p>
+
+<p>ok，我们现在尝试一下访问gold 资源</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>curl -g -i http://liberty-controller01:9696/v2.0/golds.json -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Auth-Token:$token"
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Content-Length: 13
+X-Openstack-Request-Id: req-7b925f97-4df0-49ee-bb6a-fd7c86fda9aa
+Date: Tue, 07 Feb 2017 08:29:34 GMT
+
+{"golds": []}
+</code></pre>
+</div>
+
+<p>这次成功了。 以上就是core plugin和resource extension</p>
+
+</article>
+
+
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">Cisco China GDC Engineering Blog</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/posts/">Posts</a>
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+        
+        
+        
+        
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:no-reply@cisco.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">no-reply@cisco.com</span>
+          </a>
+        </li>
+
+        
+          
+          <li>
+            <a href="https://github.com/ciscochina" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">ciscochina</span>
+            </a>
+          </li>
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+      <p class="text">Cisco China GDC Engineering Blog.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+
+
+  </body>
+
+</html>

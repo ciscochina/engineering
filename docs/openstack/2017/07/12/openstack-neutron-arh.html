@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>How to read OpenStack code part 5 - neutron architecture</title>
+  <meta name="description" content="今天这一章节非常重要。我们知道neutron是一个非常复杂的系统，由很多组件构成。研究这样一个复杂的系统，正确的顺序应该是现在宏观上对其整体结构有所了解，然后再由针对性的对其组件进行深入了解。本章要做的事情就是介绍neutron 宏观上的架构。">
+  
+  <meta name="author" content="Peng Xiao">
+  <meta name="copyright" content="&copy; Peng Xiao 2017">
+  
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/engineering/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/engineering/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/engineering/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/engineering/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/engineering/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/engineering/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/engineering/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/engineering/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/engineering/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/engineering/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/engineering/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/engineering/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/engineering/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/engineering/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/engineering/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+  <!-- Facebook OGP cards -->
+  <meta property="og:description" content="今天这一章节非常重要。我们知道neutron是一个非常复杂的系统，由很多组件构成。研究这样一个复杂的系统，正确的顺序应该是现在宏观上对其整体结构有所了解，然后再由针对性的对其组件进行深入了解。本章要做的事情就是介绍neutron 宏观上的架构。" />
+  <meta property="og:url" content="http://ciscochina.github.io" />
+  <meta property="og:site_name" content="Cisco China GDC Engineering Blog" />
+  <meta property="og:title" content="How to read OpenStack code part 5 - neutron architecture" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="612" />
+  <meta property="og:image:height" content="605" />
+  
+
+  
+  <!-- Twitter: card tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="How to read OpenStack code part 5 - neutron architecture">
+  <meta name="twitter:description" content="今天这一章节非常重要。我们知道neutron是一个非常复杂的系统，由很多组件构成。研究这样一个复杂的系统，正确的顺序应该是现在宏观上对其整体结构有所了解，然后再由针对性的对其组件进行深入了解。本章要做的事情就是介绍neutron 宏观上的架构。">
+  <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
+  <meta name="twitter:url" content="http://ciscochina.github.io">
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/engineering/css/main.css">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-neutron-arh.html">
+  <link rel="alternate" type="application/rss+xml" title="Cisco China GDC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/engineering/" class="logo">
+      
+      <img src="/engineering/assets/logo.png" alt="Cisco China GDC Engineering Blog">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/posts/">Posts</a>
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+          
+        
+          
+        
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container " >
+  <div class="scrim ">
+    <header class="post-header">
+      <h1 class="title">How to read OpenStack code part 5 - neutron architecture</h1>
+      <p class="info">by <strong>Mingwei Li</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+ <span class="page-divider">
+  <span class="one"></span>
+  <span class="two"></span>
+</span>
+ 
+
+<section class="post-meta">
+  <div class="post-date">July 12, 2017</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/engineering/category/openstack">Openstack</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <p>今天这一章节非常重要。我们知道neutron是一个非常复杂的系统，由很多组件构成。研究这样一个复杂的系统，正确的顺序应该是现在宏观上对其整体结构有所了解，然后再由针对性的对其组件进行深入了解。本章要做的事情就是介绍neutron 宏观上的架构。</p>
+
+<p>首先看一下下图：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>人 - - &gt;  Neutron Server - - &gt; Plugin - -&gt; message queue - -&gt; Agent
+                              (Extension)
+                                   
+                                   |
+                                   |
+                                   
+                                  MySQL database
+</code></pre>
+</div>
+
+<p>因为是markdown 编辑，所以没办法把图画的太复杂，不过其实也够了。上面就是Neutron的大致结构。</p>
+
+<p>首先，是人发起API请求给Neutron Server。这个过程没什么好说的，就是HTTP restful请求</p>
+
+<p>然后，Neutron Server 接受到请求后，会根据route规则把请求转发给相应的Plugin。这里的route规则，也就是route map是由之前介绍过的route package生成的</p>
+
+<p>Plugin接受到请求后主要做两件事，在DB中创建对象和调用Agent做响应配置。比如创建一个subnet请求，plugin会现在db创建subnet的数据对象，然后调用agent在openvswitch或者linuxbridge创建具体的配置信息。Plugin和db交互用的是sqlalchemy orm package，跟agent交互是通过message queue。</p>
+
+<p>由此可见Plugin是Neutron的核心。不过从图中还可以看到一个叫extension的东西，这里的extension跟我们之前在stevedore中提到的extension不是一回事儿，但在neutron中也非常重要，下面我们大概了解一下plugin 和 extension。</p>
+
+<h1 id="plugin-">Plugin 发展历史</h1>
+
+<p>Neutron是所谓pluggable结构的，就是说它的很多组件应该可以像积木一样随意插拔使用。</p>
+
+<p>Plugin 和 driver（plugin的底层结构）在neutron社区中被称作third-party code。Kilo版本之前，这些third-party code虽然可以由第三方组织或个人开发，但还是包含在Neutron的代码树中，统一管理在Neutron的代码库中。</p>
+
+<p>Kilo版本中Plugin 和 driver等代码进入了decomposition阶段。这一阶段大部分Plugin和driver的代码把主要的逻辑剥离出来存入了独立的repository。</p>
+
+<p>到了Liberty版本，Plugin等代码基本就可以独立存在于Neutron的代码库之外了。</p>
+
+<p>所以后面的文章我们会尝试编写一个独立的python plugin。所谓独立，即是说该plugin可以由我们自己独立管理，安装和发布。</p>
+
+<h1 id="core-plugin--service-plugin">Core plugin 和 Service Plugin</h1>
+
+<p>Neutron早期的功能很有限，只是支持network/subnet/port/subnet-pool等资源。所以当时的Plugin主要就是管理这些资源（subnet-pool资源是后来引入的），这些Plugin叫做Core Plugin。</p>
+
+<p>Core Plugin主要涉及的都是二层的技术，比如在linuxbridge/openvswitch上配置一些二层网络。但二层上的具体实现技术有很多种，除了linuxbridge，openvswitch之外还有如cisco自己的交换机，huawei，juniper，edison等。各个厂商为了让neutron能够在自己的产品上配置二层网络开发了很多自己的core plugin，所以就出现了很多不同的core plugin。</p>
+
+<p>不过你现在去安装部署neutron会发现大部分时候用的core plugin都是一个叫ml2的core plugin。这是因为社区发现，没必要为每种二层技术开发一个plugin。core plugin要做两件事：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>1.在数据库中创建网络对象。这部分工作不论用哪种二层技术（openvswitch还是linuxbridge）区别都不打，所以单独提炼出来一个type driver来做这件事儿
+2.用具体的二层技术如openvswitch或者linuxbridge来配置二层网络。这部分工作依据二层技术的不同会有较大不同，所以交给mechanism  driver来做
+</code></pre>
+</div>
+
+<p>现在不同的二层技术只需要实现具体的mechnisam driver即可。</p>
+
+<p>再后来随着neutron的发展，它可以支持更丰富的内容，如创建router，firewall，loadbalance等。这部分工作在neutron中叫做service。这些service neutron也和之前的资源一样用plugin来管理。不过这部分plugin不叫core plugin叫做service plugin。代码通常放在neutron/services下面，如l3_router。</p>
+
+<p>所以，neutron中的plugin主要分为core plugin 和 service plugin。core plugin用来管理核心资源network/subnet/port/subnet-pool，而service plugin用来管理高层的服务如router。</p>
+
+<p>不过，从neutron的代码中可以发现，其实neutron社区是想把这两种plugin合并成一种的。主要是把core plugin变成 service plugin的一种。neutron/manage.py中有这么一段注释很清楚的阐述了这一发展趋势：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    # core plugin as a part of plugin collection simplifies
+    # checking extensions
+    # TODO(enikanorov): make core plugin the same as
+    # the rest of service plugins
+</code></pre>
+</div>
+
+<h1 id="extension">extension</h1>
+
+<p>上面主要再聊plugin，那么什么是extension呢？extension主要用于丰富和扩展现有的API功能，有时新增的功能也用extension来实现，这些新功能不会放入正式的API列表，只有在测试使用过一段时间后，才会放入正是API列表，并且这些extension也会慢慢转为plugin。</p>
+
+<p>目前有下面三种extension</p>
+
+<blockquote>
+  <ul>
+    <li>Resources extension introduce a new “entity” to the API. 所谓entity就是neutron中的资源，核心的资源有network/subnet/port/subnet-pool，当你想引入一个新的资源的时候，可以先用extension来实现</li>
+    <li>Action extensions tend to be “verbs” that act on a resource.举个例子，tiger是一种资源，但是eat是动作，neutron中通常的做法是用action extension来处理这个动作</li>
+    <li>Request extensions allow one to add new values to existing requests objects. 比如port本来是个很稳定的资源，API也很稳定。但是现在你想在创建PORT的时候添加一个属性，叫description或者area，那么可以通过extension来实现。</li>
+  </ul>
+</blockquote>
+
+<p>下一篇文章我们将看一下core plugin以及extension。</p>
+
+</article>
+
+
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">Cisco China GDC Engineering Blog</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/posts/">Posts</a>
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+        
+        
+        
+        
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:no-reply@cisco.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">no-reply@cisco.com</span>
+          </a>
+        </li>
+
+        
+          
+          <li>
+            <a href="https://github.com/ciscochina" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">ciscochina</span>
+            </a>
+          </li>
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+      <p class="text">Cisco China GDC Engineering Blog.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+
+
+  </body>
+
+</html>

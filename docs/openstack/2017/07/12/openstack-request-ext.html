@@ -6,8 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Hello World</title>
-  <meta name="description" content="Hello world!">
+  <title>How to read OpenStack code part 9 - request extension</title>
+  <meta name="description" content="We have learned resource extension and action extension. This post we will write a request extension">
   
   <meta name="author" content="Peng Xiao">
   <meta name="copyright" content="&copy; Peng Xiao 2017">
@@ -41,10 +41,10 @@
 
   
   <!-- Facebook OGP cards -->
-  <meta property="og:description" content="Hello world!" />
+  <meta property="og:description" content="We have learned resource extension and action extension. This post we will write a request extension" />
   <meta property="og:url" content="http://ciscochina.github.io" />
   <meta property="og:site_name" content="Cisco China GDC Engineering Blog" />
-  <meta property="og:title" content="Hello World" />
+  <meta property="og:title" content="How to read OpenStack code part 9 - request extension" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
   <meta property="og:image:type" content="image/png" />
@@ -55,8 +55,8 @@
   
   <!-- Twitter: card tags -->
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Hello World">
-  <meta name="twitter:description" content="Hello world!">
+  <meta name="twitter:title" content="How to read OpenStack code part 9 - request extension">
+  <meta name="twitter:description" content="We have learned resource extension and action extension. This post we will write a request extension">
   <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
   <meta name="twitter:url" content="http://ciscochina.github.io">
   
@@ -65,7 +65,7 @@
 
   <!-- Site styles -->
   <link rel="stylesheet" href="/engineering/css/main.css">
-  <link rel="canonical" href="http://ciscochina.github.io/engineering/test/2017/07/08/helloworld.html">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-request-ext.html">
   <link rel="alternate" type="application/rss+xml" title="Cisco China GDC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
 </head>
 
@@ -119,8 +119,8 @@
 <div class="post-header-container " >
   <div class="scrim ">
     <header class="post-header">
-      <h1 class="title">Hello World</h1>
-      <p class="info">by <strong>Peng Xiao</strong></p>
+      <h1 class="title">How to read OpenStack code part 9 - request extension</h1>
+      <p class="info">by <strong>Mingwei Li</strong></p>
     </header>
   </div>
 </div>
@@ -134,22 +134,76 @@
  
 
 <section class="post-meta">
-  <div class="post-date">July 8, 2017</div>
+  <div class="post-date">July 12, 2017</div>
   <div class="post-categories">
   in 
     
-    <a href="/engineering/category/test">Test</a>
+    <a href="/engineering/category/openstack">Openstack</a>
     
   
   </div>
 </section>
 
 <article class="post-content">
-  <p>Hello world!</p>
+  <p>We have learned resource extension and action extension. This post we will write a request extension</p>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">print</span> <span class="s">'hello world'</span>
+<p>First see two API call</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>curl -X POST http://liberty-controller01:9696/v2.0/networks.json -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Auth-Token: $token" -d '{"network": {"name": "net3", "admin_state_up": true}}'
+
+{"network": {"status": "ACTIVE", "subnets": [], "name": "net3", "provider:physical_network": "physnet1", "admin_state_up": true, "tenant_id": "8c5f13ee6a404759839e48537bdf69ac", "mtu": 0, "router:external": false, "shared": false, "port_security_enabled": true, "provider:network_type": "vlan", "id": "95c955ac-c963-4f53-ab4a-d721fa0cda51", "provider:segmentation_id": 490}}
 </code></pre>
 </div>
+
+<p>It run successful. Nothing to say. Then this one</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>curl -X POST http://liberty-controller01:9696/v2.0/networks.json -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Auth-Token: $token" -d '{"network": {"name": "net3", "admin_state_up": true, "some_attr":"some_value"}}'
+
+{"NeutronError": {"message": "Unrecognized attribute(s) 'some_attr'", "type": "HTTPBadRequest", "detail": ""}}[root@liberty-controller01 myPluginPKG]# 
+</code></pre>
+</div>
+
+<p>This one is bad request. But the only difference is the POST body. Neutron think the some_attr is not a attribute of network and it is right. Because this is a core resource and the attribute map of this resource do not have some_attr</p>
+
+<p>To solve this we need an request extension which actually update the resource attribute map of network. Below are the code</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>from neutron.api import extensions
+
+EXTENDED_ATTRIBUTES_2_0 = {
+    'networks': {
+        'some_attr': {'allow_post': True,
+                 'allow_put': False,
+                 'is_visible': True,
+                 'default': ''}
+    }
+}
+
+
+class Myreq(extensions.ExtensionDescriptor):
+    @classmethod
+    def get_name(cls):
+        return "myreq"
+
+    @classmethod
+    def get_alias(cls):
+        return 'myreq'
+
+    @classmethod
+    def get_description(cls):
+        return "myreq"
+
+    @classmethod
+    def get_updated(cls):
+        return "2017-02-08T10:00:00-00:00"
+
+    def get_extended_resources(self, *args, **kwargs):
+        return EXTENDED_ATTRIBUTES_2_0
+</code></pre>
+</div>
+
+<p>You can see we defined a dict in the extension and return it with method get_extended_resources.</p>
+
+<p>So to implement an request extension is very easy. Define a method called get_extended_resources and return some attributes that you want to added to the original reosurce</p>
 
 </article>
 

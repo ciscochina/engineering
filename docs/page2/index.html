@@ -68,7 +68,7 @@
 
   <!-- Site styles -->
   <link rel="stylesheet" href="/engineering/css/main.css">
-  <link rel="canonical" href="http://ciscochina.github.io/engineering/">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/page2/">
   <link rel="alternate" type="application/rss+xml" title="Cisco China GDC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
 </head>
 
@@ -133,10 +133,10 @@
   
   <li>
     <h2>
-      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-wsgi.html">How to read OpenStack code part 1 - wsgi</a>
+      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-plugin.html">How to read OpenStack code part 6 - core plugin and extension</a>
     </h2>
     <section class="post-excerpt" itemprop="description">
-      <p>要读懂本篇，你至少得写过一个python的web程序，并且把它部署到web服务器上过。 什么是wsgi 假设你写了一个python的web程序，并部署到了nginx上，那么你应该知道一个http request的处理流程一般是下面这样： client/浏览器（发送请求） - - - - &gt; web服务器(转发该请求) - - - - &gt; 你的程序（1. 处理请求。2.生成结果。3.返回结果） | | V client/浏览器（收到结果） &lt;- - - -web服务器（接受你的程序返回的结果，并返回给浏览器） 问题是，开发web程序的人和开发web服务器的人并没有沟通，为什么web application 能够部署在web 服务器上呢？ 这是因为他们都遵循了相同的规则 – WSGI。 WSGI 全名叫 web server gateway interface， 是python 中web程序和web服务器沟通的标准。 简单的说，只要你写的web application 遵守这个规则，另一个人开发的web 服务器也遵循这个规则，那么你写的程序就能运行在他开发的web服务器上。 wsgi application WSGI对application和server做出了不同的规定，大部分人不需要写server,因此我们只了解一下application的规定即可。首先看一个标准的WSGI application。该application的功能是，返回client所使用的http method(GET/POST等)：...</p>
+      <p>本章我们将写一个自己的core plugin 和一个resource extension来加深理解。(阅读本文的前提是你已经理解了restful以及stevedore等内容) 什么是 core plugin neutron的plugin有core和service两种。core plugin实现core resource的增删改查，service plugin我们在本文暂不讨论。 core resource 有network/subnet/port/subnet-pool。每种资源对应CURD和index5种操作。以network资源为例，相关操作和HTTP请求的对应关系如下 create_network POST networks delete_network DELETE networks/network_id update_network PUT networks/network_id get_network GET networks/network_id get_networks GET networks 因此，core plugin中对各种核心资源都有如下的函数对应： create_{resource_name} update_{resource_name} delete_{resource_name} get_{resource_name} get_{resource_names} how to write core plugin 既然是plugin，也就是我们前面说过的third-party code，那就应该定义一些接口，好让第三方的组织可以参与开发。 neutron中定义的接口在neutron.neutron_plugin_base_v2.NeutronPluginBaseV2。要实现一个core plugin，你需要实现这个class。 下面是我写的一个core plugin 代码 from neutron...</p>
     </section>
     <section class="post-meta">
       <div class="post-date">July 12, 2017</div>
@@ -155,10 +155,10 @@
   
   <li>
     <h2>
-      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-stevedore.html">How to read OpenStack code part 3 - stevedore</a>
+      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-pastedeploy.html">How to read OpenStack code part 2 - pastedeploy</a>
     </h2>
     <section class="post-excerpt" itemprop="description">
-      <p>学习了WSGI/Paste deploy后，还需要对一些在openstack中一些package有一些了解，才能更好的理解openstack的代码 What is stevedore 我们在写代码的时候通常把一个一个的功能块独立编写，甚至发布一定的规则和接口由第三方编写，然后在运行时根据实际情况来选择加载哪些功能模块。这样的好处是松耦合，灵活，而且便于协作。 stevedore就是一个很好的帮助动态加载代码的工具，openstack中很多plugin就是通过stevedore加载的。 下面通过一些应用场景看一下如何使用stevedore。 Driver 场景 假设我们有一个开源系统，我们不希望限定用户对数据库的选择。用户可以选择mysql/oracle/mongo等任意数据库。这就意味着我们需要对很多种数据库提供接口。这个工作量很大，并且要求开发人员对每一种数据库非常熟悉。最好的做法就是把数据库的接口设计成driver，并发布出该driver所需要实现的接口。这样任何第三方的组织或个人都可以参与开发。 比如，我们定义下面的接口。任何开发者，只要编写一个实现了下列接口的class，就可以实现一个driver @six.add_metaclass(abc.ABCMeta) class Base(object): """ The Base class for db driver """ @abc.abstractmethod def create_user(self, user_name): """ :param user_name: The name of user :return: A user object """ 基于上述接口，我们尝试开发一个mysql的driver如下： # mysql_driver.py import base class MysqlDriver(base.Base): def create_user(self, user_name): return...</p>
+      <p>本篇分为以下几个部分 paste 是什么 怎样使用paste paste of neutron paste 是什么 WSGI 是python 中application 和 web server互通的标准。 我们知道了wsgi 中包括 app, middleware ， server而且middleware可以有很多个。wsgi结构的系统最大的好处就是middleware像积木一样，可以灵活的添加组成不同的功能。 我们上一篇文章中，把2个middleware和一个app组合到了一起，但我们采用的写法是在代码中这样写： httpd = make_server('10.79.99.86', 8051, CheckError(AuthToken(check_number))) 把各个模块之间的关系硬编码到了代码中，这很显然不够灵活，假设有一天想重新组织middleware的结构，我们还需要找到相关的代码去修改代码。最好的办法是通过配置文件来组织各个模块之间的关系，通过修改配置文件来影响系统中各个模块的组合与调用。 Paste 就是解决这个问题的。 paste 是python的一个module，通过paste， 你可以把wsgi的模块写入ini风格的配置文件，灵活部署。 下面我们用paste构建一个小系统，进一步了解 怎样使用paste 首先，我们将构建三个wsgi组件， 一个application叫check_number， 该application的功能是check http req中的数字是奇数还是偶数，如果是奇数返回odd否则返回even。 代码如下： class CheckNumber(object): def __call__(self, env, start_response): number = int(env.get('PATH_INFO').split('/')[-1])...</p>
     </section>
     <section class="post-meta">
       <div class="post-date">July 12, 2017</div>
@@ -177,10 +177,10 @@
   
   <li>
     <h2>
-      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-service-plugin.html">How to read OpenStack code part 7 - service plugin</a>
+      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-neutron-arh.html">How to read OpenStack code part 5 - neutron architecture</a>
     </h2>
     <section class="post-excerpt" itemprop="description">
-      <p>We have learned core plugin, service plugin and extension in last post. Now let`s review: Core Plugin Core plugin manage core resources which are network, subnet, port and subnetpool. Service Plugin Service plugin manage higher services. extension Extensions are called API Extensions. There are three types of extension resource extension...</p>
+      <p>今天这一章节非常重要。我们知道neutron是一个非常复杂的系统，由很多组件构成。研究这样一个复杂的系统，正确的顺序应该是现在宏观上对其整体结构有所了解，然后再由针对性的对其组件进行深入了解。本章要做的事情就是介绍neutron 宏观上的架构。 首先看一下下图： 人 - - &gt; Neutron Server - - &gt; Plugin - -&gt; message queue - -&gt; Agent (Extension) | | MySQL database 因为是markdown 编辑，所以没办法把图画的太复杂，不过其实也够了。上面就是Neutron的大致结构。 首先，是人发起API请求给Neutron Server。这个过程没什么好说的，就是HTTP restful请求 然后，Neutron Server 接受到请求后，会根据route规则把请求转发给相应的Plugin。这里的route规则，也就是route map是由之前介绍过的route package生成的 Plugin接受到请求后主要做两件事，在DB中创建对象和调用Agent做响应配置。比如创建一个subnet请求，plugin会现在db创建subnet的数据对象，然后调用agent在openvswitch或者linuxbridge创建具体的配置信息。Plugin和db交互用的是sqlalchemy orm package，跟agent交互是通过message queue。 由此可见Plugin是Neutron的核心。不过从图中还可以看到一个叫extension的东西，这里的extension跟我们之前在stevedore中提到的extension不是一回事儿，但在neutron中也非常重要，下面我们大概了解一下plugin 和 extension。 Plugin 发展历史 Neutron是所谓pluggable结构的，就是说它的很多组件应该可以像积木一样随意插拔使用。 Plugin 和 driver（plugin的底层结构）在neutron社区中被称作third-party code。Kilo版本之前，这些third-party code虽然可以由第三方组织或个人开发，但还是包含在Neutron的代码树中，统一管理在Neutron的代码库中。...</p>
     </section>
     <section class="post-meta">
       <div class="post-date">July 12, 2017</div>
@@ -199,10 +199,10 @@
   
   <li>
     <h2>
-      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-route.html">How to read OpenStack code part 4 - route</a>
+      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-action-exten.html">How to read OpenStack code part 8 - action extension</a>
     </h2>
     <section class="post-excerpt" itemprop="description">
-      <p>When coding a web system, you have to think about an important problem, how to map urls to logic. Openstack use routes to solve this problem. What is routes Routes is a python package used to map urls to program logic. Normally this is the web framework`s responsibility, so besides...</p>
+      <p>之前我们看过了core plugin， service plugin 还有resource extension。 resource extension的作用是定义新的资源。而我们说过还有两种extension： action extension 跟 request extension。这一章我们将写一个action extension。 action in RESTful openstack中所有的网络服务都是RESTful风格的。但RESTful风格的URL有一个问题，如何表示动作。 像 network，tiger 这些单词都是名词，用在URL中以HTTP的POST/GET/DELETE/PUT来对应create get delete update没有任何问题。但有的时候我们需要在url中表示一些动词。比如，router是一个名词，但router中添加一个端口是一个动词。这时候我们有三种选择： 把增加端口变成update router的一个分支功能 这是一个好办法，但很多时候由于种种原因并不适用，比如这需要修改原来的update逻辑，需要修改原来的router数据结构，可能这个动作及其复杂，把它放入update不合适等等等等 把这个动作变成一个独立的资源 比如原来的url是api/v2/routers, 但现在我们用下面的URL表示这个动作 api/v2/routers/{router id}/add_router_interface 这个方法也很不错。事实上，neutron中大多数情况下都是用的这个方法。不过，如果这么做的话，动作变成了资源，那么就不用action extension而用resource extension了。所以这种方法不是我们这里要讨论的 用一个action资源来处理所有的动作 比如原来的url是api/v2/routers,现在我们用下面的url api/v2/routers/action POST 既然是POST 那么肯定有body， body可能是 '{"add_router_interface"："some value"}' 这样就可以通过一个action url处理所有的动作请求了。这正是neutron action extension所做的事。 不过，奇妙的是，搜索遍了neutron的代码，没有看到一个功能是用这种extension来实现的。也许neutron正在努力用第二种方式替代第三种方式。 write...</p>
     </section>
     <section class="post-meta">
       <div class="post-date">July 12, 2017</div>
@@ -221,17 +221,17 @@
   
   <li>
     <h2>
-      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-request-ext.html">How to read OpenStack code part 9 - request extension</a>
+      <a class="post-link" href="/engineering/database/2017/07/08/mongo.html">MongoDB HA Test with Pymongo</a>
     </h2>
     <section class="post-excerpt" itemprop="description">
-      <p>We have learned resource extension and action extension. This post we will write a request extension First see two API call curl -X POST http://liberty-controller01:9696/v2.0/networks.json -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Auth-Token: $token" -d '{"network": {"name": "net3", "admin_state_up": true}}' {"network": {"status": "ACTIVE", "subnets": [], "name": "net3", "provider:physical_network": "physnet1", "admin_state_up":...</p>
+      <p>1 Environment Setup One CentOS 7 machine $ more /etc/redhat-release CentOS Linux release 7.2.1511 (Core) Mongodb version $ mongod --version db version v3.2.6 git version: 05552b562c7a0b3143a729aaa0838e558dc49b25 OpenSSL version: OpenSSL 1.0.1e-fips 11 Feb 2013 allocator: tcmalloc modules: none build environment: distmod: rhel70 distarch: x86_64 target_arch: x86_64 Pymongo version &gt;&gt;&gt; import pymongo...</p>
     </section>
     <section class="post-meta">
-      <div class="post-date">July 12, 2017</div>
+      <div class="post-date">July 8, 2017</div>
       <div class="post-categories">
       in 
         
-        <a href="/engineering/category/openstack">Openstack</a>
+        <a href="/engineering/category/database">Database</a>
         
       
       </div>
@@ -244,14 +244,18 @@
 <nav class="pagination" role="navigation">
 	<p>
     
-		<span class="fa-stack fa-lg">
-      <i class="fa fa-square fa-stack-2x"></i>
-      <i class="fa fa-angle-double-left fa-stack-1x fa-inverse"></i>
-    </span>
+			
+			<a class="newer-posts" href="/engineering/">
+        <span class="fa-stack fa-lg">
+          <i class="fa fa-square fa-stack-2x"></i>
+          <i class="fa fa-angle-double-left fa-stack-1x fa-inverse"></i>
+        </span>
+      </a>
+			
 		
-		<span class="page-number">Page 1 of 3</span>
+		<span class="page-number">Page 2 of 3</span>
 		
-		<a class="newer-posts" href="/engineering/page2">
+		<a class="newer-posts" href="/engineering/page3">
       <span class="fa-stack fa-lg">
         <i class="fa fa-square fa-stack-2x"></i>
         <i class="fa fa-angle-double-right fa-stack-1x fa-inverse"></i>

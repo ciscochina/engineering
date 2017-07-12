@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>How to read OpenStack code part 7 - service plugin</title>
+  <meta name="description" content="We have learned core plugin, service plugin and extension in last post. Now let`s review:">
+  
+  <meta name="author" content="Peng Xiao">
+  <meta name="copyright" content="&copy; Peng Xiao 2017">
+  
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/engineering/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/engineering/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/engineering/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/engineering/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/engineering/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/engineering/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/engineering/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/engineering/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/engineering/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/engineering/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/engineering/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/engineering/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/engineering/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/engineering/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/engineering/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+  <!-- Facebook OGP cards -->
+  <meta property="og:description" content="We have learned core plugin, service plugin and extension in last post. Now let`s review:" />
+  <meta property="og:url" content="http://ciscochina.github.io" />
+  <meta property="og:site_name" content="Cisco China GDC Engineering Blog" />
+  <meta property="og:title" content="How to read OpenStack code part 7 - service plugin" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="612" />
+  <meta property="og:image:height" content="605" />
+  
+
+  
+  <!-- Twitter: card tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="How to read OpenStack code part 7 - service plugin">
+  <meta name="twitter:description" content="We have learned core plugin, service plugin and extension in last post. Now let`s review:">
+  <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
+  <meta name="twitter:url" content="http://ciscochina.github.io">
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/engineering/css/main.css">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-service-plugin.html">
+  <link rel="alternate" type="application/rss+xml" title="Cisco China GDC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/engineering/" class="logo">
+      
+      <img src="/engineering/assets/logo.png" alt="Cisco China GDC Engineering Blog">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/posts/">Posts</a>
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+          
+        
+          
+        
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container " >
+  <div class="scrim ">
+    <header class="post-header">
+      <h1 class="title">How to read OpenStack code part 7 - service plugin</h1>
+      <p class="info">by <strong>Mingwei Li</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+ <span class="page-divider">
+  <span class="one"></span>
+  <span class="two"></span>
+</span>
+ 
+
+<section class="post-meta">
+  <div class="post-date">July 12, 2017</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/engineering/category/openstack">Openstack</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <p>We have learned core plugin, service plugin and extension in last post. Now let`s review:</p>
+
+<p><strong>Core Plugin</strong></p>
+
+<p>Core plugin manage core resources which are network, subnet, port and subnetpool.</p>
+
+<p><strong>Service Plugin</strong></p>
+
+<p>Service plugin manage higher services.</p>
+
+<p><strong>extension</strong></p>
+
+<p>Extensions are called API Extensions. There are three types of extension</p>
+
+<blockquote>
+  <ul>
+    <li>resource extension which define new resources</li>
+    <li>action extension which define actions for resource</li>
+    <li>request extension which can add more parameter to request</li>
+  </ul>
+</blockquote>
+
+<p>Normally a new feature will be implemented by extension first. When the feature is stable, the community will move it to official api and may implement it in plugin.</p>
+
+<p>We write our core plugin in the previous post now we are going to write our service plugin.</p>
+
+<h1 id="what-is-the-difference-between-core-plugin-and-service-plugin">What is the difference between core plugin and service plugin</h1>
+
+<p>Core plugin manage core resource in neutron. The code structure is different from service plugin. But the community are considering transfer core plugin into one kind of service plugin. You will see the trend in code</p>
+
+<h1 id="design-our-service-plugin">Design our service plugin</h1>
+
+<p>Our service plugin is called “ZOO”. This plugin will manage some resource like “tiger”. We are going to do API call like CREATE/UPDATE/DELETE/GET tiger with this service plugin.</p>
+
+<h1 id="write-our-service-plugin">Write our service plugin</h1>
+
+<p>Service plugin must be inherited from the class neutron.services.service_base.ServicePluginBase</p>
+
+<p>Below are my service plugin</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>from neutron.services import service_base
+
+
+class ZooPlugin(service_base.ServicePluginBase):
+	supported_extension_aliases = ["zoo"]
+
+	def __init__(self):
+		super(ZooPlugin, self).__init__()
+
+	def get_plugin_name(self):
+		return "ZOO"
+
+	def get_plugin_type(self):
+		# should be under neutron/plugins/common/constants.py
+		return "ZOO"
+
+	def get_plugin_description(self):
+		return ("ZOO")
+
+	def create_tiger(self, context, tiger):
+		return "tiger created"
+
+	def get_tigers(self, context, filters, fields):
+		return {}
+</code></pre>
+</div>
+
+<p>supported_extension_aliases is necessary since we need an extension to generate the resource.</p>
+
+<p>We only support get_tigers and create_tiger here for simplicity purpose.</p>
+
+<p>Because the plugin is third-party code, so we have to register it under certain entry point so neutron can load it. So our code structure will be like :</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[root@liberty-controller01 tmp]# tree zooServicePlugin
+zooServicePlugin/
+├── setup.py
+└── zoo
+	├── __init__.py
+	├── zoo_plugin.py
+</code></pre>
+</div>
+
+<p>The content of setup.py is like</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>from setuptools import setup, find_packages
+
+setup(
+	name='zoo',
+	version='1.0',
+
+	packages=find_packages(),
+
+	entry_points={
+		'neutron.service_plugins': [
+			'zoo = zoo.zoo_plugin:ZooPlugin',
+		],
+	},
+)
+</code></pre>
+</div>
+
+<p>The key point here is to register the plugin under neutron.service_plugins namespace.</p>
+
+<h1 id="write-the-extension">Write the extension</h1>
+
+<p>We have service plugin ready to manage the tiger resource. But we do not have the tiger resource yet. One option is to modify the neutron/api/v2/attribute.py which is not suggested. The recommended way is to generate the resource by extension like below</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>from neutron.api import extensions
+from neutron.api.v2 import base
+from neutron import manager
+
+
+EXT_PREFIX = '/zoo'
+RESOURCE_NAME = 'tiger'
+COLLECTION_NAME = '%ss' % RESOURCE_NAME
+RESOURCE_ATTRIBUTE_MAP = {
+    'tiger': {
+        'id': {'allow_post': False, 'allow_put': False,
+               'validate': {'type:uuid': None},
+               'is_visible': True,
+               'primary_key': True},
+        'name': {'allow_post': True,
+                 'allow_put': False,
+                 'is_visible': True,
+                 'default': ''},
+        'tenant_id': {'allow_post': True, 'allow_put': False,
+                      'required_by_policy': True,
+                      'validate': {'type:string': None},
+                      'is_visible': True}
+    }
+}
+
+
+class Zoo(extensions.ExtensionDescriptor):
+    @classmethod
+    def get_name(cls):
+        return "zoo"
+
+    @classmethod
+    def get_alias(cls):
+        return 'zoo'
+
+    @classmethod
+    def get_description(cls):
+        return "zoo"
+
+    @classmethod
+    def get_updated(cls):
+        return "2017-02-08T10:00:00-00:00"
+
+    @classmethod
+    def get_resources(cls):
+        # This method registers the URL and the dictionary  of
+        # attributes on the neutron-server.
+        exts = list()
+        plugin = manager.NeutronManager.get_service_plugins()['ZOO']
+        resource_name = RESOURCE_NAME
+        collection_name = COLLECTION_NAME
+        params = RESOURCE_ATTRIBUTE_MAP.get(resource_name)
+        controller = base.create_resource(collection_name, resource_name,
+                                          plugin, params, allow_bulk=False)
+        ex = extensions.ResourceExtension(collection_name, controller, path_prefix=EXT_PREFIX)
+        exts.append(ex)
+        return exts
+</code></pre>
+</div>
+
+<p>The RESOURCE_ATTRIBUTE_MAP is used for define resource tiger. The tenant_id attribute is necessary for auth.</p>
+
+<p>An extension must inherited from extensions.ExtensionDescriptor</p>
+
+<p>get_alias method is really important because plugin will use this value to find the extension. This value must be in the supported_extension_alias of plugin</p>
+
+<p>The get_resources method is necessary for an extension who define new resource. We will see the detail in later post.</p>
+
+<h1 id="config">Config</h1>
+
+<p>Now we have our service plugin and extension we need to install our service plugin by python setup.py install and put the extension under neutron/extensions</p>
+
+<p>Also config the /etc/neutron/neutron.conf</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>service_plugins = ...,zoo
+</code></pre>
+</div>
+
+<p>Restart your neutron server and run below API</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>curl -g -i  "http://liberty-controller01:9696/v2.0/zoo/tigers" -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Auth-Token:$token"
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Content-Length: 14
+X-Openstack-Request-Id: req-82ed8ccc-da9d-46d9-8fd9-beb01a24385b
+Date: Wed, 08 Feb 2017 11:09:13 GMT
+
+{"tigers": []}
+</code></pre>
+</div>
+
+<p>It work</p>
+
+</article>
+
+
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">Cisco China GDC Engineering Blog</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/posts/">Posts</a>
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+        
+        
+        
+        
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:no-reply@cisco.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">no-reply@cisco.com</span>
+          </a>
+        </li>
+
+        
+          
+          <li>
+            <a href="https://github.com/ciscochina" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">ciscochina</span>
+            </a>
+          </li>
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+      <p class="text">Cisco China GDC Engineering Blog.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+
+
+  </body>
+
+</html>

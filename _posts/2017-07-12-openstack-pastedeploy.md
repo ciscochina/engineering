@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "How to read OpenStack code - pastedeploy"
+title:  "How to read OpenStack code part 2 - pastedeploy"
 date:   2017-07-12 08:43:59
 author: Mingwei Li
 categories: openstack
