@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Cisco China GDC Engineering Blog</title>
+    <description>Cisco China GDC Engineering Blog.
+</description>
+    <link>http://ciscochina.github.io/</link>
+    <atom:link href="http://ciscochina.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Wed, 12 Jul 2017 11:46:45 +0800</pubDate>
+    <lastBuildDate>Wed, 12 Jul 2017 11:46:45 +0800</lastBuildDate>
+    <generator>Jekyll v3.2.1</generator>
+    
+      <item>
+        <title>Hello World</title>
+        <description>&lt;p&gt;Hello world!&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'hello world'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</description>
+        <pubDate>Sat, 08 Jul 2017 16:43:59 +0800</pubDate>
+        <link>http://ciscochina.github.io/test/2017/07/08/helloworld.html</link>
+        <guid isPermaLink="true">http://ciscochina.github.io/test/2017/07/08/helloworld.html</guid>
+        
+        
+        <category>test</category>
+        
+      </item>
+    
+  </channel>
+</rss>
