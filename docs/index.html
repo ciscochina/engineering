@@ -151,6 +151,28 @@
   
   <li>
     <h2>
+      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-pastedeploy.html">How to read OpenStack code - pastedeploy</a>
+    </h2>
+    <section class="post-excerpt" itemprop="description">
+      <p>本篇分为以下几个部分 paste 是什么 怎样使用paste paste of neutron paste 是什么 WSGI 是python 中application 和 web server互通的标准。 我们知道了wsgi 中包括 app, middleware ， server而且middleware可以有很多个。wsgi结构的系统最大的好处就是middleware像积木一样，可以灵活的添加组成不同的功能。 我们上一篇文章中，把2个middleware和一个app组合到了一起，但我们采用的写法是在代码中这样写： httpd = make_server('10.79.99.86', 8051, CheckError(AuthToken(check_number))) 把各个模块之间的关系硬编码到了代码中，这很显然不够灵活，假设有一天想重新组织middleware的结构，我们还需要找到相关的代码去修改代码。最好的办法是通过配置文件来组织各个模块之间的关系，通过修改配置文件来影响系统中各个模块的组合与调用。 Paste 就是解决这个问题的。 paste 是python的一个module，通过paste， 你可以把wsgi的模块写入ini风格的配置文件，灵活部署。 下面我们用paste构建一个小系统，进一步了解 怎样使用paste 首先，我们将构建三个wsgi组件， 一个application叫check_number， 该application的功能是check http req中的数字是奇数还是偶数，如果是奇数返回odd否则返回even。 代码如下： class CheckNumber(object): def __call__(self, env, start_response): number = int(env.get('PATH_INFO').split('/')[-1])...</p>
+    </section>
+    <section class="post-meta">
+      <div class="post-date">July 12, 2017</div>
+      <div class="post-categories">
+      in 
+        
+        <a href="/engineering/category/openstack">Openstack</a>
+        
+      
+      </div>
+    </section>
+  </li>
+  
+  <hr>
+  
+  
+  <li>
+    <h2>
       <a class="post-link" href="/engineering/database/2017/07/08/mongo.html">MongoDB HA Test with Pymongo</a>
     </h2>
     <section class="post-excerpt" itemprop="description">
