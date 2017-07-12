@@ -4,10 +4,10 @@
     <title>Cisco China GDC Engineering Blog</title>
     <description>Cisco China GDC Engineering Blog.
 </description>
-    <link>http://ciscochina.github.io/</link>
-    <atom:link href="http://ciscochina.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 12 Jul 2017 11:46:45 +0800</pubDate>
-    <lastBuildDate>Wed, 12 Jul 2017 11:46:45 +0800</lastBuildDate>
+    <link>http://ciscochina.github.io/engineering/</link>
+    <atom:link href="http://ciscochina.github.io/engineering/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Wed, 12 Jul 2017 15:34:15 +0800</pubDate>
+    <lastBuildDate>Wed, 12 Jul 2017 15:34:15 +0800</lastBuildDate>
     <generator>Jekyll v3.2.1</generator>
     
       <item>
@@ -19,8 +19,8 @@
 &lt;/div&gt;
 </description>
         <pubDate>Sat, 08 Jul 2017 16:43:59 +0800</pubDate>
-        <link>http://ciscochina.github.io/test/2017/07/08/helloworld.html</link>
-        <guid isPermaLink="true">http://ciscochina.github.io/test/2017/07/08/helloworld.html</guid>
+        <link>http://ciscochina.github.io/engineering/test/2017/07/08/helloworld.html</link>
+        <guid isPermaLink="true">http://ciscochina.github.io/engineering/test/2017/07/08/helloworld.html</guid>
         
         
         <category>test</category>

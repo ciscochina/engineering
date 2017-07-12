@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>http://ciscochina.github.io/test/2017/07/08/helloworld.html</loc>
+<loc>http://ciscochina.github.io/engineering/test/2017/07/08/helloworld.html</loc>
 <lastmod>2017-07-08T16:43:59+08:00</lastmod>
 </url>
 <url>
-<loc>http://ciscochina.github.io/about/</loc>
+<loc>http://ciscochina.github.io/engineering/about/</loc>
 </url>
 <url>
-<loc>http://ciscochina.github.io/</loc>
+<loc>http://ciscochina.github.io/engineering/</loc>
 </url>
 <url>
-<loc>http://ciscochina.github.io/posts/</loc>
+<loc>http://ciscochina.github.io/engineering/posts/</loc>
 </url>
 <url>
-<loc>http://ciscochina.github.io/typography/</loc>
+<loc>http://ciscochina.github.io/engineering/typography/</loc>
 </url>
 </urlset>
