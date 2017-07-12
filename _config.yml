@@ -10,8 +10,8 @@ exclude:
 
 # Site settings
 title: Cisco China GDC Engineering Blog
-subtitle: "never stop learning"
-email: xiaoquwl@gmail.com
+subtitle: "Never stop learning and sharing"
+email: no-reply@cisco.com
 name: Peng Xiao
 description: >
   Cisco China GDC Engineering Blog.
@@ -50,6 +50,12 @@ jekyll-archives:
 descriptions:
   - cat: test
     desc: "some test page"
+  - cat: linux
+    desc: "linux"
+  - cat: network
+    desc: "network"
+  - cat: python
+    desc: "python"
 
 social:
 
