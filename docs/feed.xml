@@ -6,8 +6,8 @@
 </description>
     <link>http://ciscochina.github.io/engineering/</link>
     <atom:link href="http://ciscochina.github.io/engineering/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 12 Jul 2017 16:30:44 +0800</pubDate>
-    <lastBuildDate>Wed, 12 Jul 2017 16:30:44 +0800</lastBuildDate>
+    <pubDate>Wed, 12 Jul 2017 16:35:12 +0800</pubDate>
+    <lastBuildDate>Wed, 12 Jul 2017 16:35:12 +0800</lastBuildDate>
     <generator>Jekyll v3.2.1</generator>
     
       <item>
@@ -53,7 +53,7 @@ build environment:
 
 &lt;p&gt;We will configure three nodes replication in one machine，like:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://ciscochina.github.io/assets/topo.png&quot; alt=&quot;topo&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/engineering/assets/topo.png&quot; alt=&quot;topo&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;1) Prepare three mongodb config file&lt;/p&gt;
 
@@ -281,7 +281,7 @@ rs0:PRIMARY&amp;gt; db.auth(&quot;myUserAdmin&quot;,&quot;abc123&quot;)
 
 &lt;p&gt;We use &lt;a href=&quot;http://api.mongodb.org/python/current/examples/high_availability.html&quot;&gt;pymongo&lt;/a&gt; to do some basic testing.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://ciscochina.github.io/assets/election.png&quot; alt=&quot;Failover&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/engineering/assets/election.png&quot; alt=&quot;Failover&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Connecting to a Replica Set&lt;/p&gt;
 
@@ -394,7 +394,7 @@ rs0:PRIMARY&amp;gt; db.auth(&quot;myUserAdmin&quot;,&quot;abc123&quot;)
 
 &lt;p&gt;根据&lt;a href=&quot;http://docs.mongodb.org/manual/core/replica-set-write-concern/&quot;&gt;Write Concern for Replica Sets&lt;/a&gt;的介绍：&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://ciscochina.github.io/assets/writeconcern.png&quot; alt=&quot;WriteConcern&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/engineering/assets/writeconcern.png&quot; alt=&quot;WriteConcern&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://api.mongodb.org/python/current/api/pymongo/database.html#pymongo.database.Database.write_concern&quot;&gt;pymongo write concern&lt;/a&gt;&lt;/p&gt;
 
