@@ -137,7 +137,7 @@
       <p><h4 id="clone-repository">Clone repository</h4> <div class="language-bash highlighter-rouge"><pre class="highlight"><code>xiaopeng@cisco ~ <span class="nv">$ </span>git clone https://github.com/xiaopeng163/twisted-fsm Cloning into <span class="s1">'twisted-fsm'</span>... remote: Counting objects: 17, <span class="k">done</span>. remote: Total 17 <span class="o">(</span>delta 0<span class="o">)</span>, reused 0 <span class="o">(</span>delta 0<span class="o">)</span> Unpacking objects: 100% <span class="o">(</span>17/17<span class="o">)</span>, <span class="k">done</span>. Checking connectivity... <span class="k">done</span>. </code></pre> </div>...</p>
     </section> -->
     <section class="post-meta">
-      <div class="post-date">July 8, 2017</div>
+      <div class="post-date">July 8, 2017, Peng Xiao</div>
       <div class="post-categories">
       in 
         
@@ -159,7 +159,7 @@
       <p><h2 id="environment-setup">1 Environment Setup</h2> <p>One CentOS 7 machine</p> <div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>more /etc/redhat-release CentOS Linux release 7.2.1511 <span class="o">(</span>Core<span class="o">)</span> </code></pre> </div> <p>Mongodb version</p> <div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>mongod --version db version v3.2.6 git version: 05552b562c7a0b3143a729aaa0838e558dc49b25 OpenSSL version: OpenSSL 1.0.1e-fips 11 Feb 2013 allocator: tcmalloc modules: none...</p>
     </section> -->
     <section class="post-meta">
-      <div class="post-date">July 8, 2017</div>
+      <div class="post-date">July 8, 2017, Peng Xiao</div>
       <div class="post-categories">
       in 
         
@@ -181,7 +181,7 @@
       <p><p>使用Python写命令行程序，以argparse是基础，但是有两个更好的工具可以选择，click和oslo.config</p> <h3 id="click">click</h3> <p>click可以用于简单的命令行程序，下面是我写的一个demo</p> <p>https://github.com/xiaopeng163/click-demo</p> <div class="highlighter-rouge"><pre class="highlight"><code>$ cd click-demo $ python setup.py install $ clickctl Usage: clickctl [OPTIONS] COMMAND [ARGS]... Click Demo Command Line Interface Options: -v, --verbose show debug message. --help Show this message and exit. Commands: init Initializes a controller cluster on master node. join join the...</p>
     </section> -->
     <section class="post-meta">
-      <div class="post-date">July 7, 2017</div>
+      <div class="post-date">July 7, 2017, Peng Xiao</div>
       <div class="post-categories">
       in 
         
@@ -203,7 +203,7 @@
       <p><h2 id="install">Install</h2> <p>Rsync is installed in many linux systems by default.</p> <div class="language-bash highlighter-rouge"><pre class="highlight"><code>rsync --version rsync version 3.0.9 protocol version 30 Copyright <span class="o">(</span>C<span class="o">)</span> 1996-2011 by Andrew Tridgell, Wayne Davison, and others. Web site: http://rsync.samba.org/ Capabilities: 64-bit files, 64-bit inums, 64-bit timestamps, 64-bit long ints, socketpairs, hardlinks, symlinks,...</p>
     </section> -->
     <section class="post-meta">
-      <div class="post-date">July 6, 2017</div>
+      <div class="post-date">July 6, 2017, Peng Xiao</div>
       <div class="post-categories">
       in 
         
@@ -225,7 +225,7 @@
       <p><p>Network Namespace可以实现网络的隔离，有点像路由器里的VRF。在虚拟化和LXC中有很重要的用处。</p> <h4 id="network-namespace">创建Network Namespace</h4> <div class="language-bash highlighter-rouge"><pre class="highlight"><code>ip netns add &lt;new namespace name&gt; </code></pre> </div> <p>例如：</p> <div class="language-bash highlighter-rouge"><pre class="highlight"><code>ip netns add <span class="nb">test</span> </code></pre> </div> <p>查看namespace</p> <div class="language-bash highlighter-rouge"><pre class="highlight"><code>ip netns list </code></pre> </div> <h4 id="namespace">给Namespace添加接口</h4> <p>创建的Namespace不能添加真实的物理接口，只能添加虚拟接口<code class="highlighter-rouge">veth</code>（virtual Ethernet interface），它们经常成对出现并且像一个管道一样连在一起。</p> <p>创建一对veth：<code class="highlighter-rouge">veth0</code>和<code class="highlighter-rouge">veth1</code></p> <div class="language-bash highlighter-rouge"><pre class="highlight"><code>ip link...</p>
     </section> -->
     <section class="post-meta">
-      <div class="post-date">July 6, 2017</div>
+      <div class="post-date">July 6, 2017, Peng Xiao</div>
       <div class="post-categories">
       in 
         
@@ -247,7 +247,7 @@
       <p><p><img src="/engineering/assets/gre-vxlan-openvswitch.png" alt="topo" /></p> <p>试了下OVS的一些隧道封装功能（GRE，VXLAN）。</p> <p>实验:实现两个虚机之间的Network namespace之间通信。如下图所示：</p> <h4 id="host-1">配置host 1</h4> <p>在host1中创建一个network namespace <code class="highlighter-rouge">red</code>，以及一对veth（veth0，veth1） ，其中veth0添加到<code class="highlighter-rouge">red</code>里，配置IP并且up起来。</p> <div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>sudo ip netns add red <span class="gp">$ </span>sudo ip link add veth0 <span class="nb">type </span>veth peer name veth1 <span class="gp">$ </span>sudo ip link <span class="nb">set </span>veth0 netns red <span...</p>
     </section> -->
     <section class="post-meta">
-      <div class="post-date">July 6, 2017</div>
+      <div class="post-date">July 6, 2017, Peng Xiao</div>
       <div class="post-categories">
       in 
         
