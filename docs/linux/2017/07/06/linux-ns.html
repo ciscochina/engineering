@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Linux Network Namespace</title>
+  <meta name="description" content="Network Namespace可以实现网络的隔离，有点像路由器里的VRF。在虚拟化和LXC中有很重要的用处。">
+  
+  <meta name="author" content="Peng Xiao">
+  <meta name="copyright" content="&copy; Peng Xiao 2017">
+  
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/engineering/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/engineering/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/engineering/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/engineering/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/engineering/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/engineering/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/engineering/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/engineering/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/engineering/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/engineering/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/engineering/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/engineering/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/engineering/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/engineering/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/engineering/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+  <!-- Facebook OGP cards -->
+  <meta property="og:description" content="Network Namespace可以实现网络的隔离，有点像路由器里的VRF。在虚拟化和LXC中有很重要的用处。" />
+  <meta property="og:url" content="http://ciscochina.github.io" />
+  <meta property="og:site_name" content="Cisco China GDC Engineering Blog" />
+  <meta property="og:title" content="Linux Network Namespace" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="612" />
+  <meta property="og:image:height" content="605" />
+  
+
+  
+  <!-- Twitter: card tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Linux Network Namespace">
+  <meta name="twitter:description" content="Network Namespace可以实现网络的隔离，有点像路由器里的VRF。在虚拟化和LXC中有很重要的用处。">
+  <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
+  <meta name="twitter:url" content="http://ciscochina.github.io">
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/engineering/css/main.css">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/linux/2017/07/06/linux-ns.html">
+  <link rel="alternate" type="application/rss+xml" title="Cisco China GDC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/engineering/" class="logo">
+      
+      <img src="/engineering/assets/logo.png" alt="Cisco China GDC Engineering Blog">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+          
+        
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container " >
+  <div class="scrim ">
+    <header class="post-header">
+      <h1 class="title">Linux Network Namespace</h1>
+      <p class="info">by <strong>Peng Xiao</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+ <span class="page-divider">
+  <span class="one"></span>
+  <span class="two"></span>
+</span>
+ 
+
+<section class="post-meta">
+  <div class="post-date">July 6, 2017</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/engineering/category/linux">Linux</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <p>Network Namespace可以实现网络的隔离，有点像路由器里的VRF。在虚拟化和LXC中有很重要的用处。</p>
+
+<h4 id="network-namespace">创建Network Namespace</h4>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>ip netns add &lt;new namespace name&gt;
+</code></pre>
+</div>
+
+<p>例如：</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>ip netns add <span class="nb">test</span>
+</code></pre>
+</div>
+
+<p>查看namespace</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>ip netns list
+</code></pre>
+</div>
+
+<h4 id="namespace">给Namespace添加接口</h4>
+
+<p>创建的Namespace不能添加真实的物理接口，只能添加虚拟接口<code class="highlighter-rouge">veth</code>（virtual Ethernet interface），它们经常成对出现并且像一个管道一样连在一起。</p>
+
+<p>创建一对veth：<code class="highlighter-rouge">veth0</code>和<code class="highlighter-rouge">veth1</code></p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>ip link add veth0 <span class="nb">type </span>veth peer name veth1
+</code></pre>
+</div>
+
+<p>通过命令可以查看我们创建的veth</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="o">[</span>root@controller0 ~]# ip link list
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 16436 qdisc noqueue state UNKNOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UNKNOWN qlen 1000
+    link/ether 08:00:27:ec:3c:70 brd ff:ff:ff:ff:ff:ff
+3: eth1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UNKNOWN qlen 1000
+    link/ether 08:00:27:d1:f2:b3 brd ff:ff:ff:ff:ff:ff
+4: eth2: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UNKNOWN qlen 1000
+    link/ether 08:00:27:ad:03:e8 brd ff:ff:ff:ff:ff:ff
+5: eth3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 08:00:27:b2:eb:13 brd ff:ff:ff:ff:ff:ff
+6: virbr0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UNKNOWN 
+    link/ether 52:54:00:eb:0e:7e brd ff:ff:ff:ff:ff:ff
+7: virbr0-nic: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN qlen 500
+    link/ether 52:54:00:eb:0e:7e brd ff:ff:ff:ff:ff:ff
+10: veth1: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN qlen 1000
+    link/ether 86:e4:2c:b1:77:d0 brd ff:ff:ff:ff:ff:ff
+11: veth0: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN qlen 1000
+    link/ether 82:bf:54:c0:5c:a9 brd ff:ff:ff:ff:ff:ff
+</code></pre>
+</div>
+<p>现在这两个veth都是属于默认（global）的Network  Namespace，下面我们把veth0放到test的namespace里，veth1保留在global的namespace里。</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="o">[</span>root@controller0 ~]# ip link <span class="nb">set </span>veth0 netns <span class="nb">test</span>
+<span class="o">[</span>root@controller0 ~]# ip netns <span class="nb">exec test </span>ip a
+9: lo: &lt;LOOPBACK&gt; mtu 16436 qdisc noop state DOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+11: veth0: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN qlen 1000
+    link/ether 82:bf:54:c0:5c:a9 brd ff:ff:ff:ff:ff:ff
+</code></pre>
+</div>
+<p>发现veth0已经跑到test这个namespace里了，全局的network namespace里已没有了veth0.</p>
+
+<p>目前veth0和veth1时down的状态，下面我们为两个veth对配置IP地址</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>ip netns <span class="nb">exec test </span>ip addr add 192.168.10.2/24 dev veth0 
+ip netns <span class="nb">exec test </span>ip link <span class="nb">set </span>veth0 up
+<span class="o">[</span>root@controller0 ~]# ip netns <span class="nb">exec test </span>ip a
+9: lo: &lt;LOOPBACK&gt; mtu 16436 qdisc noop state DOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+11: veth0: &lt;NO-CARRIER,BROADCAST,MULTICAST,UP&gt; mtu 1500 qdisc pfifo_fast state DOWN qlen 1000
+    link/ether 82:bf:54:c0:5c:a9 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.10.2/24 scope global veth0
+<span class="o">[</span>root@controller0 ~]#
+</code></pre>
+</div>
+<p>给veth1配置IP地址，veth1在global的Network Namespace里</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>ip addr add 192.168.10.1/24 dev veth1 up
+<span class="o">[</span>root@controller0 ~]# ip a
+10: veth1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 86:e4:2c:b1:77:d0 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.10.1/24 scope global veth1
+    inet6 fe80::84e4:2cff:feb1:77d0/64 scope link 
+       valid_lft forever preferred_lft forever
+<span class="o">[</span>root@controller0 ~]# ip netns <span class="nb">exec test </span>ip a
+9: lo: &lt;LOOPBACK&gt; mtu 16436 qdisc noop state DOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+11: veth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 82:bf:54:c0:5c:a9 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.10.2/24 scope global veth0
+    inet6 fe80::80bf:54ff:fec0:5ca9/64 scope link 
+       valid_lft forever preferred_lft forever
+</code></pre>
+</div>
+<p>可以看到veth0和veth1都up了起来。验证一下连通性。</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="o">[</span>root@controller0 ~]# ping 192.168.10.2
+PING 192.168.10.2 <span class="o">(</span>192.168.10.2<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
+64 bytes from 192.168.10.2: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.084 ms
+64 bytes from 192.168.10.2: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.102 ms
+^C
+--- 192.168.10.2 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, <span class="nb">time </span>1326ms
+rtt min/avg/max/mdev <span class="o">=</span> 0.084/0.093/0.102/0.009 ms
+<span class="o">[</span>root@controller0 ~]# ip netns <span class="nb">exec test </span>ping 192.168.10.1
+PING 192.168.10.1 <span class="o">(</span>192.168.10.1<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
+64 bytes from 192.168.10.1: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.076 ms
+64 bytes from 192.168.10.1: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.076 ms
+^C
+--- 192.168.10.1 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, <span class="nb">time </span>1552ms
+rtt min/avg/max/mdev <span class="o">=</span> 0.076/0.076/0.076/0.000 ms
+<span class="o">[</span>root@controller0 ~]# 
+</code></pre>
+</div>
+
+<p>从外往里ping和从里往外ping都是通的。</p>
+
+
+</article>
+
+
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">Cisco China GDC Engineering Blog</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+        
+        
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:penxiao@cisco.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">penxiao@cisco.com</span>
+          </a>
+        </li>
+
+        
+          
+          <li>
+            <a href="https://github.com/ciscochina" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">ciscochina</span>
+            </a>
+          </li>
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+      <p class="text">Cisco China GDC Engineering Blog.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+
+
+  </body>
+
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>GRE and VXLAN with Open vSwitch</title>
+  <meta name="description" content="">
+  
+  <meta name="author" content="Peng Xiao">
+  <meta name="copyright" content="&copy; Peng Xiao 2017">
+  
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/engineering/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/engineering/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/engineering/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/engineering/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/engineering/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/engineering/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/engineering/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/engineering/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/engineering/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/engineering/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/engineering/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/engineering/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/engineering/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/engineering/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/engineering/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+  <!-- Facebook OGP cards -->
+  <meta property="og:description" content="" />
+  <meta property="og:url" content="http://ciscochina.github.io" />
+  <meta property="og:site_name" content="Cisco China GDC Engineering Blog" />
+  <meta property="og:title" content="GRE and VXLAN with Open vSwitch" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="612" />
+  <meta property="og:image:height" content="605" />
+  
+
+  
+  <!-- Twitter: card tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="GRE and VXLAN with Open vSwitch">
+  <meta name="twitter:description" content="">
+  <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
+  <meta name="twitter:url" content="http://ciscochina.github.io">
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/engineering/css/main.css">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/network/2017/07/06/gre-ovs.html">
+  <link rel="alternate" type="application/rss+xml" title="Cisco China GDC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/engineering/" class="logo">
+      
+      <img src="/engineering/assets/logo.png" alt="Cisco China GDC Engineering Blog">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+          
+        
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container " >
+  <div class="scrim ">
+    <header class="post-header">
+      <h1 class="title">GRE and VXLAN with Open vSwitch</h1>
+      <p class="info">by <strong>Peng Xiao</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+ <span class="page-divider">
+  <span class="one"></span>
+  <span class="two"></span>
+</span>
+ 
+
+<section class="post-meta">
+  <div class="post-date">July 6, 2017</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/engineering/category/network">Network</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <p><img src="/engineering/assets/gre-vxlan-openvswitch.png" alt="topo" /></p>
+
+<p>试了下OVS的一些隧道封装功能（GRE，VXLAN）。</p>
+
+<p>实验:实现两个虚机之间的Network namespace之间通信。如下图所示：</p>
+
+<h4 id="host-1">配置host 1</h4>
+<p>在host1中创建一个network namespace <code class="highlighter-rouge">red</code>，以及一对veth（veth0，veth1）
+，其中veth0添加到<code class="highlighter-rouge">red</code>里，配置IP并且up起来。</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>sudo ip netns add red
+<span class="gp">$ </span>sudo ip link add veth0 <span class="nb">type </span>veth peer name veth1
+<span class="gp">$ </span>sudo ip link <span class="nb">set </span>veth0 netns red
+<span class="gp">$ </span>sudo ip netns <span class="nb">exec </span>red ip addr add 10.1.1.1/24 dev veth0
+<span class="gp">$ </span>sudo ip netns <span class="nb">exec </span>red ip a
+7: lo: &lt;LOOPBACK&gt; mtu 16436 qdisc noop state DOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+9: veth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether ca:4f:8c:a1:3b:24 brd ff:ff:ff:ff:ff:ff
+    inet 10.1.1.1/24 scope global veth0
+    inet6 fe80::c84f:8cff:fea1:3b24/64 scope link 
+       valid_lft forever preferred_lft forever
+</code></pre>
+</div>
+
+<p>OVS创建一个bridge <code class="highlighter-rouge">br-int</code>，并且把前面创建的veth对里的<code class="highlighter-rouge">veth1</code>作为端口添加到这个bridge上并up起来，然后给端口打上vlan tag 10。</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>sudo ovs-vsctl add-br br-int
+<span class="gp">$ </span>sudo ovs-vsctl add-port br-int veth1
+<span class="gp">$ </span>sudo ip link <span class="nb">set </span>veth1 up
+<span class="gp">$ </span>sudo  ovs-vsctl <span class="nb">set </span>port veth1 <span class="nv">tag</span><span class="o">=</span>10
+</code></pre>
+</div>
+
+<h4 id="host2">配置host2</h4>
+
+<p>host2的配置和host1几乎完全相同，唯一不同的是veth0的IP地址时10.1.1.2/24</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>sudo ip netns <span class="nb">exec </span>red ip a
+9: lo: &lt;LOOPBACK&gt; mtu 16436 qdisc noop state DOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+11: veth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 12:09:83:aa:97:57 brd ff:ff:ff:ff:ff:ff
+    inet 10.1.1.2/24 scope global veth0
+    inet6 fe80::1009:83ff:feaa:9757/64 scope link 
+       valid_lft forever preferred_lft forever
+</code></pre>
+</div>
+<h4 id="host1host2gre">配置host1和host2之间的GRE隧道</h4>
+
+<p>在host1上配置</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>sudo ovs-vsctl add-port br-int gre0 -- <span class="nb">set </span>interface gre0 <span class="nb">type</span><span class="o">=</span>gre options:remote_ip<span class="o">=</span>192.168.4.202
+</code></pre>
+</div>
+<p>其中192.168.4.202是host2上的eth2</p>
+
+<p>在host2上配置</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>sudo ovs-vsctl add-port br-int gre0 -- <span class="nb">set </span>interface gre0 <span class="nb">type</span><span class="o">=</span>gre options:remote_ip<span class="o">=</span>192.168.4.201
+</code></pre>
+</div>
+<p>其中192.168.4.201是host1的eth2地址。</p>
+
+<p>可以通过OVS查看配置</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>sudo ovs-vsctl show
+d33f919d-82b7-4541-a4c2-39ca45286a83
+    Bridge br-int
+        Port <span class="s2">"veth1"</span>
+            tag: 10
+            Interface <span class="s2">"veth1"</span>
+        Port br-int
+            Interface br-int
+                <span class="nb">type</span>: internal
+        Port <span class="s2">"gre0"</span>
+            Interface <span class="s2">"gre0"</span>
+                <span class="nb">type</span>: gre
+                options: <span class="o">{</span><span class="nv">remote_ip</span><span class="o">=</span><span class="s2">"192.168.4.201"</span><span class="o">}</span>
+    ovs_version: <span class="s2">"1.11.0"</span>
+</code></pre>
+</div>
+
+<p>验证两个host上的red network namespace是否连通</p>
+
+<p>在host1上ping</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ ip netns exec red ping -c 4 10.1.1.2
+PING 10.1.1.2 (10.1.1.2) 56(84) bytes of data.
+64 bytes from 10.1.1.2: icmp_seq=1 ttl=64 time=0.977 ms
+64 bytes from 10.1.1.2: icmp_seq=2 ttl=64 time=0.915 ms
+64 bytes from 10.1.1.2: icmp_seq=3 ttl=64 time=1.00 ms
+64 bytes from 10.1.1.2: icmp_seq=4 ttl=64 time=0.658 ms
+--- 10.1.1.2 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3005ms
+rtt min/avg/max/mdev = 0.658/0.889/1.008/0.140 ms
+</code></pre>
+</div>
+
+<p>同时在host2的eth2上抓包可以看到</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>sudo tcpdump -i eth2
+tcpdump: verbose output suppressed, use -v or -vv <span class="k">for </span>full protocol decode
+listening on eth2, link-type EN10MB <span class="o">(</span>Ethernet<span class="o">)</span>, capture size 65535 bytes
+16:23:59.597256 IP 192.168.4.201 &gt; 192.168.4.202: GREv0, length 106: IP 10.1.1.1 &gt; 10.1.1.2: ICMP <span class="nb">echo </span>request, id 13321, seq 1, length 64
+16:23:59.597499 IP 192.168.4.202 &gt; 192.168.4.201: GREv0, length 106: IP 10.1.1.2 &gt; 10.1.1.1: ICMP <span class="nb">echo </span>reply, id 13321, seq 1, length 64
+16:24:00.598288 IP 192.168.4.201 &gt; 192.168.4.202: GREv0, length 106: IP 10.1.1.1 &gt; 10.1.1.2: ICMP <span class="nb">echo </span>request, id 13321, seq 2, length 64
+16:24:00.598461 IP 192.168.4.202 &gt; 192.168.4.201: GREv0, length 106: IP 10.1.1.2 &gt; 10.1.1.1: ICMP <span class="nb">echo </span>reply, id 13321, seq 2, length 64
+16:24:01.600200 IP 192.168.4.201 &gt; 192.168.4.202: GREv0, length 106: IP 10.1.1.1 &gt; 10.1.1.2: ICMP <span class="nb">echo </span>request, id 13321, seq 3, length 64
+16:24:01.600441 IP 192.168.4.202 &gt; 192.168.4.201: GREv0, length 106: IP 10.1.1.2 &gt; 10.1.1.1: ICMP <span class="nb">echo </span>reply, id 13321, seq 3, length 64
+16:24:02.133695 IP 192.168.4.1.17500 &gt; 192.168.4.255.17500: UDP, length 104
+16:24:02.601673 IP 192.168.4.201 &gt; 192.168.4.202: GREv0, length 106: IP 10.1.1.1 &gt; 10.1.1.2: ICMP <span class="nb">echo </span>request, id 13321, seq 4, length 64
+16:24:02.601833 IP 192.168.4.202 &gt; 192.168.4.201: GREv0, length 106: IP 10.1.1.2 &gt; 10.1.1.1: ICMP <span class="nb">echo </span>reply, id 13321, seq 4, length 64
+</code></pre>
+</div>
+<p>可以看到有ICMP的包通过GRE的封装发送过来。</p>
+
+<h4 id="host1host2vxlan">配置host1和host2之间VXLAN封装</h4>
+
+<p>首先在host1和host2上把ovs上的gre0 port 删掉</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>sudo  ovs-vsctl del-port gre0
+</code></pre>
+</div>
+<p>然后在host1和host2上分别配置vxlan，和GRE的区别就是type字段改成<code class="highlighter-rouge">vxlan</code></p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>sudo ovs-vsctl add-port br-int vxlan0 -- <span class="nb">set </span>interface vxlan0 <span class="nb">type</span><span class="o">=</span>vxlan options:remote_ip<span class="o">=</span>192.168.4.201
+<span class="gp">$ </span>sudo ovs-vsctl show
+d33f919d-82b7-4541-a4c2-39ca45286a83
+    Bridge br-int
+        Port <span class="s2">"veth1"</span>
+            tag: 10
+            Interface <span class="s2">"veth1"</span>
+        Port br-int
+            Interface br-int
+                <span class="nb">type</span>: internal
+        Port <span class="s2">"vxlan0"</span>
+            Interface <span class="s2">"vxlan0"</span>
+                <span class="nb">type</span>: vxlan
+                options: <span class="o">{</span><span class="nv">remote_ip</span><span class="o">=</span><span class="s2">"192.168.4.201"</span><span class="o">}</span>
+    ovs_version: <span class="s2">"1.11.0"</span>
+</code></pre>
+</div>
+
+<p>验证</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>tcpdump -i eth2
+tcpdump: verbose output suppressed, use -v or -vv <span class="k">for </span>full protocol decode
+listening on eth2, link-type EN10MB <span class="o">(</span>Ethernet<span class="o">)</span>, capture size 65535 bytes
+16:38:40.018375 ARP, Request who-has 192.168.4.202 tell 192.168.4.201, length 46
+16:38:40.018422 ARP, Reply 192.168.4.202 is-at 08:00:27:fd:39:c8 <span class="o">(</span>oui Unknown<span class="o">)</span>, length 28
+16:38:40.018724 IP 192.168.4.201.60827 &gt; 192.168.4.202.4789: UDP, length 54
+16:38:40.019324 IP 192.168.4.202.56167 &gt; 192.168.4.201.4789: UDP, length 54
+16:38:40.020405 IP 192.168.4.201.57614 &gt; 192.168.4.202.4789: UDP, length 110
+16:38:40.021146 IP 192.168.4.202.39657 &gt; 192.168.4.201.4789: UDP, length 110
+16:38:41.018502 IP 192.168.4.201.57614 &gt; 192.168.4.202.4789: UDP, length 110
+16:38:41.018674 IP 192.168.4.202.39657 &gt; 192.168.4.201.4789: UDP, length 110
+16:38:42.019908 IP 192.168.4.201.57614 &gt; 192.168.4.202.4789: UDP, length 110
+16:38:42.020198 IP 192.168.4.202.39657 &gt; 192.168.4.201.4789: UDP, length 110
+16:38:43.021400 IP 192.168.4.201.57614 &gt; 192.168.4.202.4789: UDP, length 110
+16:38:43.021597 IP 192.168.4.202.39657 &gt; 192.168.4.201.4789: UDP, length 110
+16:38:45.018441 ARP, Request who-has 192.168.4.201 tell 192.168.4.202, length 28
+16:38:45.019091 ARP, Reply 192.168.4.201 is-at 08:00:27:f4:b2:82 <span class="o">(</span>oui Unknown<span class="o">)</span>, length 46
+16:38:45.020773 IP 192.168.4.202.56167 &gt; 192.168.4.201.4789: UDP, length 54
+16:38:45.021771 IP 192.168.4.201.55994 &gt; 192.168.4.202.4789: UDP, length 54
+</code></pre>
+</div>
+
+<p>端口4789就是vxlan的端口。</p>
+
+<p>参考：</p>
+
+<p><a href="http://blog.scottlowe.org/2013/09/09/namespaces-vlans-open-vswitch-and-gre-tunnels/">http://blog.scottlowe.org/2013/09/09/namespaces-vlans-open-vswitch-and-gre-tunnels/</a></p>
+
+<p><a href="http://blog.scottlowe.org/2013/05/07/using-gre-tunnels-with-open-vswitch/">http://blog.scottlowe.org/2013/05/07/using-gre-tunnels-with-open-vswitch/</a></p>
+
+<p><a href="http://blog.csdn.net/landhang/article/details/8885927">http://blog.csdn.net/landhang/article/details/8885927</a></p>
+
+</article>
+
+
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">Cisco China GDC Engineering Blog</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+        
+        
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:penxiao@cisco.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">penxiao@cisco.com</span>
+          </a>
+        </li>
+
+        
+          
+          <li>
+            <a href="https://github.com/ciscochina" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">ciscochina</span>
+            </a>
+          </li>
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+      <p class="text">Cisco China GDC Engineering Blog.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+
+
+  </body>
+
+</html>

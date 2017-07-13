@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Trace Packets in MPLS VPNv4 Network</title>
+  <meta name="description" content="">
+  
+  <meta name="author" content="Peng Xiao">
+  <meta name="copyright" content="&copy; Peng Xiao 2017">
+  
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/engineering/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/engineering/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/engineering/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/engineering/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/engineering/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/engineering/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/engineering/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/engineering/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/engineering/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/engineering/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/engineering/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/engineering/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/engineering/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/engineering/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/engineering/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+  <!-- Facebook OGP cards -->
+  <meta property="og:description" content="" />
+  <meta property="og:url" content="http://ciscochina.github.io" />
+  <meta property="og:site_name" content="Cisco China GDC Engineering Blog" />
+  <meta property="og:title" content="Trace Packets in MPLS VPNv4 Network" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="612" />
+  <meta property="og:image:height" content="605" />
+  
+
+  
+  <!-- Twitter: card tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Trace Packets in MPLS VPNv4 Network">
+  <meta name="twitter:description" content="">
+  <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
+  <meta name="twitter:url" content="http://ciscochina.github.io">
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/engineering/css/main.css">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/network/2017/07/09/mpls-vpn-packet.html">
+  <link rel="alternate" type="application/rss+xml" title="Cisco China GDC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/engineering/" class="logo">
+      
+      <img src="/engineering/assets/logo.png" alt="Cisco China GDC Engineering Blog">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+          
+        
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container " >
+  <div class="scrim ">
+    <header class="post-header">
+      <h1 class="title">Trace Packets in MPLS VPNv4 Network</h1>
+      <p class="info">by <strong>Peng Xiao</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+ <span class="page-divider">
+  <span class="one"></span>
+  <span class="two"></span>
+</span>
+ 
+
+<section class="post-meta">
+  <div class="post-date">July 9, 2017</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/engineering/category/network">Network</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <p><img src="/engineering/assets/vpnv4-packets/topo.png" alt="topo" /></p>
+
+<p>source https://github.com/xiaopeng163/www.pengxiao.me/blob/master/source/_posts/vpnv4-packets.md</p>
+
+<p>主要想看看数据包是怎么在MPLS VPNv4 Core Network中路由传播的，顺便抓个两层标签的数据包。实验拓扑如上。</p>
+
+<p><code class="highlighter-rouge">AS 100</code>： <code class="highlighter-rouge">MPLS VPN</code>主干，通过<code class="highlighter-rouge">MP-BGP</code>传递<code class="highlighter-rouge">VPNv4</code>路由信息（其中<code class="highlighter-rouge">RR</code>反射<code class="highlighter-rouge">VPNv4</code>路由）。
+<code class="highlighter-rouge">PE</code>和<code class="highlighter-rouge">CE</code>直接采用<code class="highlighter-rouge">EBGP</code>来承载客户路由。<code class="highlighter-rouge">CE</code>宣告路由<code class="highlighter-rouge">1.1.1.1/32</code>， <code class="highlighter-rouge">CE2</code>宣告<code class="highlighter-rouge">2.2.2.2/32</code>来模拟客户网络路由。相关配置见本文最后。
+操作为在<code class="highlighter-rouge">CE1</code>上<code class="highlighter-rouge">ping 2.2.2.2</code> 到<code class="highlighter-rouge">CE2</code>，看数据包是如何传递，由于<code class="highlighter-rouge">CE1</code>到<code class="highlighter-rouge">PE1</code>，<code class="highlighter-rouge">PE2</code>到<code class="highlighter-rouge">CE2</code>是普通的<code class="highlighter-rouge">IPv4</code>，所以我们主要看去往<code class="highlighter-rouge">2.2.2.2</code>的数据包如何在<code class="highlighter-rouge">PE1，RR，PE2</code>直接传递的。</p>
+
+<h3 id="vpnv4">一，VPNv4路由收敛</h3>
+
+<p>从<code class="highlighter-rouge">PE1</code>的入方向看，<code class="highlighter-rouge">PE1</code>收到<code class="highlighter-rouge">RR</code>反射<code class="highlighter-rouge">PE2</code>过来的<code class="highlighter-rouge">VPNv4</code>路由<code class="highlighter-rouge">update</code>如下，其中<code class="highlighter-rouge">extended community</code>字段是<code class="highlighter-rouge">router target</code>信息，标识导入相关的<code class="highlighter-rouge">VPN</code>路由表，<code class="highlighter-rouge">VPN</code>的<code class="highlighter-rouge">NLRI</code>是真正的<code class="highlighter-rouge">VPN</code>路由，
+其中<code class="highlighter-rouge">AFI</code>和<code class="highlighter-rouge">SAFI</code>代表了<code class="highlighter-rouge">VPNv4</code>；<code class="highlighter-rouge">Nexthop</code>属性是此<code class="highlighter-rouge">VPN</code>路由的下一跳（里面默认加了<code class="highlighter-rouge">RD 0:0</code>，正是为了和VPN路由对应一致<code class="highlighter-rouge">RD+IP prefix</code>）;</p>
+
+<p>最下面是真正的<code class="highlighter-rouge">VPNv4</code>路由：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>RD=65002:1
+Label Stack = 19 (第二标签的由来)
+prefix = 2.2.2.2/32
+</code></pre>
+</div>
+
+<p><img src="/engineering/assets/vpnv4-packets/wireshark1.png" alt="topo" /></p>
+
+<h3 id="ping-2222">二，ping 2.2.2.2</h3>
+
+<h4 id="pe1">PE1：</h4>
+
+<p>（1）收到从<code class="highlighter-rouge">CE1</code>过来的去往<code class="highlighter-rouge">2.2.2.2</code>的数据包，<code class="highlighter-rouge">PE1</code>会查看自己的VPN（对应此CE）路由表，得到下一跳是<code class="highlighter-rouge">192.168.1.3</code>，并且得到VPN的出站标签是<code class="highlighter-rouge">19</code></p>
+
+<p><img src="/engineering/assets/vpnv4-packets/show1.png" alt="topo" /></p>
+
+<p>（2）查看本地MPLS转发表，得知下一跳<code class="highlighter-rouge">192.168.1.3</code>出站标签<code class="highlighter-rouge">17</code></p>
+
+<p><img src="/engineering/assets/vpnv4-packets/show2.png" alt="topo" /></p>
+
+<p>（3）打上以上两个MPLS标签，成ICMP报文发给<code class="highlighter-rouge">RR 10.12.1.2</code></p>
+
+<p><img src="/engineering/assets/vpnv4-packets/wireshark2.png" alt="topo" /></p>
+
+<h4 id="rr">RR：</h4>
+
+<p>RR收到PE1发过来的ICMP数据包，直接根据MPLS转发表找到<code class="highlighter-rouge">192.168.1.3</code></p>
+
+<p><img src="/engineering/assets/vpnv4-packets/show3.png" alt="topo" /></p>
+
+<p>出站<code class="highlighter-rouge">pop tag</code>（此处应该是MPLS的PHP技术），POP而不是untag，说明RR发现此MPLS数据包里标签并非栈低。
+成ICMP报文发给下一跳<code class="highlighter-rouge">10.23.1.2</code>，也就是<code class="highlighter-rouge">PE2</code></p>
+
+<p><img src="/engineering/assets/vpnv4-packets/wireshark3.png" alt="topo" /></p>
+
+<h4 id="pe2">PE2：</h4>
+
+<p>PE2从RR收到的ICMP报文，其实还有一层标签。然后就去标签直接发往相应的下一跳了。</p>
+
+<p><img src="/engineering/assets/vpnv4-packets/show4.png" alt="topo" /></p>
+
+<p>数据包的返回的过程类似。</p>
+
+<h3 id="section">附：</h3>
+
+<p>CE1：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>router bgp 65001
+no synchronization
+bgp log-neighbor-changes
+network 1.1.1.1 mask 255.255.255.255
+neighbor 12.0.0.2 remote-as 100
+neighbor 12.0.0.2 ebgp-multihop 255
+no auto-summary
+!
+</code></pre>
+</div>
+<p>PE1：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>router bgp 100
+bgp router-id 192.168.1.1
+no bgp default ipv4-unicast
+bgp log-neighbor-changes
+neighbor 192.168.1.2 remote-as 100
+neighbor 192.168.1.2 update-source Loopback0
+!
+address-family ipv4
+  neighbor 192.168.1.2 activate
+  no auto-summary
+  no synchronization
+exit-address-family
+!
+address-family vpnv4
+  neighbor 192.168.1.2 activate
+  neighbor 192.168.1.2 send-community extended
+exit-address-family
+!
+address-family ipv4 vrf cisco
+  redistribute connected
+  neighbor 12.0.0.1 remote-as 65001
+  neighbor 12.0.0.1 activate
+  no synchronization
+exit-address-family
+!
+</code></pre>
+</div>
+<p>RR：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>router bgp 100
+bgp router-id 192.168.1.2
+no bgp default ipv4-unicast
+no bgp default route-target filter
+bgp log-neighbor-changes
+neighbor 192.168.1.1 remote-as 100
+neighbor 192.168.1.1 update-source Loopback0
+neighbor 192.168.1.3 remote-as 100
+neighbor 192.168.1.3 update-source Loopback0
+!
+address-family vpnv4
+  neighbor 192.168.1.1 activate
+  neighbor 192.168.1.1 send-community both
+  neighbor 192.168.1.1 route-reflector-client
+  neighbor 192.168.1.3 activate
+  neighbor 192.168.1.3 send-community extended
+  neighbor 192.168.1.3 route-reflector-client
+exit-address-family
+!
+</code></pre>
+</div>
+
+<p>PE2：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>router bgp 100
+bgp router-id 192.168.1.3
+no bgp default ipv4-unicast
+bgp log-neighbor-changes
+neighbor 192.168.1.2 remote-as 100
+neighbor 192.168.1.2 update-source Loopback0
+!
+address-family ipv4
+  neighbor 192.168.1.2 activate
+  no auto-summary
+  no synchronization
+exit-address-family
+!
+address-family vpnv4
+  neighbor 192.168.1.2 activate
+  neighbor 192.168.1.2 send-community both
+exit-address-family
+!
+address-family ipv4 vrf cisco
+  redistribute connected
+  neighbor 23.0.0.2 remote-as 65002
+  neighbor 23.0.0.2 activate
+  no synchronization
+exit-address-family
+</code></pre>
+</div>
+
+<p>CE2：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>router bgp 65002
+no synchronization
+bgp log-neighbor-changes
+network 2.2.2.2 mask 255.255.255.255
+neighbor 23.0.0.1 remote-as 100
+neighbor 23.0.0.1 ebgp-multihop 255
+no auto-summary
+!
+</code></pre>
+</div>
+
+</article>
+
+
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">Cisco China GDC Engineering Blog</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+        
+        
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:penxiao@cisco.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">penxiao@cisco.com</span>
+          </a>
+        </li>
+
+        
+          
+          <li>
+            <a href="https://github.com/ciscochina" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">ciscochina</span>
+            </a>
+          </li>
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+      <p class="text">Cisco China GDC Engineering Blog.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+
+
+  </body>
+
+</html>

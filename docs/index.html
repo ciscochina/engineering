@@ -108,8 +108,6 @@
         
           
         
-          
-        
       </ul>
     </nav>
   </div>
@@ -238,6 +236,116 @@
     </section>
   </li>
   
+  <hr>
+  
+  
+  <li>
+    <h2>
+      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-plugin.html">How to read OpenStack code part 6 - core plugin and extension</a>
+    </h2>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p>本章我们将写一个自己的core plugin 和一个resource extension来加深理解。(阅读本文的前提是你已经理解了restful以及stevedore等内容)</p> <h1 id="core-plugin">什么是 core plugin</h1> <p>neutron的plugin有core和service两种。core plugin实现core resource的增删改查，service plugin我们在本文暂不讨论。</p> <p>core resource 有network/subnet/port/subnet-pool。每种资源对应CURD和index5种操作。以network资源为例，相关操作和HTTP请求的对应关系如下</p> <div class="highlighter-rouge"><pre class="highlight"><code>create_network POST networks delete_network DELETE networks/network_id update_network PUT networks/network_id get_network GET networks/network_id get_networks GET networks </code></pre> </div> <p>因此，core plugin中对各种核心资源都有如下的函数对应：</p> <div class="highlighter-rouge"><pre class="highlight"><code>create_{resource_name} update_{resource_name} delete_{resource_name} get_{resource_name} get_{resource_names} </code></pre> </div> <h1 id="how-to-write-core-plugin">how to write core...</p>
+    </section> -->
+    <section class="post-meta">
+      <div class="post-date">July 12, 2017</div>
+      <div class="post-categories">
+      in 
+        
+        <a href="/engineering/category/openstack">Openstack</a>
+        
+      
+      </div>
+    </section>
+  </li>
+  
+  <hr>
+  
+  
+  <li>
+    <h2>
+      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-pastedeploy.html">How to read OpenStack code part 2 - pastedeploy</a>
+    </h2>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p>本篇分为以下几个部分</p> <blockquote> <ul> <li>paste 是什么</li> <li>怎样使用paste</li> <li>paste of neutron</li> </ul> </blockquote> <h2 id="paste-">paste 是什么</h2> <p>WSGI 是python 中application 和 web server互通的标准。 我们知道了wsgi 中包括 app, middleware ， server而且middleware可以有很多个。wsgi结构的系统最大的好处就是middleware像积木一样，可以灵活的添加组成不同的功能。</p> <p>我们上一篇文章中，把2个middleware和一个app组合到了一起，但我们采用的写法是在代码中这样写：</p> <div class="highlighter-rouge"><pre class="highlight"><code>httpd = make_server('10.79.99.86', 8051, CheckError(AuthToken(check_number))) </code></pre> </div> <p>把各个模块之间的关系硬编码到了代码中，这很显然不够灵活，假设有一天想重新组织middleware的结构，我们还需要找到相关的代码去修改代码。最好的办法是通过配置文件来组织各个模块之间的关系，通过修改配置文件来影响系统中各个模块的组合与调用。 Paste 就是解决这个问题的。</p> <p>paste 是python的一个module，通过paste， 你可以把wsgi的模块写入ini风格的配置文件，灵活部署。</p> <p>下面我们用paste构建一个小系统，进一步了解</p> <h2 id="paste">怎样使用paste</h2> <p>首先，我们将构建三个wsgi组件， 一个application叫check_number， 该application的功能是check http req中的数字是奇数还是偶数，如果是奇数返回odd否则返回even。...</p>
+    </section> -->
+    <section class="post-meta">
+      <div class="post-date">July 12, 2017</div>
+      <div class="post-categories">
+      in 
+        
+        <a href="/engineering/category/openstack">Openstack</a>
+        
+      
+      </div>
+    </section>
+  </li>
+  
+  <hr>
+  
+  
+  <li>
+    <h2>
+      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-neutron-arh.html">How to read OpenStack code part 5 - neutron architecture</a>
+    </h2>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p>今天这一章节非常重要。我们知道neutron是一个非常复杂的系统，由很多组件构成。研究这样一个复杂的系统，正确的顺序应该是现在宏观上对其整体结构有所了解，然后再由针对性的对其组件进行深入了解。本章要做的事情就是介绍neutron 宏观上的架构。</p> <p>首先看一下下图：</p> <div class="highlighter-rouge"><pre class="highlight"><code>人 - - &gt; Neutron Server - - &gt; Plugin - -&gt; message queue - -&gt; Agent (Extension) | | MySQL database </code></pre> </div> <p>因为是markdown 编辑，所以没办法把图画的太复杂，不过其实也够了。上面就是Neutron的大致结构。</p> <p>首先，是人发起API请求给Neutron Server。这个过程没什么好说的，就是HTTP restful请求</p> <p>然后，Neutron Server 接受到请求后，会根据route规则把请求转发给相应的Plugin。这里的route规则，也就是route map是由之前介绍过的route package生成的</p> <p>Plugin接受到请求后主要做两件事，在DB中创建对象和调用Agent做响应配置。比如创建一个subnet请求，plugin会现在db创建subnet的数据对象，然后调用agent在openvswitch或者linuxbridge创建具体的配置信息。Plugin和db交互用的是sqlalchemy orm package，跟agent交互是通过message queue。</p> <p>由此可见Plugin是Neutron的核心。不过从图中还可以看到一个叫extension的东西，这里的extension跟我们之前在stevedore中提到的extension不是一回事儿，但在neutron中也非常重要，下面我们大概了解一下plugin 和 extension。</p> <h1 id="plugin-">Plugin 发展历史</h1> <p>Neutron是所谓pluggable结构的，就是说它的很多组件应该可以像积木一样随意插拔使用。</p>...</p>
+    </section> -->
+    <section class="post-meta">
+      <div class="post-date">July 12, 2017</div>
+      <div class="post-categories">
+      in 
+        
+        <a href="/engineering/category/openstack">Openstack</a>
+        
+      
+      </div>
+    </section>
+  </li>
+  
+  <hr>
+  
+  
+  <li>
+    <h2>
+      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-action-exten.html">How to read OpenStack code part 8 - action extension</a>
+    </h2>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p>之前我们看过了core plugin， service plugin 还有resource extension。</p> <p>resource extension的作用是定义新的资源。而我们说过还有两种extension： action extension 跟 request extension。这一章我们将写一个action extension。</p> <h1 id="action-in-restful">action in RESTful</h1> <p>openstack中所有的网络服务都是RESTful风格的。但RESTful风格的URL有一个问题，如何表示动作。</p> <p>像 network，tiger 这些单词都是名词，用在URL中以HTTP的POST/GET/DELETE/PUT来对应create get delete update没有任何问题。但有的时候我们需要在url中表示一些动词。比如，router是一个名词，但router中添加一个端口是一个动词。这时候我们有三种选择：</p> <p><strong>把增加端口变成update router的一个分支功能</strong></p> <p>这是一个好办法，但很多时候由于种种原因并不适用，比如这需要修改原来的update逻辑，需要修改原来的router数据结构，可能这个动作及其复杂，把它放入update不合适等等等等</p> <p><strong>把这个动作变成一个独立的资源</strong></p> <p>比如原来的url是api/v2/routers, 但现在我们用下面的URL表示这个动作</p> <div class="highlighter-rouge"><pre class="highlight"><code>api/v2/routers/{router id}/add_router_interface </code></pre> </div> <p>这个方法也很不错。事实上，neutron中大多数情况下都是用的这个方法。不过，如果这么做的话，动作变成了资源，那么就不用action extension而用resource extension了。所以这种方法不是我们这里要讨论的</p> <p><strong>用一个action资源来处理所有的动作</strong></p> <p>比如原来的url是api/v2/routers,现在我们用下面的url</p> <div class="highlighter-rouge"><pre class="highlight"><code>api/v2/routers/action POST </code></pre> </div> <p>既然是POST 那么肯定有body，...</p>
+    </section> -->
+    <section class="post-meta">
+      <div class="post-date">July 12, 2017</div>
+      <div class="post-categories">
+      in 
+        
+        <a href="/engineering/category/openstack">Openstack</a>
+        
+      
+      </div>
+    </section>
+  </li>
+  
+  <hr>
+  
+  
+  <li>
+    <h2>
+      <a class="post-link" href="/engineering/network/2017/07/09/mpls-vpn-packet.html">Trace Packets in MPLS VPNv4 Network</a>
+    </h2>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p><img src="/engineering/assets/vpnv4-packets/topo.png" alt="topo" /></p> <p>source https://github.com/xiaopeng163/www.pengxiao.me/blob/master/source/_posts/vpnv4-packets.md</p> <p>主要想看看数据包是怎么在MPLS VPNv4 Core Network中路由传播的，顺便抓个两层标签的数据包。实验拓扑如上。</p> <p><code class="highlighter-rouge">AS 100</code>： <code class="highlighter-rouge">MPLS VPN</code>主干，通过<code class="highlighter-rouge">MP-BGP</code>传递<code class="highlighter-rouge">VPNv4</code>路由信息（其中<code class="highlighter-rouge">RR</code>反射<code class="highlighter-rouge">VPNv4</code>路由）。 <code class="highlighter-rouge">PE</code>和<code class="highlighter-rouge">CE</code>直接采用<code class="highlighter-rouge">EBGP</code>来承载客户路由。<code class="highlighter-rouge">CE</code>宣告路由<code class="highlighter-rouge">1.1.1.1/32</code>， <code class="highlighter-rouge">CE2</code>宣告<code class="highlighter-rouge">2.2.2.2/32</code>来模拟客户网络路由。相关配置见本文最后。 操作为在<code class="highlighter-rouge">CE1</code>上<code class="highlighter-rouge">ping 2.2.2.2</code> 到<code class="highlighter-rouge">CE2</code>，看数据包是如何传递，由于<code class="highlighter-rouge">CE1</code>到<code class="highlighter-rouge">PE1</code>，<code class="highlighter-rouge">PE2</code>到<code class="highlighter-rouge">CE2</code>是普通的<code class="highlighter-rouge">IPv4</code>，所以我们主要看去往<code class="highlighter-rouge">2.2.2.2</code>的数据包如何在<code class="highlighter-rouge">PE1，RR，PE2</code>直接传递的。</p> <h3 id="vpnv4">一，VPNv4路由收敛</h3> <p>从<code class="highlighter-rouge">PE1</code>的入方向看，<code class="highlighter-rouge">PE1</code>收到<code class="highlighter-rouge">RR</code>反射<code class="highlighter-rouge">PE2</code>过来的<code class="highlighter-rouge">VPNv4</code>路由<code...</p>
+    </section> -->
+    <section class="post-meta">
+      <div class="post-date">July 9, 2017</div>
+      <div class="post-categories">
+      in 
+        
+        <a href="/engineering/category/network">Network</a>
+        
+      
+      </div>
+    </section>
+  </li>
+  
   
 </ul>
 
@@ -249,7 +357,7 @@
       <i class="fa fa-angle-double-left fa-stack-1x fa-inverse"></i>
     </span>
 		
-		<span class="page-number">Page 1 of 3</span>
+		<span class="page-number">Page 1 of 2</span>
 		
 		<a class="newer-posts" href="/engineering/page2">
       <span class="fa-stack fa-lg">
@@ -293,8 +401,6 @@
         
         
           <li class="nav-link"><a href="/engineering/typography/">Typography</a>
-        
-        
         
         
         

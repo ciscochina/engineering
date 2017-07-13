@@ -27,7 +27,7 @@ logo: "/assets/logo.png"
 
 # Build settings
 markdown: kramdown
-paginate: 5
+paginate: 10
 paginate_path: "/page:num/"
 inter_post_navigation: false
 highlightjs_theme: "monokai-sublime"
@@ -53,9 +53,9 @@ descriptions:
   - cat: database
   - cat: linux
   - cat: network
-    desc: "network"
   - cat: openstack
   - cat: python
+  - cat: docker
 
 social:
 
