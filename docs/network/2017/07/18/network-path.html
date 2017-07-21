@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>网络学习和CCIE认证</title>
+  <meta name="description" content="本文假设你没有任何网络基础，从头开始，打算在2-3年内达到某一个方向CCIE的水准（不是paper IE）, 以我个人的经历梳理的一个计划。对于每一个部分需要花的时间，不同的人会有不同的情况，要依情况而定。但是总体来讲，在不影响工作的前提下，稳步提升，2-3年是一个比较合理的时间。">
+  
+  <meta name="author" content="Peng Xiao">
+  <meta name="copyright" content="&copy; Peng Xiao 2017">
+  
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/engineering/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/engineering/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/engineering/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/engineering/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/engineering/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/engineering/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/engineering/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/engineering/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/engineering/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/engineering/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/engineering/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/engineering/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/engineering/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/engineering/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/engineering/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+  <!-- Facebook OGP cards -->
+  <meta property="og:description" content="本文假设你没有任何网络基础，从头开始，打算在2-3年内达到某一个方向CCIE的水准（不是paper IE）, 以我个人的经历梳理的一个计划。对于每一个部分需要花的时间，不同的人会有不同的情况，要依情况而定。但是总体来讲，在不影响工作的前提下，稳步提升，2-3年是一个比较合理的时间。" />
+  <meta property="og:url" content="http://ciscochina.github.io" />
+  <meta property="og:site_name" content="Cisco China GDC Engineering Blog" />
+  <meta property="og:title" content="网络学习和CCIE认证" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="612" />
+  <meta property="og:image:height" content="605" />
+  
+
+  
+  <!-- Twitter: card tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="网络学习和CCIE认证">
+  <meta name="twitter:description" content="本文假设你没有任何网络基础，从头开始，打算在2-3年内达到某一个方向CCIE的水准（不是paper IE）, 以我个人的经历梳理的一个计划。对于每一个部分需要花的时间，不同的人会有不同的情况，要依情况而定。但是总体来讲，在不影响工作的前提下，稳步提升，2-3年是一个比较合理的时间。">
+  <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
+  <meta name="twitter:url" content="http://ciscochina.github.io">
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/engineering/css/main.css">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/network/2017/07/18/network-path.html">
+  <link rel="alternate" type="application/rss+xml" title="Cisco China GDC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/engineering/" class="logo">
+      
+      <img src="/engineering/assets/logo.png" alt="Cisco China GDC Engineering Blog">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+          
+        
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container " >
+  <div class="scrim ">
+    <header class="post-header">
+      <h1 class="title">网络学习和CCIE认证</h1>
+      <p class="info">by <strong>Peng Xiao</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+ <span class="page-divider">
+  <span class="one"></span>
+  <span class="two"></span>
+</span>
+ 
+
+<section class="post-meta">
+  <div class="post-date">July 18, 2017</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/engineering/category/network">Network</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <p>本文假设你没有任何网络基础，从头开始，打算在2-3年内达到某一个方向CCIE的水准（不是paper IE）, 以我个人的经历梳理的一个计划。对于每一个部分需要花的时间，不同的人会有不同的情况，要依情况而定。但是总体来讲，在不影响工作的前提下，稳步提升，2-3年是一个比较合理的时间。</p>
+
+<p>我是2010年7月11号开始在思科实习，为期一年，2011年初考了CCNA，然后开始学习CCNP，但是并没有考CCNP的认证，主要时间用来学习OSPF和BGP。从2012年开始准备CCIE，2013年5月获取了CCIE SP的认证。</p>
+
+<p>学习过程中一定要理论+实践，实践要占高的比重，另外如果能做一些笔记记录就更好了。我在那三年时间，大概写了70篇相关技术博客。下面我就按照从基础——&gt;CCNA——&gt;CCNP——&gt;CCIE的顺序，总结一下大概的学习流程。</p>
+
+<h1 id="section">1. 基础篇</h1>
+
+<p>在基础篇里，基本不会涉及和接触到具体网络设备，而偏重于理论和概念，但是非常重要，这是学习后面所有知识的基础。</p>
+
+<p>如果大学或者研究生课程学过类似 <code class="highlighter-rouge">通信网基本概念与主体结构</code>[<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup>] 或者 <code class="highlighter-rouge">计算机网络</code>, <code class="highlighter-rouge">通信网基础</code>等课程，那么基础篇可以略过了，因为你已经掌握了<strong>网络分层</strong>，<strong>TCP/IP协议</strong>，<strong>路由算法</strong>的基本概念。（不太自信的话，也可以复习一遍）</p>
+
+<h3 id="tcpip">1.1 TCP/IP基础</h3>
+
+<p>如何学习TCP/IP协议，可以参考知乎的一篇问答“如何学习tcp ip协议”[<sup id="fnref:2"><a href="#fn:2" class="footnote">2</a></sup>]. 总结一下基本有这么两点：</p>
+
+<ol>
+  <li>理论：TCP,UDP,IP,ARP,ICMP,DHCP,DNS等.</li>
+  <li>实践: 理论是枯燥的，实践是有趣的
+    <ul>
+      <li>基础实践：使用wireshark抓包分析网页打开的过程，HTTP, TCP三次握手<a href="">http://web.engr.oregonstate.edu/~qassimy/index_files/WiresharkLab-HTTP-Ch2-Sol.pdf</a></li>
+      <li>基础实践：使用熟悉的编程语言写socket小程序，并抓包分析. 例如：<a href="">http://www.binarytides.com/python-socket-programming-tutorial/</a></li>
+      <li>进阶实践：使用scapy做各种发包实验 <a href="">https://github.com/secdev/scapy</a></li>
+    </ul>
+  </li>
+</ol>
+
+<h4 id="section-1">参考资料</h4>
+
+<ol>
+  <li>《计算机网络》[<sup id="fnref:3"><a href="#fn:3" class="footnote">3</a></sup>]</li>
+  <li>《TCP/IP详解卷一：协议》[<sup id="fnref:4"><a href="#fn:4" class="footnote">4</a></sup>]</li>
+</ol>
+
+<h4 id="section-2">工具</h4>
+
+<p><code class="highlighter-rouge">wireshark</code>[<sup id="fnref:5"><a href="#fn:5" class="footnote">5</a></sup>]</p>
+
+<h3 id="section-3">1.2 路由协议基础</h3>
+
+<p>主要还是概念性的东西。</p>
+<ul>
+  <li>路由器的基本概念</li>
+  <li>静态路由和动态路由的概念（距离矢量算法和链路状态算法）。</li>
+  <li>RIP/OSPF/BGP基本概念</li>
+</ul>
+
+<h1 id="ccna">2. CCNA篇</h1>
+
+<p>在基础篇的基础下，增加对路由器交换机设备的接触，可以以CCNA学习指南[<sup id="fnref:6"><a href="#fn:6" class="footnote">6</a></sup>]为参考资料，以Cisco Packet tracer[<sup id="fnref:7"><a href="#fn:7" class="footnote">7</a></sup>]为模拟器进行试验操作。
+在操作上，基本上要达到：</p>
+
+<ul>
+  <li>交换机路由器telnet的配置</li>
+  <li>对于交换机路由器的接口IP配置</li>
+  <li>VLAN的基本配置</li>
+  <li>路由协议RIP/EIGRP/OSPF的简单配置</li>
+  <li>基本的show命令</li>
+  <li>基本的网络排错能力（ping，traceroute，telnet，arp）</li>
+</ul>
+
+<p>结果能在不背诵题库，全部理解的前提下通过CCNA的考试。（我个人大概花了小半年的时间在CCNA上，2010年低-2011年初，记录了一些博客<a href="">http://blog.sina.com.cn/s/articlelist_1263548705_10_1.html</a>）</p>
+
+<h1 id="ccnp">3. CCNP篇</h1>
+
+<p>我个人没有考过CCNP，个人感觉如果不考试，NP阶段的学习重点是各种路由协议，这个学习不是简单会配置（在入门篇已达到这个水平），而是要深入学习。
+基本方式就是GNS3[<sup id="fnref:8"><a href="#fn:8" class="footnote">8</a></sup>]（或者IOL）加wireshark抓包分析，配置手册和相关的RFC也需要看看。此时的实验拓扑一般比较小，不太会出现IE那种复杂拓扑。</p>
+
+<p>我下面以OSPF和BGP为例，其它协议RIPv2，EIGRP，ISIS类似。</p>
+
+<h2 id="ospf">3.1 OSPF</h2>
+
+<p>主要就是做实验做实验！可以OSPF命令行配置手册。
+《Cisco OSPF Command and Configuration Handbook》[<sup id="fnref:9"><a href="#fn:9" class="footnote">9</a></sup>]</p>
+
+<ul>
+  <li>OSPF的邻接怎么建立起来（抓包分析）</li>
+  <li>OSPF的五种数据包类型，以及在建立邻接关系过程中各起到什么作用？</li>
+  <li>OSPF的特殊区域类型</li>
+  <li>OSPF的LA类型（抓包）</li>
+  <li>OSPF Area</li>
+</ul>
+
+<h2 id="bgp">3.2 BGP</h2>
+
+<p>《Cisco BGP-4 Command and Configuration Handbook》[<sup id="fnref:10"><a href="#fn:10" class="footnote">10</a></sup>] ，RFC 4271[<sup id="fnref:11"><a href="#fn:11" class="footnote">11</a></sup>]</p>
+
+<ul>
+  <li>BGP邻居建立过程（抓包分析）</li>
+  <li>BGP Message类型（Open，Update，Keepalive，Notification）</li>
+  <li>IBGP，RR，RR Client，EBGP的概念和配置</li>
+  <li>基本的BGP Route Policy</li>
+</ul>
+
+<p>如果打算考CCNP，建议再看看题库，考试大纲，指南。个人不太建议CCNP，其实直接选一个方向深入进去，准备CCIE就可以的。</p>
+
+<h1 id="cciesp">4. CCIE篇（SP方向）</h1>
+
+<p>CCIE的方向有很多，比较大众的Routing Switch方向和Service Provider方向，因为项目需要，我需要专攻BGP，所以CCIIE选择了SP方向，</p>
+
+<p>SP方向的重中之重是MPLS VPN。必看书籍为《MPLS和VPN体系结构》[<sup id="fnref:12"><a href="#fn:12" class="footnote">12</a></sup>]，以卷1为主，卷2为辅。另外还有一些组播和l2vpn的内容，建议不要一上来就做CCIE的lab题库，要先过知识点，每一个知识点都要动手做实验。CCIE我大概写了28篇相应的博客<a href="">http://blog.sina.com.cn/s/articlelist_1263548705_15_1.html</a>，另外网络上资源也非常多，各种博客，视频也是学习的好工具。</p>
+
+<p>这样到最后，再去做lab题库，会非常顺手，然后考前准备就是一个敲命令行的熟练度问题了.</p>
+
+<h2 id="section-4">4.1 试验环境的搭建</h2>
+
+<p>CCIE SP方向的考试，实验拓扑的设备基本都是IOS-XR, 很多配置和IOS语法略有不同。真正准备考试的拓扑可以使用XRv[<sup id="fnref:13"><a href="#fn:13" class="footnote">13</a></sup>]去搭建。XRv比较消耗系统资源，所以在平时知识点学习的时候，个人还是建议使用GNS3.
+因为机制是一样的，只不过配置语法不同，关键是GNS3“即插即用”，搭建拓扑妥妥拽拽非常简单，更重要的是，通过wireshark抓包非常方便，这点非常重要。对于IOS-XR配置的训练可以从后期准备实验真题练习开始。</p>
+
+<h2 id="igp">4.2 IGP</h2>
+
+<p>CCIE SP方向考试，IGP比较简单，基本就是IPv4+IPv6单区域的OSPF或者ISIS。在考试中，IGP是后面所有的配置的基础，特别是BGP。因为IBGP neighbor都是以Loopback0作为update-source，所以要保证一个BGP AS里所有的loopback0接口都能相互ping通（IPv4+IPv6）。要熟悉ping，扩展ping，traceroute等trouble shooting工具，因为错误在所难免，少配置一行，多一行很常见，所以要有基本的trouble shooting能力。</p>
+
+<h2 id="bgp-1">4.3 BGP</h2>
+
+<p>对于IBGP，EBGP，RR-client配置要非常熟悉。然后就是MPLS VPN的基本配置，PE，CE。最后是Inter-AS VPN那几种option，以及CSC。</p>
+
+<p>trouble shooting还是一样的，各种ping，show命令一跳跳查找故障点。</p>
+
+<h2 id="section-5">4.4 组播</h2>
+
+<p>组播刚看概念会比较抽象一些，所以我做了很多实验，包括使用Python和一些软件自己建立组播源。大家可以参考<a href="">http://blog.sina.com.cn/s/articlelist_1263548705_15_1.html</a></p>
+
+<h2 id="section-6">4.5 其它</h2>
+
+<p>参考考试大纲[<sup id="fnref:14"><a href="#fn:14" class="footnote">14</a></sup>]。</p>
+
+<h1 id="section-7">5. 后续</h1>
+
+<p>学习网络知识并不是为了考一个CCIE认证，当拿到一个认证以后，后期还是要继续学习的，一是知识会遗忘，二是新技术层出不穷，要多多去接触，比如SDN，container等等。</p>
+
+<h1 id="reference">Reference</h1>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p>通信网基本概念与主体结构 <a href="">https://item.jd.com/10078500.html</a> <a href="#fnref:1" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:2">
+      <p>如何学习TCP/IP协议？<a href="">https://www.zhihu.com/question/28943943</a> <a href="#fnref:2" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:3">
+      <p>计算机网络 <a href="">https://book.douban.com/subject/2970300/</a> <a href="#fnref:3" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:4">
+      <p>《TCP/IP详解卷一：协议》<a href="">https://book.douban.com/subject/1088054/</a> <a href="#fnref:4" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:5">
+      <p>WireShark <a href="">https://www.wireshark.org/</a> <a href="#fnref:5" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:6">
+      <p>CCNA学习指南 <a href="">https://book.douban.com/subject/2968802/</a> <a href="#fnref:6" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:7">
+      <p>Cisco Packet tracer <a href="">https://www.netacad.com/about-networking-academy/packet-tracer/</a> <a href="#fnref:7" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:8">
+      <p>GNS3 <a href="">https://www.gns3.com/</a> <a href="#fnref:8" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:9">
+      <p>Cisco OSPF Command and Configuration Handbook <a href="">http://www.ciscopress.com/store/cisco-ospf-command-and-configuration-handbook-9781587050718</a> <a href="#fnref:9" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:10">
+      <p>Cisco BGP-4 Command and Configuration Handbook <a href="">http://www.ciscopress.com/store/cisco-bgp-4-command-and-configuration-handbook-9781587050176</a> <a href="#fnref:10" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:11">
+      <p>RFC 4271 <a href="">https://tools.ietf.org/html/rfc4271</a> <a href="#fnref:11" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:12">
+      <p>MPLS和VPN体系结构 <a href="">https://book.douban.com/subject/4896791/</a> <a href="#fnref:12" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:13">
+      <p>Cisco XRv <a href="">https://docs.gns3.com/appliances/cisco-iosxrv.html</a> <a href="#fnref:13" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:14">
+      <p>CCIE Service Provider <a href="">http://www.cisco.com/c/en/us/training-events/training-certifications/certifications/expert/ccie-service-provider.html</a> <a href="#fnref:14" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+</article>
+
+
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+      <a href="//twitter.com/share?text=%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E5%92%8CCCIE%E8%AE%A4%E8%AF%81&url=http%3A%2F%2Fciscochina.github.io%2Fengineering%2Fnetwork%2F2017%2F07%2F18%2Fnetwork-path.html&via=cisco"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=255');return false;">
+        <i class="fa fa-twitter-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+      <a href="//plus.google.com/share?title=%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E5%92%8CCCIE%E8%AE%A4%E8%AF%81&url=http%3A%2F%2Fciscochina.github.io%2Fengineering%2Fnetwork%2F2017%2F07%2F18%2Fnetwork-path.html"
+        onclick="window.open(this.href, 'google-plus-share', 'width=550,height=255');return false;">
+        <i class="fa fa-google-plus-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+<section class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'ciscochina';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">Cisco China GDC Engineering Blog</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+        
+        
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:penxiao@cisco.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">penxiao@cisco.com</span>
+          </a>
+        </li>
+
+        
+          
+          <li>
+            <a href="https://github.com/ciscochina" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">ciscochina</span>
+            </a>
+          </li>
+          
+        
+          
+          <li>
+            <a href="https://twitter.com/cisco" title="Follow me on Twitter">
+              <i class="fa fa-twitter"></i>
+              <span class="username">cisco</span>
+            </a>
+          </li>
+          
+        
+          
+        
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+      <p class="text">Cisco China GDC Engineering Blog.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+
+
+  </body>
+
+</html>

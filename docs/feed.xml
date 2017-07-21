@@ -6,9 +6,200 @@
 </description>
     <link>http://ciscochina.github.io/engineering/</link>
     <atom:link href="http://ciscochina.github.io/engineering/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 13 Jul 2017 11:48:45 +0800</pubDate>
-    <lastBuildDate>Thu, 13 Jul 2017 11:48:45 +0800</lastBuildDate>
+    <pubDate>Fri, 21 Jul 2017 10:32:44 +0800</pubDate>
+    <lastBuildDate>Fri, 21 Jul 2017 10:32:44 +0800</lastBuildDate>
     <generator>Jekyll v3.2.1</generator>
+    
+      <item>
+        <title>网络学习和CCIE认证</title>
+        <description>&lt;p&gt;本文假设你没有任何网络基础，从头开始，打算在2-3年内达到某一个方向CCIE的水准（不是paper IE）, 以我个人的经历梳理的一个计划。对于每一个部分需要花的时间，不同的人会有不同的情况，要依情况而定。但是总体来讲，在不影响工作的前提下，稳步提升，2-3年是一个比较合理的时间。&lt;/p&gt;
+
+&lt;p&gt;我是2010年7月11号开始在思科实习，为期一年，2011年初考了CCNA，然后开始学习CCNP，但是并没有考CCNP的认证，主要时间用来学习OSPF和BGP。从2012年开始准备CCIE，2013年5月获取了CCIE SP的认证。&lt;/p&gt;
+
+&lt;p&gt;学习过程中一定要理论+实践，实践要占高的比重，另外如果能做一些笔记记录就更好了。我在那三年时间，大概写了70篇相关技术博客。下面我就按照从基础——&amp;gt;CCNA——&amp;gt;CCNP——&amp;gt;CCIE的顺序，总结一下大概的学习流程。&lt;/p&gt;
+
+&lt;h1 id=&quot;section&quot;&gt;1. 基础篇&lt;/h1&gt;
+
+&lt;p&gt;在基础篇里，基本不会涉及和接触到具体网络设备，而偏重于理论和概念，但是非常重要，这是学习后面所有知识的基础。&lt;/p&gt;
+
+&lt;p&gt;如果大学或者研究生课程学过类似 &lt;code class=&quot;highlighter-rouge&quot;&gt;通信网基本概念与主体结构&lt;/code&gt;[&lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;] 或者 &lt;code class=&quot;highlighter-rouge&quot;&gt;计算机网络&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;通信网基础&lt;/code&gt;等课程，那么基础篇可以略过了，因为你已经掌握了&lt;strong&gt;网络分层&lt;/strong&gt;，&lt;strong&gt;TCP/IP协议&lt;/strong&gt;，&lt;strong&gt;路由算法&lt;/strong&gt;的基本概念。（不太自信的话，也可以复习一遍）&lt;/p&gt;
+
+&lt;h3 id=&quot;tcpip&quot;&gt;1.1 TCP/IP基础&lt;/h3&gt;
+
+&lt;p&gt;如何学习TCP/IP协议，可以参考知乎的一篇问答“如何学习tcp ip协议”[&lt;sup id=&quot;fnref:2&quot;&gt;&lt;a href=&quot;#fn:2&quot; class=&quot;footnote&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;]. 总结一下基本有这么两点：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;理论：TCP,UDP,IP,ARP,ICMP,DHCP,DNS等.&lt;/li&gt;
+  &lt;li&gt;实践: 理论是枯燥的，实践是有趣的
+    &lt;ul&gt;
+      &lt;li&gt;基础实践：使用wireshark抓包分析网页打开的过程，HTTP, TCP三次握手&lt;a href=&quot;&quot;&gt;http://web.engr.oregonstate.edu/~qassimy/index_files/WiresharkLab-HTTP-Ch2-Sol.pdf&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;基础实践：使用熟悉的编程语言写socket小程序，并抓包分析. 例如：&lt;a href=&quot;&quot;&gt;http://www.binarytides.com/python-socket-programming-tutorial/&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;进阶实践：使用scapy做各种发包实验 &lt;a href=&quot;&quot;&gt;https://github.com/secdev/scapy&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;section-1&quot;&gt;参考资料&lt;/h4&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;《计算机网络》[&lt;sup id=&quot;fnref:3&quot;&gt;&lt;a href=&quot;#fn:3&quot; class=&quot;footnote&quot;&gt;3&lt;/a&gt;&lt;/sup&gt;]&lt;/li&gt;
+  &lt;li&gt;《TCP/IP详解卷一：协议》[&lt;sup id=&quot;fnref:4&quot;&gt;&lt;a href=&quot;#fn:4&quot; class=&quot;footnote&quot;&gt;4&lt;/a&gt;&lt;/sup&gt;]&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;section-2&quot;&gt;工具&lt;/h4&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;wireshark&lt;/code&gt;[&lt;sup id=&quot;fnref:5&quot;&gt;&lt;a href=&quot;#fn:5&quot; class=&quot;footnote&quot;&gt;5&lt;/a&gt;&lt;/sup&gt;]&lt;/p&gt;
+
+&lt;h3 id=&quot;section-3&quot;&gt;1.2 路由协议基础&lt;/h3&gt;
+
+&lt;p&gt;主要还是概念性的东西。&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;路由器的基本概念&lt;/li&gt;
+  &lt;li&gt;静态路由和动态路由的概念（距离矢量算法和链路状态算法）。&lt;/li&gt;
+  &lt;li&gt;RIP/OSPF/BGP基本概念&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;ccna&quot;&gt;2. CCNA篇&lt;/h1&gt;
+
+&lt;p&gt;在基础篇的基础下，增加对路由器交换机设备的接触，可以以CCNA学习指南[&lt;sup id=&quot;fnref:6&quot;&gt;&lt;a href=&quot;#fn:6&quot; class=&quot;footnote&quot;&gt;6&lt;/a&gt;&lt;/sup&gt;]为参考资料，以Cisco Packet tracer[&lt;sup id=&quot;fnref:7&quot;&gt;&lt;a href=&quot;#fn:7&quot; class=&quot;footnote&quot;&gt;7&lt;/a&gt;&lt;/sup&gt;]为模拟器进行试验操作。
+在操作上，基本上要达到：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;交换机路由器telnet的配置&lt;/li&gt;
+  &lt;li&gt;对于交换机路由器的接口IP配置&lt;/li&gt;
+  &lt;li&gt;VLAN的基本配置&lt;/li&gt;
+  &lt;li&gt;路由协议RIP/EIGRP/OSPF的简单配置&lt;/li&gt;
+  &lt;li&gt;基本的show命令&lt;/li&gt;
+  &lt;li&gt;基本的网络排错能力（ping，traceroute，telnet，arp）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;结果能在不背诵题库，全部理解的前提下通过CCNA的考试。（我个人大概花了小半年的时间在CCNA上，2010年低-2011年初，记录了一些博客&lt;a href=&quot;&quot;&gt;http://blog.sina.com.cn/s/articlelist_1263548705_10_1.html&lt;/a&gt;）&lt;/p&gt;
+
+&lt;h1 id=&quot;ccnp&quot;&gt;3. CCNP篇&lt;/h1&gt;
+
+&lt;p&gt;我个人没有考过CCNP，个人感觉如果不考试，NP阶段的学习重点是各种路由协议，这个学习不是简单会配置（在入门篇已达到这个水平），而是要深入学习。
+基本方式就是GNS3[&lt;sup id=&quot;fnref:8&quot;&gt;&lt;a href=&quot;#fn:8&quot; class=&quot;footnote&quot;&gt;8&lt;/a&gt;&lt;/sup&gt;]（或者IOL）加wireshark抓包分析，配置手册和相关的RFC也需要看看。此时的实验拓扑一般比较小，不太会出现IE那种复杂拓扑。&lt;/p&gt;
+
+&lt;p&gt;我下面以OSPF和BGP为例，其它协议RIPv2，EIGRP，ISIS类似。&lt;/p&gt;
+
+&lt;h2 id=&quot;ospf&quot;&gt;3.1 OSPF&lt;/h2&gt;
+
+&lt;p&gt;主要就是做实验做实验！可以OSPF命令行配置手册。
+《Cisco OSPF Command and Configuration Handbook》[&lt;sup id=&quot;fnref:9&quot;&gt;&lt;a href=&quot;#fn:9&quot; class=&quot;footnote&quot;&gt;9&lt;/a&gt;&lt;/sup&gt;]&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;OSPF的邻接怎么建立起来（抓包分析）&lt;/li&gt;
+  &lt;li&gt;OSPF的五种数据包类型，以及在建立邻接关系过程中各起到什么作用？&lt;/li&gt;
+  &lt;li&gt;OSPF的特殊区域类型&lt;/li&gt;
+  &lt;li&gt;OSPF的LA类型（抓包）&lt;/li&gt;
+  &lt;li&gt;OSPF Area&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;bgp&quot;&gt;3.2 BGP&lt;/h2&gt;
+
+&lt;p&gt;《Cisco BGP-4 Command and Configuration Handbook》[&lt;sup id=&quot;fnref:10&quot;&gt;&lt;a href=&quot;#fn:10&quot; class=&quot;footnote&quot;&gt;10&lt;/a&gt;&lt;/sup&gt;] ，RFC 4271[&lt;sup id=&quot;fnref:11&quot;&gt;&lt;a href=&quot;#fn:11&quot; class=&quot;footnote&quot;&gt;11&lt;/a&gt;&lt;/sup&gt;]&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;BGP邻居建立过程（抓包分析）&lt;/li&gt;
+  &lt;li&gt;BGP Message类型（Open，Update，Keepalive，Notification）&lt;/li&gt;
+  &lt;li&gt;IBGP，RR，RR Client，EBGP的概念和配置&lt;/li&gt;
+  &lt;li&gt;基本的BGP Route Policy&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;如果打算考CCNP，建议再看看题库，考试大纲，指南。个人不太建议CCNP，其实直接选一个方向深入进去，准备CCIE就可以的。&lt;/p&gt;
+
+&lt;h1 id=&quot;cciesp&quot;&gt;4. CCIE篇（SP方向）&lt;/h1&gt;
+
+&lt;p&gt;CCIE的方向有很多，比较大众的Routing Switch方向和Service Provider方向，因为项目需要，我需要专攻BGP，所以CCIIE选择了SP方向，&lt;/p&gt;
+
+&lt;p&gt;SP方向的重中之重是MPLS VPN。必看书籍为《MPLS和VPN体系结构》[&lt;sup id=&quot;fnref:12&quot;&gt;&lt;a href=&quot;#fn:12&quot; class=&quot;footnote&quot;&gt;12&lt;/a&gt;&lt;/sup&gt;]，以卷1为主，卷2为辅。另外还有一些组播和l2vpn的内容，建议不要一上来就做CCIE的lab题库，要先过知识点，每一个知识点都要动手做实验。CCIE我大概写了28篇相应的博客&lt;a href=&quot;&quot;&gt;http://blog.sina.com.cn/s/articlelist_1263548705_15_1.html&lt;/a&gt;，另外网络上资源也非常多，各种博客，视频也是学习的好工具。&lt;/p&gt;
+
+&lt;p&gt;这样到最后，再去做lab题库，会非常顺手，然后考前准备就是一个敲命令行的熟练度问题了.&lt;/p&gt;
+
+&lt;h2 id=&quot;section-4&quot;&gt;4.1 试验环境的搭建&lt;/h2&gt;
+
+&lt;p&gt;CCIE SP方向的考试，实验拓扑的设备基本都是IOS-XR, 很多配置和IOS语法略有不同。真正准备考试的拓扑可以使用XRv[&lt;sup id=&quot;fnref:13&quot;&gt;&lt;a href=&quot;#fn:13&quot; class=&quot;footnote&quot;&gt;13&lt;/a&gt;&lt;/sup&gt;]去搭建。XRv比较消耗系统资源，所以在平时知识点学习的时候，个人还是建议使用GNS3.
+因为机制是一样的，只不过配置语法不同，关键是GNS3“即插即用”，搭建拓扑妥妥拽拽非常简单，更重要的是，通过wireshark抓包非常方便，这点非常重要。对于IOS-XR配置的训练可以从后期准备实验真题练习开始。&lt;/p&gt;
+
+&lt;h2 id=&quot;igp&quot;&gt;4.2 IGP&lt;/h2&gt;
+
+&lt;p&gt;CCIE SP方向考试，IGP比较简单，基本就是IPv4+IPv6单区域的OSPF或者ISIS。在考试中，IGP是后面所有的配置的基础，特别是BGP。因为IBGP neighbor都是以Loopback0作为update-source，所以要保证一个BGP AS里所有的loopback0接口都能相互ping通（IPv4+IPv6）。要熟悉ping，扩展ping，traceroute等trouble shooting工具，因为错误在所难免，少配置一行，多一行很常见，所以要有基本的trouble shooting能力。&lt;/p&gt;
+
+&lt;h2 id=&quot;bgp-1&quot;&gt;4.3 BGP&lt;/h2&gt;
+
+&lt;p&gt;对于IBGP，EBGP，RR-client配置要非常熟悉。然后就是MPLS VPN的基本配置，PE，CE。最后是Inter-AS VPN那几种option，以及CSC。&lt;/p&gt;
+
+&lt;p&gt;trouble shooting还是一样的，各种ping，show命令一跳跳查找故障点。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-5&quot;&gt;4.4 组播&lt;/h2&gt;
+
+&lt;p&gt;组播刚看概念会比较抽象一些，所以我做了很多实验，包括使用Python和一些软件自己建立组播源。大家可以参考&lt;a href=&quot;&quot;&gt;http://blog.sina.com.cn/s/articlelist_1263548705_15_1.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;section-6&quot;&gt;4.5 其它&lt;/h2&gt;
+
+&lt;p&gt;参考考试大纲[&lt;sup id=&quot;fnref:14&quot;&gt;&lt;a href=&quot;#fn:14&quot; class=&quot;footnote&quot;&gt;14&lt;/a&gt;&lt;/sup&gt;]。&lt;/p&gt;
+
+&lt;h1 id=&quot;section-7&quot;&gt;5. 后续&lt;/h1&gt;
+
+&lt;p&gt;学习网络知识并不是为了考一个CCIE认证，当拿到一个认证以后，后期还是要继续学习的，一是知识会遗忘，二是新技术层出不穷，要多多去接触，比如SDN，container等等。&lt;/p&gt;
+
+&lt;h1 id=&quot;reference&quot;&gt;Reference&lt;/h1&gt;
+
+&lt;div class=&quot;footnotes&quot;&gt;
+  &lt;ol&gt;
+    &lt;li id=&quot;fn:1&quot;&gt;
+      &lt;p&gt;通信网基本概念与主体结构 &lt;a href=&quot;&quot;&gt;https://item.jd.com/10078500.html&lt;/a&gt; &lt;a href=&quot;#fnref:1&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:2&quot;&gt;
+      &lt;p&gt;如何学习TCP/IP协议？&lt;a href=&quot;&quot;&gt;https://www.zhihu.com/question/28943943&lt;/a&gt; &lt;a href=&quot;#fnref:2&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:3&quot;&gt;
+      &lt;p&gt;计算机网络 &lt;a href=&quot;&quot;&gt;https://book.douban.com/subject/2970300/&lt;/a&gt; &lt;a href=&quot;#fnref:3&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:4&quot;&gt;
+      &lt;p&gt;《TCP/IP详解卷一：协议》&lt;a href=&quot;&quot;&gt;https://book.douban.com/subject/1088054/&lt;/a&gt; &lt;a href=&quot;#fnref:4&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:5&quot;&gt;
+      &lt;p&gt;WireShark &lt;a href=&quot;&quot;&gt;https://www.wireshark.org/&lt;/a&gt; &lt;a href=&quot;#fnref:5&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:6&quot;&gt;
+      &lt;p&gt;CCNA学习指南 &lt;a href=&quot;&quot;&gt;https://book.douban.com/subject/2968802/&lt;/a&gt; &lt;a href=&quot;#fnref:6&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:7&quot;&gt;
+      &lt;p&gt;Cisco Packet tracer &lt;a href=&quot;&quot;&gt;https://www.netacad.com/about-networking-academy/packet-tracer/&lt;/a&gt; &lt;a href=&quot;#fnref:7&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:8&quot;&gt;
+      &lt;p&gt;GNS3 &lt;a href=&quot;&quot;&gt;https://www.gns3.com/&lt;/a&gt; &lt;a href=&quot;#fnref:8&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:9&quot;&gt;
+      &lt;p&gt;Cisco OSPF Command and Configuration Handbook &lt;a href=&quot;&quot;&gt;http://www.ciscopress.com/store/cisco-ospf-command-and-configuration-handbook-9781587050718&lt;/a&gt; &lt;a href=&quot;#fnref:9&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:10&quot;&gt;
+      &lt;p&gt;Cisco BGP-4 Command and Configuration Handbook &lt;a href=&quot;&quot;&gt;http://www.ciscopress.com/store/cisco-bgp-4-command-and-configuration-handbook-9781587050176&lt;/a&gt; &lt;a href=&quot;#fnref:10&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:11&quot;&gt;
+      &lt;p&gt;RFC 4271 &lt;a href=&quot;&quot;&gt;https://tools.ietf.org/html/rfc4271&lt;/a&gt; &lt;a href=&quot;#fnref:11&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:12&quot;&gt;
+      &lt;p&gt;MPLS和VPN体系结构 &lt;a href=&quot;&quot;&gt;https://book.douban.com/subject/4896791/&lt;/a&gt; &lt;a href=&quot;#fnref:12&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:13&quot;&gt;
+      &lt;p&gt;Cisco XRv &lt;a href=&quot;&quot;&gt;https://docs.gns3.com/appliances/cisco-iosxrv.html&lt;/a&gt; &lt;a href=&quot;#fnref:13&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:14&quot;&gt;
+      &lt;p&gt;CCIE Service Provider &lt;a href=&quot;&quot;&gt;http://www.cisco.com/c/en/us/training-events/training-certifications/certifications/expert/ccie-service-provider.html&lt;/a&gt; &lt;a href=&quot;#fnref:14&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/div&gt;
+</description>
+        <pubDate>Tue, 18 Jul 2017 16:43:59 +0800</pubDate>
+        <link>http://ciscochina.github.io/engineering/network/2017/07/18/network-path.html</link>
+        <guid isPermaLink="true">http://ciscochina.github.io/engineering/network/2017/07/18/network-path.html</guid>
+        
+        
+        <category>network</category>
+        
+      </item>
     
       <item>
         <title>How to read OpenStack code part 1 - wsgi</title>
@@ -2035,186 +2226,6 @@ The tiger eat a wolf
         
         
         <category>openstack</category>
-        
-      </item>
-    
-      <item>
-        <title>Trace Packets in MPLS VPNv4 Network</title>
-        <description>&lt;p&gt;&lt;img src=&quot;/engineering/assets/vpnv4-packets/topo.png&quot; alt=&quot;topo&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;source https://github.com/xiaopeng163/www.pengxiao.me/blob/master/source/_posts/vpnv4-packets.md&lt;/p&gt;
-
-&lt;p&gt;主要想看看数据包是怎么在MPLS VPNv4 Core Network中路由传播的，顺便抓个两层标签的数据包。实验拓扑如上。&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;AS 100&lt;/code&gt;： &lt;code class=&quot;highlighter-rouge&quot;&gt;MPLS VPN&lt;/code&gt;主干，通过&lt;code class=&quot;highlighter-rouge&quot;&gt;MP-BGP&lt;/code&gt;传递&lt;code class=&quot;highlighter-rouge&quot;&gt;VPNv4&lt;/code&gt;路由信息（其中&lt;code class=&quot;highlighter-rouge&quot;&gt;RR&lt;/code&gt;反射&lt;code class=&quot;highlighter-rouge&quot;&gt;VPNv4&lt;/code&gt;路由）。
-&lt;code class=&quot;highlighter-rouge&quot;&gt;PE&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;CE&lt;/code&gt;直接采用&lt;code class=&quot;highlighter-rouge&quot;&gt;EBGP&lt;/code&gt;来承载客户路由。&lt;code class=&quot;highlighter-rouge&quot;&gt;CE&lt;/code&gt;宣告路由&lt;code class=&quot;highlighter-rouge&quot;&gt;1.1.1.1/32&lt;/code&gt;， &lt;code class=&quot;highlighter-rouge&quot;&gt;CE2&lt;/code&gt;宣告&lt;code class=&quot;highlighter-rouge&quot;&gt;2.2.2.2/32&lt;/code&gt;来模拟客户网络路由。相关配置见本文最后。
-操作为在&lt;code class=&quot;highlighter-rouge&quot;&gt;CE1&lt;/code&gt;上&lt;code class=&quot;highlighter-rouge&quot;&gt;ping 2.2.2.2&lt;/code&gt; 到&lt;code class=&quot;highlighter-rouge&quot;&gt;CE2&lt;/code&gt;，看数据包是如何传递，由于&lt;code class=&quot;highlighter-rouge&quot;&gt;CE1&lt;/code&gt;到&lt;code class=&quot;highlighter-rouge&quot;&gt;PE1&lt;/code&gt;，&lt;code class=&quot;highlighter-rouge&quot;&gt;PE2&lt;/code&gt;到&lt;code class=&quot;highlighter-rouge&quot;&gt;CE2&lt;/code&gt;是普通的&lt;code class=&quot;highlighter-rouge&quot;&gt;IPv4&lt;/code&gt;，所以我们主要看去往&lt;code class=&quot;highlighter-rouge&quot;&gt;2.2.2.2&lt;/code&gt;的数据包如何在&lt;code class=&quot;highlighter-rouge&quot;&gt;PE1，RR，PE2&lt;/code&gt;直接传递的。&lt;/p&gt;
-
-&lt;h3 id=&quot;vpnv4&quot;&gt;一，VPNv4路由收敛&lt;/h3&gt;
-
-&lt;p&gt;从&lt;code class=&quot;highlighter-rouge&quot;&gt;PE1&lt;/code&gt;的入方向看，&lt;code class=&quot;highlighter-rouge&quot;&gt;PE1&lt;/code&gt;收到&lt;code class=&quot;highlighter-rouge&quot;&gt;RR&lt;/code&gt;反射&lt;code class=&quot;highlighter-rouge&quot;&gt;PE2&lt;/code&gt;过来的&lt;code class=&quot;highlighter-rouge&quot;&gt;VPNv4&lt;/code&gt;路由&lt;code class=&quot;highlighter-rouge&quot;&gt;update&lt;/code&gt;如下，其中&lt;code class=&quot;highlighter-rouge&quot;&gt;extended community&lt;/code&gt;字段是&lt;code class=&quot;highlighter-rouge&quot;&gt;router target&lt;/code&gt;信息，标识导入相关的&lt;code class=&quot;highlighter-rouge&quot;&gt;VPN&lt;/code&gt;路由表，&lt;code class=&quot;highlighter-rouge&quot;&gt;VPN&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;NLRI&lt;/code&gt;是真正的&lt;code class=&quot;highlighter-rouge&quot;&gt;VPN&lt;/code&gt;路由，
-其中&lt;code class=&quot;highlighter-rouge&quot;&gt;AFI&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;SAFI&lt;/code&gt;代表了&lt;code class=&quot;highlighter-rouge&quot;&gt;VPNv4&lt;/code&gt;；&lt;code class=&quot;highlighter-rouge&quot;&gt;Nexthop&lt;/code&gt;属性是此&lt;code class=&quot;highlighter-rouge&quot;&gt;VPN&lt;/code&gt;路由的下一跳（里面默认加了&lt;code class=&quot;highlighter-rouge&quot;&gt;RD 0:0&lt;/code&gt;，正是为了和VPN路由对应一致&lt;code class=&quot;highlighter-rouge&quot;&gt;RD+IP prefix&lt;/code&gt;）;&lt;/p&gt;
-
-&lt;p&gt;最下面是真正的&lt;code class=&quot;highlighter-rouge&quot;&gt;VPNv4&lt;/code&gt;路由：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;RD=65002:1
-Label Stack = 19 (第二标签的由来)
-prefix = 2.2.2.2/32
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;&lt;img src=&quot;/engineering/assets/vpnv4-packets/wireshark1.png&quot; alt=&quot;topo&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;ping-2222&quot;&gt;二，ping 2.2.2.2&lt;/h3&gt;
-
-&lt;h4 id=&quot;pe1&quot;&gt;PE1：&lt;/h4&gt;
-
-&lt;p&gt;（1）收到从&lt;code class=&quot;highlighter-rouge&quot;&gt;CE1&lt;/code&gt;过来的去往&lt;code class=&quot;highlighter-rouge&quot;&gt;2.2.2.2&lt;/code&gt;的数据包，&lt;code class=&quot;highlighter-rouge&quot;&gt;PE1&lt;/code&gt;会查看自己的VPN（对应此CE）路由表，得到下一跳是&lt;code class=&quot;highlighter-rouge&quot;&gt;192.168.1.3&lt;/code&gt;，并且得到VPN的出站标签是&lt;code class=&quot;highlighter-rouge&quot;&gt;19&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/engineering/assets/vpnv4-packets/show1.png&quot; alt=&quot;topo&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;（2）查看本地MPLS转发表，得知下一跳&lt;code class=&quot;highlighter-rouge&quot;&gt;192.168.1.3&lt;/code&gt;出站标签&lt;code class=&quot;highlighter-rouge&quot;&gt;17&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/engineering/assets/vpnv4-packets/show2.png&quot; alt=&quot;topo&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;（3）打上以上两个MPLS标签，成ICMP报文发给&lt;code class=&quot;highlighter-rouge&quot;&gt;RR 10.12.1.2&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/engineering/assets/vpnv4-packets/wireshark2.png&quot; alt=&quot;topo&quot; /&gt;&lt;/p&gt;
-
-&lt;h4 id=&quot;rr&quot;&gt;RR：&lt;/h4&gt;
-
-&lt;p&gt;RR收到PE1发过来的ICMP数据包，直接根据MPLS转发表找到&lt;code class=&quot;highlighter-rouge&quot;&gt;192.168.1.3&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/engineering/assets/vpnv4-packets/show3.png&quot; alt=&quot;topo&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;出站&lt;code class=&quot;highlighter-rouge&quot;&gt;pop tag&lt;/code&gt;（此处应该是MPLS的PHP技术），POP而不是untag，说明RR发现此MPLS数据包里标签并非栈低。
-成ICMP报文发给下一跳&lt;code class=&quot;highlighter-rouge&quot;&gt;10.23.1.2&lt;/code&gt;，也就是&lt;code class=&quot;highlighter-rouge&quot;&gt;PE2&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/engineering/assets/vpnv4-packets/wireshark3.png&quot; alt=&quot;topo&quot; /&gt;&lt;/p&gt;
-
-&lt;h4 id=&quot;pe2&quot;&gt;PE2：&lt;/h4&gt;
-
-&lt;p&gt;PE2从RR收到的ICMP报文，其实还有一层标签。然后就去标签直接发往相应的下一跳了。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/engineering/assets/vpnv4-packets/show4.png&quot; alt=&quot;topo&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;数据包的返回的过程类似。&lt;/p&gt;
-
-&lt;h3 id=&quot;section&quot;&gt;附：&lt;/h3&gt;
-
-&lt;p&gt;CE1：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;router bgp 65001
-no synchronization
-bgp log-neighbor-changes
-network 1.1.1.1 mask 255.255.255.255
-neighbor 12.0.0.2 remote-as 100
-neighbor 12.0.0.2 ebgp-multihop 255
-no auto-summary
-!
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;PE1：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;router bgp 100
-bgp router-id 192.168.1.1
-no bgp default ipv4-unicast
-bgp log-neighbor-changes
-neighbor 192.168.1.2 remote-as 100
-neighbor 192.168.1.2 update-source Loopback0
-!
-address-family ipv4
-  neighbor 192.168.1.2 activate
-  no auto-summary
-  no synchronization
-exit-address-family
-!
-address-family vpnv4
-  neighbor 192.168.1.2 activate
-  neighbor 192.168.1.2 send-community extended
-exit-address-family
-!
-address-family ipv4 vrf cisco
-  redistribute connected
-  neighbor 12.0.0.1 remote-as 65001
-  neighbor 12.0.0.1 activate
-  no synchronization
-exit-address-family
-!
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;RR：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;router bgp 100
-bgp router-id 192.168.1.2
-no bgp default ipv4-unicast
-no bgp default route-target filter
-bgp log-neighbor-changes
-neighbor 192.168.1.1 remote-as 100
-neighbor 192.168.1.1 update-source Loopback0
-neighbor 192.168.1.3 remote-as 100
-neighbor 192.168.1.3 update-source Loopback0
-!
-address-family vpnv4
-  neighbor 192.168.1.1 activate
-  neighbor 192.168.1.1 send-community both
-  neighbor 192.168.1.1 route-reflector-client
-  neighbor 192.168.1.3 activate
-  neighbor 192.168.1.3 send-community extended
-  neighbor 192.168.1.3 route-reflector-client
-exit-address-family
-!
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;PE2：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;router bgp 100
-bgp router-id 192.168.1.3
-no bgp default ipv4-unicast
-bgp log-neighbor-changes
-neighbor 192.168.1.2 remote-as 100
-neighbor 192.168.1.2 update-source Loopback0
-!
-address-family ipv4
-  neighbor 192.168.1.2 activate
-  no auto-summary
-  no synchronization
-exit-address-family
-!
-address-family vpnv4
-  neighbor 192.168.1.2 activate
-  neighbor 192.168.1.2 send-community both
-exit-address-family
-!
-address-family ipv4 vrf cisco
-  redistribute connected
-  neighbor 23.0.0.2 remote-as 65002
-  neighbor 23.0.0.2 activate
-  no synchronization
-exit-address-family
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;CE2：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;router bgp 65002
-no synchronization
-bgp log-neighbor-changes
-network 2.2.2.2 mask 255.255.255.255
-neighbor 23.0.0.1 remote-as 100
-neighbor 23.0.0.1 ebgp-multihop 255
-no auto-summary
-!
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-</description>
-        <pubDate>Sun, 09 Jul 2017 16:43:59 +0800</pubDate>
-        <link>http://ciscochina.github.io/engineering/network/2017/07/09/mpls-vpn-packet.html</link>
-        <guid isPermaLink="true">http://ciscochina.github.io/engineering/network/2017/07/09/mpls-vpn-packet.html</guid>
-        
-        
-        <category>network</category>
         
       </item>
     

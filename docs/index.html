@@ -131,6 +131,28 @@
   
   <li>
     <h2>
+      <a class="post-link" href="/engineering/network/2017/07/18/network-path.html">网络学习和CCIE认证</a>
+    </h2>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p>本文假设你没有任何网络基础，从头开始，打算在2-3年内达到某一个方向CCIE的水准（不是paper IE）, 以我个人的经历梳理的一个计划。对于每一个部分需要花的时间，不同的人会有不同的情况，要依情况而定。但是总体来讲，在不影响工作的前提下，稳步提升，2-3年是一个比较合理的时间。</p> <p>我是2010年7月11号开始在思科实习，为期一年，2011年初考了CCNA，然后开始学习CCNP，但是并没有考CCNP的认证，主要时间用来学习OSPF和BGP。从2012年开始准备CCIE，2013年5月获取了CCIE SP的认证。</p> <p>学习过程中一定要理论+实践，实践要占高的比重，另外如果能做一些笔记记录就更好了。我在那三年时间，大概写了70篇相关技术博客。下面我就按照从基础——&gt;CCNA——&gt;CCNP——&gt;CCIE的顺序，总结一下大概的学习流程。</p> <h1 id="section">1. 基础篇</h1> <p>在基础篇里，基本不会涉及和接触到具体网络设备，而偏重于理论和概念，但是非常重要，这是学习后面所有知识的基础。</p> <p>如果大学或者研究生课程学过类似 <code class="highlighter-rouge">通信网基本概念与主体结构</code>[<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup>] 或者 <code class="highlighter-rouge">计算机网络</code>, <code class="highlighter-rouge">通信网基础</code>等课程，那么基础篇可以略过了，因为你已经掌握了<strong>网络分层</strong>，<strong>TCP/IP协议</strong>，<strong>路由算法</strong>的基本概念。（不太自信的话，也可以复习一遍）</p> <h3 id="tcpip">1.1 TCP/IP基础</h3> <p>如何学习TCP/IP协议，可以参考知乎的一篇问答“如何学习tcp ip协议”[<sup id="fnref:2"><a href="#fn:2" class="footnote">2</a></sup>]. 总结一下基本有这么两点：</p> <ol> <li>理论：TCP,UDP,IP,ARP,ICMP,DHCP,DNS等.</li> <li>实践: 理论是枯燥的，实践是有趣的 <ul> <li>基础实践：使用wireshark抓包分析网页打开的过程，HTTP, TCP三次握手<a href="">http://web.engr.oregonstate.edu/~qassimy/index_files/WiresharkLab-HTTP-Ch2-Sol.pdf</a></li> <li>基础实践：使用熟悉的编程语言写socket小程序，并抓包分析. 例如：<a href="">http://www.binarytides.com/python-socket-programming-tutorial/</a></li> <li>进阶实践：使用scapy做各种发包实验 <a href="">https://github.com/secdev/scapy</a></li> </ul> </li> </ol> <h4 id="section-1">参考资料</h4> <ol>...</p>
+    </section> -->
+    <section class="post-meta">
+      <div class="post-date">July 18, 2017, Peng Xiao</div>
+      <div class="post-categories">
+      in 
+        
+        <a href="/engineering/category/network">Network</a>
+        
+      
+      </div>
+    </section>
+  </li>
+  
+  <hr>
+  
+  
+  <li>
+    <h2>
       <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-wsgi.html">How to read OpenStack code part 1 - wsgi</a>
     </h2>
     <!--<section class="post-excerpt" itemprop="description">
@@ -318,28 +340,6 @@
       in 
         
         <a href="/engineering/category/openstack">Openstack</a>
-        
-      
-      </div>
-    </section>
-  </li>
-  
-  <hr>
-  
-  
-  <li>
-    <h2>
-      <a class="post-link" href="/engineering/network/2017/07/09/mpls-vpn-packet.html">Trace Packets in MPLS VPNv4 Network</a>
-    </h2>
-    <!--<section class="post-excerpt" itemprop="description">
-      <p><p><img src="/engineering/assets/vpnv4-packets/topo.png" alt="topo" /></p> <p>source https://github.com/xiaopeng163/www.pengxiao.me/blob/master/source/_posts/vpnv4-packets.md</p> <p>主要想看看数据包是怎么在MPLS VPNv4 Core Network中路由传播的，顺便抓个两层标签的数据包。实验拓扑如上。</p> <p><code class="highlighter-rouge">AS 100</code>： <code class="highlighter-rouge">MPLS VPN</code>主干，通过<code class="highlighter-rouge">MP-BGP</code>传递<code class="highlighter-rouge">VPNv4</code>路由信息（其中<code class="highlighter-rouge">RR</code>反射<code class="highlighter-rouge">VPNv4</code>路由）。 <code class="highlighter-rouge">PE</code>和<code class="highlighter-rouge">CE</code>直接采用<code class="highlighter-rouge">EBGP</code>来承载客户路由。<code class="highlighter-rouge">CE</code>宣告路由<code class="highlighter-rouge">1.1.1.1/32</code>， <code class="highlighter-rouge">CE2</code>宣告<code class="highlighter-rouge">2.2.2.2/32</code>来模拟客户网络路由。相关配置见本文最后。 操作为在<code class="highlighter-rouge">CE1</code>上<code class="highlighter-rouge">ping 2.2.2.2</code> 到<code class="highlighter-rouge">CE2</code>，看数据包是如何传递，由于<code class="highlighter-rouge">CE1</code>到<code class="highlighter-rouge">PE1</code>，<code class="highlighter-rouge">PE2</code>到<code class="highlighter-rouge">CE2</code>是普通的<code class="highlighter-rouge">IPv4</code>，所以我们主要看去往<code class="highlighter-rouge">2.2.2.2</code>的数据包如何在<code class="highlighter-rouge">PE1，RR，PE2</code>直接传递的。</p> <h3 id="vpnv4">一，VPNv4路由收敛</h3> <p>从<code class="highlighter-rouge">PE1</code>的入方向看，<code class="highlighter-rouge">PE1</code>收到<code class="highlighter-rouge">RR</code>反射<code class="highlighter-rouge">PE2</code>过来的<code class="highlighter-rouge">VPNv4</code>路由<code...</p>
-    </section> -->
-    <section class="post-meta">
-      <div class="post-date">July 9, 2017, Peng Xiao</div>
-      <div class="post-categories">
-      in 
-        
-        <a href="/engineering/category/network">Network</a>
         
       
       </div>
