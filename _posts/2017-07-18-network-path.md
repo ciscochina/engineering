@@ -67,7 +67,7 @@ categories: network
 
 ## 3.1 OSPF
 
-主要就是做实验做实验！可以OSPF命令行配置手册。
+主要就是做实验做实验！可以参考OSPF命令行配置手册。
 《Cisco OSPF Command and Configuration Handbook》[[^9]]
 
 - OSPF的邻接怎么建立起来（抓包分析）
@@ -89,7 +89,7 @@ categories: network
 
 # 4. CCIE篇（SP方向）
 
-CCIE的方向有很多，比较大众的Routing Switch方向和Service Provider方向，因为项目需要，我需要专攻BGP，所以CCIIE选择了SP方向，
+CCIE的方向有很多，比较大众的Routing Switch方向和Service Provider方向，因为项目需要，我需要专攻BGP，所以CCIE选择了SP方向，
 
 SP方向的重中之重是MPLS VPN。必看书籍为《MPLS和VPN体系结构》[[^12]]，以卷1为主，卷2为辅。另外还有一些组播和l2vpn的内容，建议不要一上来就做CCIE的lab题库，要先过知识点，每一个知识点都要动手做实验。CCIE我大概写了28篇相应的博客[http://blog.sina.com.cn/s/articlelist_1263548705_15_1.html]()，另外网络上资源也非常多，各种博客，视频也是学习的好工具。
 
@@ -98,7 +98,7 @@ SP方向的重中之重是MPLS VPN。必看书籍为《MPLS和VPN体系结构》
 ## 4.1 试验环境的搭建
 
 CCIE SP方向的考试，实验拓扑的设备基本都是IOS-XR, 很多配置和IOS语法略有不同。真正准备考试的拓扑可以使用XRv[[^13]]去搭建。XRv比较消耗系统资源，所以在平时知识点学习的时候，个人还是建议使用GNS3.
-因为机制是一样的，只不过配置语法不同，关键是GNS3“即插即用”，搭建拓扑妥妥拽拽非常简单，更重要的是，通过wireshark抓包非常方便，这点非常重要。对于IOS-XR配置的训练可以从后期准备实验真题练习开始。
+因为机制是一样的，只不过配置语法不同，关键是GNS3“即插即用”，搭建拓扑拖拖拽拽非常简单，更重要的是，通过wireshark抓包非常方便，这点非常重要。对于IOS-XR配置的训练可以从后期准备实验真题练习开始。
 
 ## 4.2 IGP
 
