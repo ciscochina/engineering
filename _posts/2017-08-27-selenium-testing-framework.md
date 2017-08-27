@@ -10,7 +10,7 @@ categories: auto-testing / python
 From the http://www.seleniumhq.org/, it gives a clear definition: Selenium automates browsers. That's it!
 
 Please check out below links if you are interest: 
-###Getting started : 
+### Getting started : 
 http://selenium-python.readthedocs.io/getting-started.html (For Python)
 ###Source Code: 
 https://github.com/SeleniumHQ/selenium
@@ -24,7 +24,7 @@ You would get an complete web application testing solution.
 <br>
 
 #### Also want to share some python coding tips that I got during the refactor of vots project: 
-#####1. 
+##### 1. 
 We know that everything is an object in python, so it makes easy for us to write ‘table-driven’ methods in python.
 For example, we get many ‘if-else’ and complex logic in each ‘if’, then we can use table-driven, extract the ‘if’ condition into ‘key’, and the ‘logic into ‘value’ of a map.
 Likes below : 
@@ -46,14 +46,14 @@ Likes below :
               operations['2']('CISCO')
               operations['3']('CISCO')
       
-#####2. 
+##### 2. 
 From above screenshot we can see python support for type hints already. This is new in version 3.5 and I think is very helpful especially when the input parameter is an complex object .
 The function below takes and returns a string and is annotated as follows: 
                                 
               def greeting(name: str) -> str:
                   return 'Hello ' + name
     
-#####3. 
+#### 3. 
 Write unit test for your code.
 For example, Vots project has two threads with loop and this makes it hard to debug when we get a bug.
 Unit test and ‘mock’ can solve this issue.
