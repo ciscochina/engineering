@@ -131,6 +131,28 @@
   
   <li>
     <h2>
+      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-action-exten.html">How to read OpenStack code part 8 - action extension</a>
+    </h2>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p>之前我们看过了core plugin， service plugin 还有resource extension。</p> <p>resource extension的作用是定义新的资源。而我们说过还有两种extension： action extension 跟 request extension。这一章我们将写一个action extension。</p> <h1 id="action-in-restful">action in RESTful</h1> <p>openstack中所有的网络服务都是RESTful风格的。但RESTful风格的URL有一个问题，如何表示动作。</p> <p>像 network，tiger 这些单词都是名词，用在URL中以HTTP的POST/GET/DELETE/PUT来对应create get delete update没有任何问题。但有的时候我们需要在url中表示一些动词。比如，router是一个名词，但router中添加一个端口是一个动词。这时候我们有三种选择：</p> <p><strong>把增加端口变成update router的一个分支功能</strong></p> <p>这是一个好办法，但很多时候由于种种原因并不适用，比如这需要修改原来的update逻辑，需要修改原来的router数据结构，可能这个动作及其复杂，把它放入update不合适等等等等</p> <p><strong>把这个动作变成一个独立的资源</strong></p> <p>比如原来的url是api/v2/routers, 但现在我们用下面的URL表示这个动作</p> <div class="highlighter-rouge"><pre class="highlight"><code>api/v2/routers/{router id}/add_router_interface </code></pre> </div> <p>这个方法也很不错。事实上，neutron中大多数情况下都是用的这个方法。不过，如果这么做的话，动作变成了资源，那么就不用action extension而用resource extension了。所以这种方法不是我们这里要讨论的</p> <p><strong>用一个action资源来处理所有的动作</strong></p> <p>比如原来的url是api/v2/routers,现在我们用下面的url</p> <div class="highlighter-rouge"><pre class="highlight"><code>api/v2/routers/action POST </code></pre> </div> <p>既然是POST 那么肯定有body，...</p>
+    </section> -->
+    <section class="post-meta">
+      <div class="post-date">July 12, 2017, Mingwei Li</div>
+      <div class="post-categories">
+      in 
+        
+        <a href="/engineering/category/openstack">Openstack</a>
+        
+      
+      </div>
+    </section>
+  </li>
+  
+  <hr>
+  
+  
+  <li>
+    <h2>
       <a class="post-link" href="/engineering/network/2017/07/09/mpls-vpn-packet.html">Trace Packets in MPLS VPNv4 Network</a>
     </h2>
     <!--<section class="post-excerpt" itemprop="description">

@@ -6,9 +6,86 @@
 </description>
     <link>http://ciscochina.github.io/engineering/</link>
     <atom:link href="http://ciscochina.github.io/engineering/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 21 Jul 2017 10:32:44 +0800</pubDate>
-    <lastBuildDate>Fri, 21 Jul 2017 10:32:44 +0800</lastBuildDate>
+    <pubDate>Sun, 27 Aug 2017 22:29:40 +0800</pubDate>
+    <lastBuildDate>Sun, 27 Aug 2017 22:29:40 +0800</lastBuildDate>
     <generator>Jekyll v3.2.1</generator>
+    
+      <item>
+        <title>Sharing of Selenium Testing Framework</title>
+        <description>&lt;h1 id=&quot;what-is-selenium&quot;&gt;What is Selenium?&lt;/h1&gt;
+
+&lt;p&gt;From the http://www.seleniumhq.org/, it gives a clear definition: Selenium automates browsers. That’s it!&lt;/p&gt;
+
+&lt;p&gt;Please check out below links if you are interest:&lt;/p&gt;
+
+&lt;h3 id=&quot;getting-started&quot;&gt;Getting started&lt;/h3&gt;
+
+&lt;p&gt;http://selenium-python.readthedocs.io/getting-started.html (For Python)&lt;/p&gt;
+
+&lt;h3 id=&quot;source-code&quot;&gt;Source Code&lt;/h3&gt;
+
+&lt;p&gt;https://github.com/SeleniumHQ/selenium&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;In generally, if your application is web-oriented and with using the Selenium for functional testing and unit test for data/backend logical testing,
+You would get an complete web application testing solution.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;also-want-to-share-some-python-coding-tips-that-i-got-during-the-refactor-of-vots-project&quot;&gt;Also want to share some python coding tips that I got during the refactor of vots project&lt;/h4&gt;
+
+&lt;h5 id=&quot;section&quot;&gt;1.&lt;/h5&gt;
+
+&lt;p&gt;We know that everything is an object in python, so it makes easy for us to write ‘table-driven’ methods in python.
+For example, we get many ‘if-else’ and complex logic in each ‘if’, then we can use table-driven, extract the ‘if’ condition into ‘key’, and the ‘logic into ‘value’ of a map.
+Likes below :&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def do_print(in_str: str):
+    print(in_str)
+                
+def do_print_with_pre(in_str: str):
+    print('pre - ' + in_str)
+
+
+def do_print_with_end(in_str: str):
+    print(in_str + ' - end')
+
+
+operations = {'1': do_print, '2': do_print_with_pre, '3': do_print_with_end}
+
+operations['1']('CISCO')
+operations['2']('CISCO')
+operations['3']('CISCO')
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h5 id=&quot;section-1&quot;&gt;2.&lt;/h5&gt;
+
+&lt;p&gt;From above screenshot we can see python support for type hints already. This is new in version 3.5 and I think is very helpful especially when the input parameter is an complex object .
+The function below takes and returns a string and is annotated as follows:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def greeting(name: str) -&amp;gt; str:
+    return 'Hello ' + name
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;section-2&quot;&gt;3.&lt;/h4&gt;
+
+&lt;p&gt;Write unit test for your code.
+For example, Vots project has two threads with loop and this makes it hard to debug when we get a bug.
+Unit test and ‘mock’ can solve this issue.
+First we reproduce bug and record real response into a txt file.
+Second we write unit test for our code, and mock the return value of the related methods with the real response in the txt file.
+Then we can begin debug from the unit test.
+Except this, unit test can improve the quality of your code and make it easy to maintenance your code for continue delivery.&lt;/p&gt;
+</description>
+        <pubDate>Sun, 27 Aug 2017 04:35:33 +0800</pubDate>
+        <link>http://ciscochina.github.io/engineering/python/2017/08/27/selenium-testing-framework.html</link>
+        <guid isPermaLink="true">http://ciscochina.github.io/engineering/python/2017/08/27/selenium-testing-framework.html</guid>
+        
+        
+        <category>python</category>
+        
+      </item>
     
       <item>
         <title>网络学习和CCIE认证</title>
@@ -84,7 +161,7 @@
 
 &lt;h2 id=&quot;ospf&quot;&gt;3.1 OSPF&lt;/h2&gt;
 
-&lt;p&gt;主要就是做实验做实验！可以OSPF命令行配置手册。
+&lt;p&gt;主要就是做实验做实验！可以参考OSPF命令行配置手册。
 《Cisco OSPF Command and Configuration Handbook》[&lt;sup id=&quot;fnref:9&quot;&gt;&lt;a href=&quot;#fn:9&quot; class=&quot;footnote&quot;&gt;9&lt;/a&gt;&lt;/sup&gt;]&lt;/p&gt;
 
 &lt;ul&gt;
@@ -110,7 +187,7 @@
 
 &lt;h1 id=&quot;cciesp&quot;&gt;4. CCIE篇（SP方向）&lt;/h1&gt;
 
-&lt;p&gt;CCIE的方向有很多，比较大众的Routing Switch方向和Service Provider方向，因为项目需要，我需要专攻BGP，所以CCIIE选择了SP方向，&lt;/p&gt;
+&lt;p&gt;CCIE的方向有很多，比较大众的Routing Switch方向和Service Provider方向，因为项目需要，我需要专攻BGP，所以CCIE选择了SP方向，&lt;/p&gt;
 
 &lt;p&gt;SP方向的重中之重是MPLS VPN。必看书籍为《MPLS和VPN体系结构》[&lt;sup id=&quot;fnref:12&quot;&gt;&lt;a href=&quot;#fn:12&quot; class=&quot;footnote&quot;&gt;12&lt;/a&gt;&lt;/sup&gt;]，以卷1为主，卷2为辅。另外还有一些组播和l2vpn的内容，建议不要一上来就做CCIE的lab题库，要先过知识点，每一个知识点都要动手做实验。CCIE我大概写了28篇相应的博客&lt;a href=&quot;&quot;&gt;http://blog.sina.com.cn/s/articlelist_1263548705_15_1.html&lt;/a&gt;，另外网络上资源也非常多，各种博客，视频也是学习的好工具。&lt;/p&gt;
 
@@ -119,7 +196,7 @@
 &lt;h2 id=&quot;section-4&quot;&gt;4.1 试验环境的搭建&lt;/h2&gt;
 
 &lt;p&gt;CCIE SP方向的考试，实验拓扑的设备基本都是IOS-XR, 很多配置和IOS语法略有不同。真正准备考试的拓扑可以使用XRv[&lt;sup id=&quot;fnref:13&quot;&gt;&lt;a href=&quot;#fn:13&quot; class=&quot;footnote&quot;&gt;13&lt;/a&gt;&lt;/sup&gt;]去搭建。XRv比较消耗系统资源，所以在平时知识点学习的时候，个人还是建议使用GNS3.
-因为机制是一样的，只不过配置语法不同，关键是GNS3“即插即用”，搭建拓扑妥妥拽拽非常简单，更重要的是，通过wireshark抓包非常方便，这点非常重要。对于IOS-XR配置的训练可以从后期准备实验真题练习开始。&lt;/p&gt;
+因为机制是一样的，只不过配置语法不同，关键是GNS3“即插即用”，搭建拓扑拖拖拽拽非常简单，更重要的是，通过wireshark抓包非常方便，这点非常重要。对于IOS-XR配置的训练可以从后期准备实验真题练习开始。&lt;/p&gt;
 
 &lt;h2 id=&quot;igp&quot;&gt;4.2 IGP&lt;/h2&gt;
 
@@ -2072,157 +2149,6 @@ paste.app_factory = neutron.api.v2.router:APIRouter.factory
         <pubDate>Wed, 12 Jul 2017 16:43:59 +0800</pubDate>
         <link>http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-neutron-arh.html</link>
         <guid isPermaLink="true">http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-neutron-arh.html</guid>
-        
-        
-        <category>openstack</category>
-        
-      </item>
-    
-      <item>
-        <title>How to read OpenStack code part 8 - action extension</title>
-        <description>&lt;p&gt;之前我们看过了core plugin， service plugin 还有resource extension。&lt;/p&gt;
-
-&lt;p&gt;resource extension的作用是定义新的资源。而我们说过还有两种extension： action extension 跟 request extension。这一章我们将写一个action extension。&lt;/p&gt;
-
-&lt;h1 id=&quot;action-in-restful&quot;&gt;action in RESTful&lt;/h1&gt;
-
-&lt;p&gt;openstack中所有的网络服务都是RESTful风格的。但RESTful风格的URL有一个问题，如何表示动作。&lt;/p&gt;
-
-&lt;p&gt;像 network，tiger 这些单词都是名词，用在URL中以HTTP的POST/GET/DELETE/PUT来对应create get delete update没有任何问题。但有的时候我们需要在url中表示一些动词。比如，router是一个名词，但router中添加一个端口是一个动词。这时候我们有三种选择：&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;把增加端口变成update router的一个分支功能&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;这是一个好办法，但很多时候由于种种原因并不适用，比如这需要修改原来的update逻辑，需要修改原来的router数据结构，可能这个动作及其复杂，把它放入update不合适等等等等&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;把这个动作变成一个独立的资源&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;比如原来的url是api/v2/routers, 但现在我们用下面的URL表示这个动作&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;api/v2/routers/{router id}/add_router_interface
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;这个方法也很不错。事实上，neutron中大多数情况下都是用的这个方法。不过，如果这么做的话，动作变成了资源，那么就不用action extension而用resource extension了。所以这种方法不是我们这里要讨论的&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;用一个action资源来处理所有的动作&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;比如原来的url是api/v2/routers,现在我们用下面的url&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;api/v2/routers/action POST
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;既然是POST 那么肯定有body， body可能是&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;'{&quot;add_router_interface&quot;：&quot;some value&quot;}'
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;这样就可以通过一个action url处理所有的动作请求了。这正是neutron action extension所做的事。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;不过，奇妙的是，搜索遍了neutron的代码，没有看到一个功能是用这种extension来实现的。也许neutron正在努力用第二种方式替代第三种方式。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h1 id=&quot;write-action-extension&quot;&gt;write action extension&lt;/h1&gt;
-
-&lt;p&gt;虽然neutron中没有用这种extension，但它还是支持的。并且我们也很有必要了解这种extension，因为在neutron的启动加载过程中会尝试处理它，如果我们不了解，那么看到了这种代码会很懵&lt;/p&gt;
-
-&lt;p&gt;之前我们写过一个zoo plugin和zoo extension。并且实现了一个tiger资源。这里我们写一个action extension来为tiger增加一个动作:eat_wolf。&lt;/p&gt;
-
-&lt;p&gt;要实现action extension非常简单，只需要提供get_actions函数如下&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from neutron.api import extensions
-from neutron.api.v2 import attributes
-from neutron.api.v2 import base
-from neutron import manager
-from neutron.api.v2 import resource_helper
-from neutron.plugins.common import constants
-
-EXT_PREFIX = '/zoo'
-RESOURCE_NAME = 'tiger'
-COLLECTION_NAME = '%ss' % RESOURCE_NAME
-
-RESOURCE_ATTRIBUTE_MAP = {
-	'tiger': {
-		'id': {'allow_post': False, 'allow_put': False,
-			   'validate': {'type:uuid': None},
-			   'is_visible': True,
-			   'primary_key': True},
-		'name': {'allow_post': True,
-				 'allow_put': False,
-				 'is_visible': True,
-				 'default': ''},
-	# tenant_id is the user id used by keystone for authorisation
-	# It's good to use the following as it is and it is necessary
-	# for every extension
-	'tenant_id': {'allow_post': True, 'allow_put': False,
-				  'required_by_policy': True,
-				  'validate': {'type:string': None},
-				  'is_visible': True}
-
-	}
-}
-
-
-class Zoo(extensions.ExtensionDescriptor):
-	#   path_prefix = &quot;zoo&quot;
-	@classmethod
-	def get_name(cls):
-		return &quot;zoo&quot;
-
-	@classmethod
-	def get_alias(cls):
-		return 'zoo'
-
-	@classmethod
-	def get_description(cls):
-		return &quot;zoo&quot;
-
-	@classmethod
-	def get_updated(cls):
-		return &quot;2017-02-08T10:00:00-00:00&quot;
-
-	@classmethod
-	def get_resources(cls):
-		# This method registers the URL and the dictionary  of
-		# attributes on the neutron-server.
-		exts = list()
-		plugin = manager.NeutronManager.get_service_plugins()['ZOO']
-		resource_name = RESOURCE_NAME
-		collection_name = COLLECTION_NAME
-		params = RESOURCE_ATTRIBUTE_MAP.get(resource_name)
-		controller = base.create_resource(collection_name, resource_name,
-										  plugin, params, allow_bulk=False)
-		ex = extensions.ResourceExtension(collection_name, controller, path_prefix=EXT_PREFIX)
-		exts.append(ex)
-		return exts
-
-	def get_actions(self):
-		eat_wolf_action = extensions.ActionExtension('tigers', 'eat_wolf', self._eat_wolf_handler)
-		return [eat_wolf_action]
-		
-	def _eat_wolf_handler(self, *args, **kwargs):
-		return 'The tiger eat a wolf'
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;我们这里贴出了所有的代码。但实际上只需要 get_action函数和 _eat_wolf_handler函数。实现了第一个函数就是action extension，第二个函数只是为了处理action的逻辑。重启neutron server后我们访问一下&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl -g -i -X POST http://liberty-controller01:9696/v2.0/tigers/40/action -H &quot;Content-Type: application/json&quot; -H &quot;Accept: application/json&quot; -H &quot;X-Auth-Token: $token&quot; -d '{&quot;eat_wolf&quot;: &quot;0730d3b8-9f1a-47e4-8d8b-365aef954160&quot;}'
-HTTP/1.1 200 OK
-Content-Type: text/html; charset=UTF-8
-Content-Length: 20
-X-Openstack-Request-Id: req-d28c6e78-d8da-49fe-8fe8-deaac591a076
-Date: Thu, 09 Feb 2017 09:58:36 GMT
-
-The tiger eat a wolf
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;OK， 上面就是我们的action extension了&lt;/p&gt;
-</description>
-        <pubDate>Wed, 12 Jul 2017 16:43:59 +0800</pubDate>
-        <link>http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-action-exten.html</link>
-        <guid isPermaLink="true">http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-action-exten.html</guid>
         
         
         <category>openstack</category>

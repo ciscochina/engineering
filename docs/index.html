@@ -131,6 +131,28 @@
   
   <li>
     <h2>
+      <a class="post-link" href="/engineering/python/2017/08/27/selenium-testing-framework.html">Sharing of Selenium Testing Framework</a>
+    </h2>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><h1 id="what-is-selenium">What is Selenium?</h1> <p>From the http://www.seleniumhq.org/, it gives a clear definition: Selenium automates browsers. That’s it!</p> <p>Please check out below links if you are interest:</p> <h3 id="getting-started">Getting started</h3> <p>http://selenium-python.readthedocs.io/getting-started.html (For Python)</p> <h3 id="source-code">Source Code</h3> <p>https://github.com/SeleniumHQ/selenium</p> <div class="highlighter-rouge"><pre class="highlight"><code>In generally, if your application is web-oriented and with using the Selenium...</p>
+    </section> -->
+    <section class="post-meta">
+      <div class="post-date">August 27, 2017, Ronghui Zhou</div>
+      <div class="post-categories">
+      in 
+        
+        <a href="/engineering/category/python">Python</a>
+        
+      
+      </div>
+    </section>
+  </li>
+  
+  <hr>
+  
+  
+  <li>
+    <h2>
       <a class="post-link" href="/engineering/network/2017/07/18/network-path.html">网络学习和CCIE认证</a>
     </h2>
     <!--<section class="post-excerpt" itemprop="description">
@@ -311,28 +333,6 @@
     </h2>
     <!--<section class="post-excerpt" itemprop="description">
       <p><p>今天这一章节非常重要。我们知道neutron是一个非常复杂的系统，由很多组件构成。研究这样一个复杂的系统，正确的顺序应该是现在宏观上对其整体结构有所了解，然后再由针对性的对其组件进行深入了解。本章要做的事情就是介绍neutron 宏观上的架构。</p> <p>首先看一下下图：</p> <div class="highlighter-rouge"><pre class="highlight"><code>人 - - &gt; Neutron Server - - &gt; Plugin - -&gt; message queue - -&gt; Agent (Extension) | | MySQL database </code></pre> </div> <p>因为是markdown 编辑，所以没办法把图画的太复杂，不过其实也够了。上面就是Neutron的大致结构。</p> <p>首先，是人发起API请求给Neutron Server。这个过程没什么好说的，就是HTTP restful请求</p> <p>然后，Neutron Server 接受到请求后，会根据route规则把请求转发给相应的Plugin。这里的route规则，也就是route map是由之前介绍过的route package生成的</p> <p>Plugin接受到请求后主要做两件事，在DB中创建对象和调用Agent做响应配置。比如创建一个subnet请求，plugin会现在db创建subnet的数据对象，然后调用agent在openvswitch或者linuxbridge创建具体的配置信息。Plugin和db交互用的是sqlalchemy orm package，跟agent交互是通过message queue。</p> <p>由此可见Plugin是Neutron的核心。不过从图中还可以看到一个叫extension的东西，这里的extension跟我们之前在stevedore中提到的extension不是一回事儿，但在neutron中也非常重要，下面我们大概了解一下plugin 和 extension。</p> <h1 id="plugin-">Plugin 发展历史</h1> <p>Neutron是所谓pluggable结构的，就是说它的很多组件应该可以像积木一样随意插拔使用。</p>...</p>
-    </section> -->
-    <section class="post-meta">
-      <div class="post-date">July 12, 2017, Mingwei Li</div>
-      <div class="post-categories">
-      in 
-        
-        <a href="/engineering/category/openstack">Openstack</a>
-        
-      
-      </div>
-    </section>
-  </li>
-  
-  <hr>
-  
-  
-  <li>
-    <h2>
-      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-action-exten.html">How to read OpenStack code part 8 - action extension</a>
-    </h2>
-    <!--<section class="post-excerpt" itemprop="description">
-      <p><p>之前我们看过了core plugin， service plugin 还有resource extension。</p> <p>resource extension的作用是定义新的资源。而我们说过还有两种extension： action extension 跟 request extension。这一章我们将写一个action extension。</p> <h1 id="action-in-restful">action in RESTful</h1> <p>openstack中所有的网络服务都是RESTful风格的。但RESTful风格的URL有一个问题，如何表示动作。</p> <p>像 network，tiger 这些单词都是名词，用在URL中以HTTP的POST/GET/DELETE/PUT来对应create get delete update没有任何问题。但有的时候我们需要在url中表示一些动词。比如，router是一个名词，但router中添加一个端口是一个动词。这时候我们有三种选择：</p> <p><strong>把增加端口变成update router的一个分支功能</strong></p> <p>这是一个好办法，但很多时候由于种种原因并不适用，比如这需要修改原来的update逻辑，需要修改原来的router数据结构，可能这个动作及其复杂，把它放入update不合适等等等等</p> <p><strong>把这个动作变成一个独立的资源</strong></p> <p>比如原来的url是api/v2/routers, 但现在我们用下面的URL表示这个动作</p> <div class="highlighter-rouge"><pre class="highlight"><code>api/v2/routers/{router id}/add_router_interface </code></pre> </div> <p>这个方法也很不错。事实上，neutron中大多数情况下都是用的这个方法。不过，如果这么做的话，动作变成了资源，那么就不用action extension而用resource extension了。所以这种方法不是我们这里要讨论的</p> <p><strong>用一个action资源来处理所有的动作</strong></p> <p>比如原来的url是api/v2/routers,现在我们用下面的url</p> <div class="highlighter-rouge"><pre class="highlight"><code>api/v2/routers/action POST </code></pre> </div> <p>既然是POST 那么肯定有body，...</p>
     </section> -->
     <section class="post-meta">
       <div class="post-date">July 12, 2017, Mingwei Li</div>
