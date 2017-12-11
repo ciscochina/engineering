@@ -131,6 +131,28 @@
   
   <li>
     <h2>
+      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-neutron-arh.html">How to read OpenStack code part 5 - neutron architecture</a>
+    </h2>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p>今天这一章节非常重要。我们知道neutron是一个非常复杂的系统，由很多组件构成。研究这样一个复杂的系统，正确的顺序应该是现在宏观上对其整体结构有所了解，然后再由针对性的对其组件进行深入了解。本章要做的事情就是介绍neutron 宏观上的架构。</p> <p>首先看一下下图：</p> <div class="highlighter-rouge"><pre class="highlight"><code>人 - - &gt; Neutron Server - - &gt; Plugin - -&gt; message queue - -&gt; Agent (Extension) | | MySQL database </code></pre> </div> <p>因为是markdown 编辑，所以没办法把图画的太复杂，不过其实也够了。上面就是Neutron的大致结构。</p> <p>首先，是人发起API请求给Neutron Server。这个过程没什么好说的，就是HTTP restful请求</p> <p>然后，Neutron Server 接受到请求后，会根据route规则把请求转发给相应的Plugin。这里的route规则，也就是route map是由之前介绍过的route package生成的</p> <p>Plugin接受到请求后主要做两件事，在DB中创建对象和调用Agent做响应配置。比如创建一个subnet请求，plugin会现在db创建subnet的数据对象，然后调用agent在openvswitch或者linuxbridge创建具体的配置信息。Plugin和db交互用的是sqlalchemy orm package，跟agent交互是通过message queue。</p> <p>由此可见Plugin是Neutron的核心。不过从图中还可以看到一个叫extension的东西，这里的extension跟我们之前在stevedore中提到的extension不是一回事儿，但在neutron中也非常重要，下面我们大概了解一下plugin 和 extension。</p> <h1 id="plugin-">Plugin 发展历史</h1> <p>Neutron是所谓pluggable结构的，就是说它的很多组件应该可以像积木一样随意插拔使用。</p>...</p>
+    </section> -->
+    <section class="post-meta">
+      <div class="post-date">July 12, 2017, Mingwei Li</div>
+      <div class="post-categories">
+      in 
+        
+        <a href="/engineering/category/openstack">Openstack</a>
+        
+      
+      </div>
+    </section>
+  </li>
+  
+  <hr>
+  
+  
+  <li>
+    <h2>
       <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-action-exten.html">How to read OpenStack code part 8 - action extension</a>
     </h2>
     <!--<section class="post-excerpt" itemprop="description">

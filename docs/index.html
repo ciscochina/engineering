@@ -131,6 +131,28 @@
   
   <li>
     <h2>
+      <a class="post-link" href="/engineering/python/2017/12/10/pipenv.html">virtualenvwrapper vs Pipenv</a>
+    </h2>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p>今年年初，Kenneth Reitz发布了Pipenv(https://www.kennethreitz.org/essays/announcing-pipenv), 目前已经是Python官方推荐的包管理工具(https://docs.pipenv.org/)。 个人之前一直都是用virtualenvwrapper(https://virtualenvwrapper.readthedocs.io/en/latest/), virtualenvwrapper基本保持了大家之前对pip，virtualenv和requirements.txt的使用习惯，但是强大和方便了许多。如果要迁移到pipenv，需要对已有项目的包管理方式做较大的改变，因为pipenv 引入了新的机制。</p> <h1 id="virtualenvwrapper">virtualenvwrapper</h1> <p>virtualenvwrapper的方便之处在于不同项目的切换，以及同一项目不同虚拟环境之间的快速切换。</p> <h2 id="install">install</h2> <div class="highlighter-rouge"><pre class="highlight"><code>$ pip install virtualenvwrapper ... $ export WORKON_HOME=~/Envs $ mkdir -p $WORKON_HOME $ source /usr/local/bin/virtualenvwrapper.sh </code></pre> </div> <p>安装完以后，两个常用的命令一个是<code class="highlighter-rouge">mkvirtualenv</code>和<code class="highlighter-rouge">rmvirtualenv</code>. 所create的虚拟环境都会放到<code class="highlighter-rouge">WORKON_HOME</code>里。</p> <h2 id="create-a-project">create a project</h2> <p>可以创建一个python3的虚拟环境。创建的同时，安装requirements.txt的依赖到虚拟环境里，并且进入到虚拟环境。</p> <div class="highlighter-rouge"><pre class="highlight"><code>➜ tmp mkdir demo ➜ tmp cd demo...</p>
+    </section> -->
+    <section class="post-meta">
+      <div class="post-date">December 10, 2017, Peng Xiao</div>
+      <div class="post-categories">
+      in 
+        
+        <a href="/engineering/category/Python">Python</a>
+        
+      
+      </div>
+    </section>
+  </li>
+  
+  <hr>
+  
+  
+  <li>
+    <h2>
       <a class="post-link" href="/engineering/python/2017/08/27/selenium-testing-framework.html">Sharing of Selenium Testing Framework</a>
     </h2>
     <!--<section class="post-excerpt" itemprop="description">
@@ -311,28 +333,6 @@
     </h2>
     <!--<section class="post-excerpt" itemprop="description">
       <p><p>本篇分为以下几个部分</p> <blockquote> <ul> <li>paste 是什么</li> <li>怎样使用paste</li> <li>paste of neutron</li> </ul> </blockquote> <h2 id="paste-">paste 是什么</h2> <p>WSGI 是python 中application 和 web server互通的标准。 我们知道了wsgi 中包括 app, middleware ， server而且middleware可以有很多个。wsgi结构的系统最大的好处就是middleware像积木一样，可以灵活的添加组成不同的功能。</p> <p>我们上一篇文章中，把2个middleware和一个app组合到了一起，但我们采用的写法是在代码中这样写：</p> <div class="highlighter-rouge"><pre class="highlight"><code>httpd = make_server('10.79.99.86', 8051, CheckError(AuthToken(check_number))) </code></pre> </div> <p>把各个模块之间的关系硬编码到了代码中，这很显然不够灵活，假设有一天想重新组织middleware的结构，我们还需要找到相关的代码去修改代码。最好的办法是通过配置文件来组织各个模块之间的关系，通过修改配置文件来影响系统中各个模块的组合与调用。 Paste 就是解决这个问题的。</p> <p>paste 是python的一个module，通过paste， 你可以把wsgi的模块写入ini风格的配置文件，灵活部署。</p> <p>下面我们用paste构建一个小系统，进一步了解</p> <h2 id="paste">怎样使用paste</h2> <p>首先，我们将构建三个wsgi组件， 一个application叫check_number， 该application的功能是check http req中的数字是奇数还是偶数，如果是奇数返回odd否则返回even。...</p>
-    </section> -->
-    <section class="post-meta">
-      <div class="post-date">July 12, 2017, Mingwei Li</div>
-      <div class="post-categories">
-      in 
-        
-        <a href="/engineering/category/openstack">Openstack</a>
-        
-      
-      </div>
-    </section>
-  </li>
-  
-  <hr>
-  
-  
-  <li>
-    <h2>
-      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-neutron-arh.html">How to read OpenStack code part 5 - neutron architecture</a>
-    </h2>
-    <!--<section class="post-excerpt" itemprop="description">
-      <p><p>今天这一章节非常重要。我们知道neutron是一个非常复杂的系统，由很多组件构成。研究这样一个复杂的系统，正确的顺序应该是现在宏观上对其整体结构有所了解，然后再由针对性的对其组件进行深入了解。本章要做的事情就是介绍neutron 宏观上的架构。</p> <p>首先看一下下图：</p> <div class="highlighter-rouge"><pre class="highlight"><code>人 - - &gt; Neutron Server - - &gt; Plugin - -&gt; message queue - -&gt; Agent (Extension) | | MySQL database </code></pre> </div> <p>因为是markdown 编辑，所以没办法把图画的太复杂，不过其实也够了。上面就是Neutron的大致结构。</p> <p>首先，是人发起API请求给Neutron Server。这个过程没什么好说的，就是HTTP restful请求</p> <p>然后，Neutron Server 接受到请求后，会根据route规则把请求转发给相应的Plugin。这里的route规则，也就是route map是由之前介绍过的route package生成的</p> <p>Plugin接受到请求后主要做两件事，在DB中创建对象和调用Agent做响应配置。比如创建一个subnet请求，plugin会现在db创建subnet的数据对象，然后调用agent在openvswitch或者linuxbridge创建具体的配置信息。Plugin和db交互用的是sqlalchemy orm package，跟agent交互是通过message queue。</p> <p>由此可见Plugin是Neutron的核心。不过从图中还可以看到一个叫extension的东西，这里的extension跟我们之前在stevedore中提到的extension不是一回事儿，但在neutron中也非常重要，下面我们大概了解一下plugin 和 extension。</p> <h1 id="plugin-">Plugin 发展历史</h1> <p>Neutron是所谓pluggable结构的，就是说它的很多组件应该可以像积木一样随意插拔使用。</p>...</p>
     </section> -->
     <section class="post-meta">
       <div class="post-date">July 12, 2017, Mingwei Li</div>

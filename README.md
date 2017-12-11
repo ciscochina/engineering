@@ -35,7 +35,9 @@ categories: database
 
 #### preview locally
 
-本地预览，请参考https://help.github.com/articles/setting-up-your-github-pages-site-locally-with-jekyll/，主要参考requirement和step2，step4.
+本地预览，请参考https://help.github.com/articles/setting-up-your-github-pages-site-locally-with-jekyll/
+
+主要参考requirement和step2，step4.
 
 
 #### commit, push and merge request

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>virtualenvwrapper vs Pipenv</title>
+  <meta name="description" content="今年年初，Kenneth Reitz发布了Pipenv(https://www.kennethreitz.org/essays/announcing-pipenv), 目前已经是Python官方推荐的包管理工具(https://docs.pipenv.org/)。个人之前一直都是用virtualenvwrappe...">
+  
+  <meta name="author" content="Peng Xiao">
+  <meta name="copyright" content="&copy; Peng Xiao 2017">
+  
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/engineering/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/engineering/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/engineering/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/engineering/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/engineering/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/engineering/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/engineering/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/engineering/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/engineering/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/engineering/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/engineering/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/engineering/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/engineering/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/engineering/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/engineering/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+  <!-- Facebook OGP cards -->
+  <meta property="og:description" content="今年年初，Kenneth Reitz发布了Pipenv(https://www.kennethreitz.org/essays/announcing-pipenv), 目前已经是Python官方推荐的包管理工具(https://docs.pipenv.org/)。个人之前一直都是用virtualenvwrappe..." />
+  <meta property="og:url" content="http://ciscochina.github.io" />
+  <meta property="og:site_name" content="Cisco China GDC Engineering Blog" />
+  <meta property="og:title" content="virtualenvwrapper vs Pipenv" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="612" />
+  <meta property="og:image:height" content="605" />
+  
+
+  
+  <!-- Twitter: card tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="virtualenvwrapper vs Pipenv">
+  <meta name="twitter:description" content="今年年初，Kenneth Reitz发布了Pipenv(https://www.kennethreitz.org/essays/announcing-pipenv), 目前已经是Python官方推荐的包管理工具(https://docs.pipenv.org/)。个人之前一直都是用virtualenvwrappe...">
+  <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
+  <meta name="twitter:url" content="http://ciscochina.github.io">
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/engineering/css/main.css">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/python/2017/12/10/pipenv.html">
+  <link rel="alternate" type="application/rss+xml" title="Cisco China GDC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/engineering/" class="logo">
+      
+      <img src="/engineering/assets/logo.png" alt="Cisco China GDC Engineering Blog">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+          
+        
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container " >
+  <div class="scrim ">
+    <header class="post-header">
+      <h1 class="title">virtualenvwrapper vs Pipenv</h1>
+      <p class="info">by <strong>Peng Xiao</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+ <span class="page-divider">
+  <span class="one"></span>
+  <span class="two"></span>
+</span>
+ 
+
+<section class="post-meta">
+  <div class="post-date">December 10, 2017</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/engineering/category/Python">Python</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <p>今年年初，Kenneth Reitz发布了Pipenv(https://www.kennethreitz.org/essays/announcing-pipenv), 目前已经是Python官方推荐的包管理工具(https://docs.pipenv.org/)。
+个人之前一直都是用virtualenvwrapper(https://virtualenvwrapper.readthedocs.io/en/latest/),
+virtualenvwrapper基本保持了大家之前对pip，virtualenv和requirements.txt的使用习惯，但是强大和方便了许多。如果要迁移到pipenv，需要对已有项目的包管理方式做较大的改变，因为pipenv
+引入了新的机制。</p>
+
+<h1 id="virtualenvwrapper">virtualenvwrapper</h1>
+
+<p>virtualenvwrapper的方便之处在于不同项目的切换，以及同一项目不同虚拟环境之间的快速切换。</p>
+
+<h2 id="install">install</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ pip install virtualenvwrapper
+...
+$ export WORKON_HOME=~/Envs
+$ mkdir -p $WORKON_HOME
+$ source /usr/local/bin/virtualenvwrapper.sh
+</code></pre>
+</div>
+
+<p>安装完以后，两个常用的命令一个是<code class="highlighter-rouge">mkvirtualenv</code>和<code class="highlighter-rouge">rmvirtualenv</code>. 所create的虚拟环境都会放到<code class="highlighter-rouge">WORKON_HOME</code>里。</p>
+
+<h2 id="create-a-project">create a project</h2>
+
+<p>可以创建一个python3的虚拟环境。创建的同时，安装requirements.txt的依赖到虚拟环境里，并且进入到虚拟环境。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>➜  tmp mkdir demo
+➜  tmp cd demo
+➜  demo touch requirements.txt
+➜  demo echo "flask" &gt;&gt; requirements.txt
+➜  demo mkvirtualenv --python=/usr/local/bin/python3.5 demo3 -a . -r requirements.txt
+Running virtualenv with interpreter /usr/local/bin/python3.5
+Using base prefix '/Library/Frameworks/Python.framework/Versions/3.5'
+New python executable in demo3/bin/python3.5
+Also creating executable in demo3/bin/python
+Installing setuptools, pip, wheel...done.
+virtualenvwrapper.user_scripts creating /Users/penxiao/PycharmProjects/virtualenv/demo3/bin/predeactivate
+virtualenvwrapper.user_scripts creating /Users/penxiao/PycharmProjects/virtualenv/demo3/bin/postdeactivate
+virtualenvwrapper.user_scripts creating /Users/penxiao/PycharmProjects/virtualenv/demo3/bin/preactivate
+virtualenvwrapper.user_scripts creating /Users/penxiao/PycharmProjects/virtualenv/demo3/bin/postactivate
+virtualenvwrapper.user_scripts creating /Users/penxiao/PycharmProjects/virtualenv/demo3/bin/get_env_details
+Setting project for demo3 to /Users/penxiao/tmp/demo
+You are using pip version 7.1.0, however version 9.0.1 is available.
+You should consider upgrading via the 'pip install --upgrade pip' command.
+Collecting flask (from -r requirements.txt (line 1))
+  Using cached Flask-0.12.2-py2.py3-none-any.whl
+....
+....
+Successfully installed Jinja2-2.10 MarkupSafe-1.0 Werkzeug-0.13 click-6.7 flask-0.12.2 itsdangerous-0.24
+(demo3)➜  demo
+</code></pre>
+</div>
+
+<p>可以再创建一个Python2的虚拟环境。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>(demo3)➜  demo mkvirtualenv demo2 -a . -r requirements.txt
+New python executable in demo2/bin/python
+Installing setuptools, pip, wheel...done.
+virtualenvwrapper.user_scripts creating /Users/penxiao/PycharmProjects/virtualenv/demo2/bin/predeactivate
+virtualenvwrapper.user_scripts creating /Users/penxiao/PycharmProjects/virtualenv/demo2/bin/postdeactivate
+virtualenvwrapper.user_scripts creating /Users/penxiao/PycharmProjects/virtualenv/demo2/bin/preactivate
+virtualenvwrapper.user_scripts creating /Users/penxiao/PycharmProjects/virtualenv/demo2/bin/postactivate
+virtualenvwrapper.user_scripts creating /Users/penxiao/PycharmProjects/virtualenv/demo2/bin/get_env_details
+Setting project for demo2 to /Users/penxiao/tmp/demo
+You are using pip version 7.1.0, however version 9.0.1 is available.
+You should consider upgrading via the 'pip install --upgrade pip' command.
+Collecting flask (from -r requirements.txt (line 1))
+  Using cached Flask-0.12.2-py2.py3-none-any.whl
+....
+(demo2)➜  demo
+</code></pre>
+</div>
+
+<p>通过workon命令可以在不同的project和虚拟环境里切换。并且可以自动cd到项目目录。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>(demo2)➜  demo workon demo3
+(demo3)➜  demo deactivate
+cd%                                                                                                                                                                         ➜  demo cd
+➜  ~ workon demo2
+(demo2)➜  demo
+</code></pre>
+</div>
+
+<h1 id="pipenv">Pipenv</h1>
+
+<p>pipenv基本抛弃了requirements.txt这一套东西，引入了<code class="highlighter-rouge">Pipfile</code>和<code class="highlighter-rouge">Pipfile.lock</code>两个文件对虚拟环境进行管理。</p>
+
+<h2 id="install-1">install</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ pip install pipenv
+</code></pre>
+</div>
+
+<h2 id="create-a-project-1">create a project</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>➜  tmp cd demo
+➜  demo pipenv --python 2.7
+Creating a virtualenv for this project…
+Using /usr/bin/python2.7 to create virtualenv…
+⠋Running virtualenv with interpreter /usr/bin/python2.7
+New python executable in /Users/penxiao/PycharmProjects/virtualenv/demo-hgu7fb10/bin/python
+Installing setuptools, pip, wheel...done.
+
+Virtualenv location: /Users/penxiao/PycharmProjects/virtualenv/demo-hgu7fb10
+Creating a Pipfile for this project…
+➜  demo ls
+Pipfile
+➜  demo pipenv install flask
+Installing flask…
+Collecting flask
+  Using cached Flask-0.12.2-py2.py3-none-any.whl
+Collecting click&gt;=2.0 (from flask)
+  Using cached click-6.7-py2.py3-none-any.whl
+Collecting itsdangerous&gt;=0.21 (from flask)
+Collecting Werkzeug&gt;=0.7 (from flask)
+  Using cached Werkzeug-0.13-py2.py3-none-any.whl
+Collecting Jinja2&gt;=2.4 (from flask)
+  Using cached Jinja2-2.10-py2.py3-none-any.whl
+Collecting MarkupSafe&gt;=0.23 (from Jinja2&gt;=2.4-&gt;flask)
+Installing collected packages: click, itsdangerous, Werkzeug, MarkupSafe, Jinja2, flask
+Successfully installed Jinja2-2.10 MarkupSafe-1.0 Werkzeug-0.13 click-6.7 flask-0.12.2 itsdangerous-0.24
+
+Adding flask to Pipfile's [packages]…
+Locking [dev-packages] dependencies…
+Locking [packages] dependencies…
+Updated Pipfile.lock (36eec0)!
+➜  demo ls
+Pipfile      Pipfile.lock
+➜  demo
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">Pipfile</code>里存储了project demo的依赖，比如当前是在Python2.7环境下依赖flask。 而<code class="highlighter-rouge">Pipfile.lock</code>文件里则详细记录了深层次的依赖关系，包括flask的当前版本，哈希，已经flask
+所依赖的所有package的版本号和哈希值。</p>
+
+<h2 id="run">run</h2>
+
+<p>如果想在虚拟环境里运行代码，可以<code class="highlighter-rouge">pipenv shell</code>进入虚拟环境，然后可以run代码，最后通过<code class="highlighter-rouge">exit</code>退出。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>➜  demo pipenv shell
+Spawning environment shell (/bin/zsh). Use 'exit' to leave.
+source /Users/penxiao/PycharmProjects/virtualenv/demo-hgu7fb10/bin/activate
+➜  demo source /Users/penxiao/PycharmProjects/virtualenv/demo-hgu7fb10/bin/activate
+(demo-hgu7fb10)➜  demo
+(demo-hgu7fb10)➜  demo exit
+➜  demo
+</code></pre>
+</div>
+
+<p>Pipenv目前有一个feature没有实现，就是如何一个项目里并行多个虚拟环境，就像之前virtualenvwrapper一个project，Python2和Python3自由切换（https://github.com/pypa/pipenv/issues/1071，
+但是官方貌似不打算实现这个。</p>
+
+<p>更多的详细内容可以阅读pipenv的文档或者github repo</p>
+
+<p>https://github.com/pypa/pipenv</p>
+
+<p>https://docs.pipenv.org/</p>
+
+<h1 id="summary">summary</h1>
+
+<p>总体来说，pipenv在严谨性和安全性上完全胜出，在易用性上也ok。但是在多个环境和项目管理上有所欠缺。</p>
+
+</article>
+
+
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+      <a href="//twitter.com/share?text=virtualenvwrapper+vs+Pipenv&url=http%3A%2F%2Fciscochina.github.io%2Fengineering%2Fpython%2F2017%2F12%2F10%2Fpipenv.html&via=cisco"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=255');return false;">
+        <i class="fa fa-twitter-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+      <a href="//plus.google.com/share?title=virtualenvwrapper+vs+Pipenv&url=http%3A%2F%2Fciscochina.github.io%2Fengineering%2Fpython%2F2017%2F12%2F10%2Fpipenv.html"
+        onclick="window.open(this.href, 'google-plus-share', 'width=550,height=255');return false;">
+        <i class="fa fa-google-plus-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+<section class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'ciscochina';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">Cisco China GDC Engineering Blog</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+        
+        
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:penxiao@cisco.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">penxiao@cisco.com</span>
+          </a>
+        </li>
+
+        
+          
+          <li>
+            <a href="https://github.com/ciscochina" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">ciscochina</span>
+            </a>
+          </li>
+          
+        
+          
+          <li>
+            <a href="https://twitter.com/cisco" title="Follow me on Twitter">
+              <i class="fa fa-twitter"></i>
+              <span class="username">cisco</span>
+            </a>
+          </li>
+          
+        
+          
+        
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+      <p class="text">Cisco China GDC Engineering Blog.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+
+
+  </body>
+
+</html>
