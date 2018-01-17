@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Mariadb Installation & Master-Master Replication</title>
+  <meta name="description" content="本文记录了MYSQL双主备份的配置过程。">
+  
+  <meta name="author" content="Peng Xiao">
+  <meta name="copyright" content="&copy; Peng Xiao 2018">
+  
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/engineering/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/engineering/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/engineering/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/engineering/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/engineering/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/engineering/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/engineering/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/engineering/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/engineering/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/engineering/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/engineering/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/engineering/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/engineering/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/engineering/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/engineering/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+  <!-- Facebook OGP cards -->
+  <meta property="og:description" content="本文记录了MYSQL双主备份的配置过程。" />
+  <meta property="og:url" content="http://ciscochina.github.io" />
+  <meta property="og:site_name" content="Cisco China ADC Engineering Blog" />
+  <meta property="og:title" content="Mariadb Installation & Master-Master Replication" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="612" />
+  <meta property="og:image:height" content="605" />
+  
+
+  
+  <!-- Twitter: card tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Mariadb Installation & Master-Master Replication">
+  <meta name="twitter:description" content="本文记录了MYSQL双主备份的配置过程。">
+  <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
+  <meta name="twitter:url" content="http://ciscochina.github.io">
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/engineering/css/main.css">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/database/2018/01/16/mysql-replica.html">
+  <link rel="alternate" type="application/rss+xml" title="Cisco China ADC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/engineering/" class="logo">
+      
+      <img src="/engineering/assets/logo.png" alt="Cisco China ADC Engineering Blog">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+          
+        
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container " >
+  <div class="scrim ">
+    <header class="post-header">
+      <h1 class="title">Mariadb Installation & Master-Master Replication</h1>
+      <p class="info">by <strong>Lin Shi & Peng Xiao</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+ <span class="page-divider">
+  <span class="one"></span>
+  <span class="two"></span>
+</span>
+ 
+
+<section class="post-meta">
+  <div class="post-date">January 16, 2018</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/engineering/category/database">Database</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <p>本文记录了MYSQL双主备份的配置过程。</p>
+
+<h2 id="section">版本和安装</h2>
+
+<h3 id="mariadb--1028">1. 文档使用Mariadb 最新稳定版本 10.2.8</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[cisco@dev1 ~]$ mysql -V
+mysql  Ver 15.1 Distrib 10.2.8-MariaDB, for Linux (x86_64) using  EditLine wrapper
+</code></pre>
+</div>
+<p>​</p>
+
+<h3 id="section-1">2. 安装教程</h3>
+
+<p>https://downloads.mariadb.org/mariadb/repositories/#mirror=neusoft&amp;distro=CentOS&amp;distro_release=centos7-amd64–centos7&amp;version=10.2</p>
+
+<h2 id="ha">HA配置与部署</h2>
+
+<p>以下操作建议在数据库安装完毕、插入数据前进行，以避免出现问题</p>
+
+<h3 id="section-2">1 编辑配置文件</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>sudo vim /etc/my.cnf.d/server.cnf
+</code></pre>
+</div>
+
+<p>编辑如下部分，注意2台设备的server-id和自增offset设置为不一致</p>
+
+<p>设备1</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[mysqld]
+
+log-bin=mysql-bin // Replication要求必须打开 bin log功能 
+server-id=101      // 两台设备分别设置不同的 id
+    ​
+
+auto-increment-increment=2  //id自增间隔，设置成2 
+auto-increment-offset=1         //其中一台设置为1，另外一台设置为2，这主要为了避免2台MySQL的id自增发生重复
+
+
+replicate-do-db=demo     // 需要同步的数据库，多个数据库写多行
+relay-log=mysqld-relay-bin
+log-slave-updates 
+</code></pre>
+</div>
+
+<p>​设备2</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>​[mysqld]
+
+log-bin=mysql-bin // Replication要求必须打开 bin log功能 
+​server-id=102      // 两台设备分别设置不同的 id
+
+​auto-increment-increment=2  //id自增间隔，设置成2 
+​auto-increment-offset=2         //其中一台设置为1，另外一台设置为2，这主要为了避免2台MySQL的id自增	发生重复
+
+​replicate-do-db=demo     // 需要同步的数据库，多个数据库写多行
+​relay-log=mysqld-relay-bin
+log-slave-updates 
+</code></pre>
+</div>
+
+<p>配置完两台server以后，分别启动mysql.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>systemctl start mariadb.service
+</code></pre>
+</div>
+
+<p>如果有防火墙，主要把mysql 3306端口配置成允许访问</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>firewall-cmd --zone=public --add-service=mysql --permanent
+firewall-cmd --reload
+</code></pre>
+</div>
+
+<h3 id="a-mysql-cli-master">2 进入设备A 的MySQL CLI 进行本机Master角色配置</h3>
+
+<p>mysql shell配置：另外一台机器访问此master的权限，用户和密码以及以及所在的机器地址。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ mysql 
+&gt; GRANT REPLICATION CLIENT, REPLICATION SLAVE ON *.* TO 'copyuser'@'172.16.1.%' IDENTIFIED BY 'root@123';
+&gt; FLUSH PRIVILEGES;
+&gt; SHOW MASTER STATUS;
++------------------+----------+--------------+------------------+
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB |
++------------------+----------+--------------+------------------+
+| mysql_bin.000001 |      497 |              |                  |
++------------------+----------+--------------+------------------+
+1 row in set (0.00 sec)
+</code></pre>
+</div>
+
+<h3 id="bslave">3 进入设备B配置slave</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ mysql 
+&gt; CHANGE MASTER TO MASTER_USER='copyuser',MASTER_PASSWORD='root@123',MASTER_HOST='172.16.1.100',MASTER_PORT=3306,MASTER_LOG_FILE='mysql_bin.000001',MASTER_LOG_POS=497;
+</code></pre>
+</div>
+
+<p>启动slave</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&gt; START SLAVE;
+Query OK, 0 rows affected (0.00 sec)
+</code></pre>
+</div>
+
+<p>查看slave的状态</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&gt; show slave status\G; 验证slave状态,注意一下两行是否为Yes
+
+
+Slave_IO_Running: Yes
+Slave_SQL_Running: Yes
+</code></pre>
+</div>
+
+<h3 id="section-3">4 把2，3的配置过程反过来再做一次</h3>
+
+<p>设备B</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>MariaDB [(none)]&gt; GRANT REPLICATION CLIENT, REPLICATION SLAVE ON *.* TO 'copyuser'@'172.16.1.%' IDENTIFIED BY 'root@123';
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; FLUSH PRIVILEGES
+    -&gt; ;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; 
+MariaDB [(none)]&gt; show master status;
++------------------+----------+--------------+------------------+
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB |
++------------------+----------+--------------+------------------+
+| mysql-bin.000001 |      816 |              |                  |
++------------------+----------+--------------+------------------+
+1 row in set (0.00 sec)
+
+MariaDB [(none)]&gt; 
+</code></pre>
+</div>
+
+<p>设备A</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ mysql 
+&gt; CHANGE MASTER TO MASTER_USER='copyuser',MASTER_PASSWORD='root@123',MASTER_HOST='172.16.1.200',MASTER_PORT=3306,MASTER_LOG_FILE='mysql-bin.000001',MASTER_LOG_POS=816;
+</code></pre>
+</div>
+
+<p>启动slave</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&gt; START SLAVE;
+Query OK, 0 rows affected (0.00 sec)
+</code></pre>
+</div>
+
+<p>查看slave的状态</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&gt; show slave status\G; 验证slave状态,注意一下两行是否为Yes
+
+
+Slave_IO_Running: Yes
+Slave_SQL_Running: Yes
+</code></pre>
+</div>
+
+<h2 id="section-4">验证</h2>
+
+<p>先在设备A上create数据库demo</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>MariaDB [(none)]&gt; create database demo;
+Query OK, 1 row affected (0.00 sec)
+
+MariaDB [(none)]&gt; 
+</code></pre>
+</div>
+
+<p>然后到设备B上查看，demo也会自动产生</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| demo               |
+| information_schema |
+| mysql              |
+| performance_schema |
+| test               |
++--------------------+
+5 rows in set (0.00 sec)
+
+MariaDB [(none)]&gt; 
+</code></pre>
+</div>
+
+<p>在设备A的demo里创建一个table</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>MariaDB [(none)]&gt; use demo;
+Database changed
+MariaDB [demo]&gt; CREATE TABLE student (id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,Name CHAR(30));
+Query OK, 0 rows affected (0.07 sec)
+
+MariaDB [demo]&gt; show columns from student;
++-------+------------------+------+-----+---------+----------------+
+| Field | Type             | Null | Key | Default | Extra          |
++-------+------------------+------+-----+---------+----------------+
+| id    | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+| Name  | char(30)         | YES  |     | NULL    |                |
++-------+------------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+MariaDB [demo]&gt; 
+</code></pre>
+</div>
+
+<p>在设备B上也能看到这个table</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>MariaDB [(none)]&gt; use demo;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+MariaDB [demo]&gt; show tables;
++----------------+
+| Tables_in_demo |
++----------------+
+| student            |
++----------------+
+1 row in set (0.00 sec)
+
+MariaDB [demo]&gt; 
+</code></pre>
+</div>
+
+<p>在设备B上插入数据</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>MariaDB [demo]&gt; INSERT INTO student (Name) VALUES ('stu1'),('stu2');
+Query OK, 2 rows affected (0.00 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+MariaDB [demo]&gt; 
+</code></pre>
+</div>
+
+<p>在设备A上能看到数据</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>MariaDB [demo]&gt; select * from student;
++----+------+
+| id | Name |
++----+------+
+|  2 | stu1 |
+|  4 | stu2 |
++----+------+
+2 rows in set (0.00 sec)
+
+MariaDB [demo]&gt; 
+</code></pre>
+</div>
+
+</article>
+
+
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+      <a href="//twitter.com/share?text=Mariadb+Installation+%26+Master-Master+Replication&url=http%3A%2F%2Fciscochina.github.io%2Fengineering%2Fdatabase%2F2018%2F01%2F16%2Fmysql-replica.html&via=cisco"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=255');return false;">
+        <i class="fa fa-twitter-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+      <a href="//plus.google.com/share?title=Mariadb+Installation+%26+Master-Master+Replication&url=http%3A%2F%2Fciscochina.github.io%2Fengineering%2Fdatabase%2F2018%2F01%2F16%2Fmysql-replica.html"
+        onclick="window.open(this.href, 'google-plus-share', 'width=550,height=255');return false;">
+        <i class="fa fa-google-plus-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+<section class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'ciscochina';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">Cisco China ADC Engineering Blog</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+        
+        
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:penxiao@cisco.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">penxiao@cisco.com</span>
+          </a>
+        </li>
+
+        
+          
+          <li>
+            <a href="https://github.com/ciscochina" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">ciscochina</span>
+            </a>
+          </li>
+          
+        
+          
+          <li>
+            <a href="https://twitter.com/cisco" title="Follow me on Twitter">
+              <i class="fa fa-twitter"></i>
+              <span class="username">cisco</span>
+            </a>
+          </li>
+          
+        
+          
+        
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+      <p class="text">Cisco China ADC Engineering Blog.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+
+
+  </body>
+
+</html>

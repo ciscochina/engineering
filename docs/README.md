@@ -1,6 +1,6 @@
-## Welcome to Cisco China GDC Engineering Blog
+## Welcome to Cisco China ADC Engineering Blog
 
-This blog is maintained by Cisco China Dalian GDC team.
+This blog is maintained by Cisco China Dalian ADC team.
 
 ### 如何提交一篇新的博客
 
