@@ -313,20 +313,23 @@ iptables -I INPUT -m state --state NEW -m udp -p udp --dport &lt;port&gt; -j ACC
 
 <h4 id="shadowsocks-1">2.3 安装客户端的 Shadowsocks</h4>
 
-<table>
-  <tbody>
-    <tr>
-      <td><a href="https://github.com/shadowsocks/shadowsocks-windows/releases" style="color:#409EFF">windows 版</a></td>
-      <td><a href="https://sourceforge.net/projects/shadowsocksgui/" style="color:#409EFF">Mac 版</a></td>
-    </tr>
-  </tbody>
-</table>
+<p><a href="https://github.com/shadowsocks/shadowsocks-windows/releases" style="color:#409EFF">windows 版</a>
+ | <a href="https://github.com/shadowsocks/ShadowsocksX-NG/releases/" style="color:#409EFF">Mac 版</a> 
+ | <a href="https://github.com/shadowsocks/shadowsocks-android/releases" style="color:#409EFF">Android 版</a></p>
 
 <p>windows 版如下， 配置好 IP、端口、密码、加密方式，就全都搞定了。</p>
 
 <p>如果配置信息忘了就去 VPS 上 /etc/shadowsocks.json 目录下看配置文件吧。</p>
 
 <p><img src="http://owu6vks0s.bkt.clouddn.com/ss_client.png" alt="enter image description here" style="margin:0; width:400px" /></p>
+
+<p>Mac 版如下。</p>
+
+<p><img src="http://owu6vks0s.bkt.clouddn.com/mac_ss.png" alt="enter image description here" style="margin:0;width:450px" /></p>
+
+<p>Android 版由于没有 Android 手机，就不上图了，和 PC 版唯一的区别就是 Android 版没有PAC代理，只有全局和分 APP 代理。</p>
+
+<p>IOS 版没有对应的 SS，有兴趣的同学可以参考<a href="https://medium.com/@scomper/surge-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6-a1533c10e80b" style="color:#409EFF">这篇文章。</a> ( 如果我哪天买了这个 APP 或发现其它靠谱的方式再来补这个地方吧。 )</p>
 
 <p>Enjoy ~</p>
 

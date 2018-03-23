@@ -6,8 +6,8 @@
 </description>
     <link>http://ciscochina.github.io/engineering/</link>
     <atom:link href="http://ciscochina.github.io/engineering/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 23 Mar 2018 13:14:05 +0800</pubDate>
-    <lastBuildDate>Fri, 23 Mar 2018 13:14:05 +0800</lastBuildDate>
+    <pubDate>Sat, 24 Mar 2018 00:32:10 +0800</pubDate>
+    <lastBuildDate>Sat, 24 Mar 2018 00:32:10 +0800</lastBuildDate>
     <generator>Jekyll v3.2.1</generator>
     
       <item>
@@ -180,20 +180,23 @@ iptables -I INPUT -m state --state NEW -m udp -p udp --dport &amp;lt;port&amp;gt
 
 &lt;h4 id=&quot;shadowsocks-1&quot;&gt;2.3 安装客户端的 Shadowsocks&lt;/h4&gt;
 
-&lt;table&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;&lt;a href=&quot;https://github.com/shadowsocks/shadowsocks-windows/releases&quot; style=&quot;color:#409EFF&quot;&gt;windows 版&lt;/a&gt;&lt;/td&gt;
-      &lt;td&gt;&lt;a href=&quot;https://sourceforge.net/projects/shadowsocksgui/&quot; style=&quot;color:#409EFF&quot;&gt;Mac 版&lt;/a&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/shadowsocks/shadowsocks-windows/releases&quot; style=&quot;color:#409EFF&quot;&gt;windows 版&lt;/a&gt;
+ | &lt;a href=&quot;https://github.com/shadowsocks/ShadowsocksX-NG/releases/&quot; style=&quot;color:#409EFF&quot;&gt;Mac 版&lt;/a&gt; 
+ | &lt;a href=&quot;https://github.com/shadowsocks/shadowsocks-android/releases&quot; style=&quot;color:#409EFF&quot;&gt;Android 版&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;windows 版如下， 配置好 IP、端口、密码、加密方式，就全都搞定了。&lt;/p&gt;
 
 &lt;p&gt;如果配置信息忘了就去 VPS 上 /etc/shadowsocks.json 目录下看配置文件吧。&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://owu6vks0s.bkt.clouddn.com/ss_client.png&quot; alt=&quot;enter image description here&quot; style=&quot;margin:0; width:400px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Mac 版如下。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://owu6vks0s.bkt.clouddn.com/mac_ss.png&quot; alt=&quot;enter image description here&quot; style=&quot;margin:0;width:450px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Android 版由于没有 Android 手机，就不上图了，和 PC 版唯一的区别就是 Android 版没有PAC代理，只有全局和分 APP 代理。&lt;/p&gt;
+
+&lt;p&gt;IOS 版没有对应的 SS，有兴趣的同学可以参考&lt;a href=&quot;https://medium.com/@scomper/surge-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6-a1533c10e80b&quot; style=&quot;color:#409EFF&quot;&gt;这篇文章。&lt;/a&gt; ( 如果我哪天买了这个 APP 或发现其它靠谱的方式再来补这个地方吧。 )&lt;/p&gt;
 
 &lt;p&gt;Enjoy ~&lt;/p&gt;
 </description>
@@ -715,8 +718,8 @@ Then we can begin debug from the unit test.
 Except this, unit test can improve the quality of your code and make it easy to maintenance your code for continue delivery.&lt;/p&gt;
 </description>
         <pubDate>Sun, 27 Aug 2017 04:35:33 +0800</pubDate>
-        <link>http://ciscochina.github.io/engineering/python/2017/08/27/selenium-testing-framework.html</link>
-        <guid isPermaLink="true">http://ciscochina.github.io/engineering/python/2017/08/27/selenium-testing-framework.html</guid>
+        <link>http://ciscochina.github.io/engineering/python/2017/08/26/selenium-testing-framework.html</link>
+        <guid isPermaLink="true">http://ciscochina.github.io/engineering/python/2017/08/26/selenium-testing-framework.html</guid>
         
         
         <category>python</category>
