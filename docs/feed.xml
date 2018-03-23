@@ -6,9 +6,205 @@
 </description>
     <link>http://ciscochina.github.io/engineering/</link>
     <atom:link href="http://ciscochina.github.io/engineering/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 17 Jan 2018 20:46:32 +0800</pubDate>
-    <lastBuildDate>Wed, 17 Jan 2018 20:46:32 +0800</lastBuildDate>
+    <pubDate>Fri, 23 Mar 2018 13:14:05 +0800</pubDate>
+    <lastBuildDate>Fri, 23 Mar 2018 13:14:05 +0800</lastBuildDate>
     <generator>Jekyll v3.2.1</generator>
+    
+      <item>
+        <title>租用 VPS 搭建 Shadowsocks</title>
+        <description>&lt;p&gt;&lt;img src=&quot;http://owu6vks0s.bkt.clouddn.com/develo_2.png&quot; alt=&quot;enter image description here&quot; style=&quot;margin:auto;border:none;width:400px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;由于个人的 PC 貌似加不到 Cisco 的域了，所以自己的电脑无法享受到 Anyconnect 的优质服务，加上平时又不喜欢走哪都拖着公司那个沉沉 T450 。那就索性自己搭一个吧，以下是对搭建过程的记录，有需要的同学可以参阅。&lt;/p&gt;
+
+&lt;h3 id=&quot;vps&quot;&gt;1. 搭建一个 VPS&lt;/h3&gt;
+
+&lt;p&gt;VPS 的提供商有很多，例如：Vultr 、Bandwagon 、DigitalOcean 、 virmach … 。&lt;/p&gt;
+
+&lt;p&gt;我大概的搜了一下，Vultr 的口碑相对好于其他的，最便宜的虚机是2.5刀一个月，用于上上 Google 完全够用，但是经常处于售罄状态，次便宜的是5刀一个月，性价比很高，而且还支持 Aalipay，那就选它了。&lt;/p&gt;
+
+&lt;h4 id=&quot;vultr-&quot;&gt;1.1 注册 Vultr 账号&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.vultr.com/?ref=7368626&quot; style=&quot;color:#409EFF&quot;&gt;注册链接&lt;/a&gt; 如果用我推荐的这个 link 注册，貌似会送我10刀，不过无所谓啦，哈哈哈。&lt;/p&gt;
+
+&lt;h4 id=&quot;section&quot;&gt;1.2 充值&lt;/h4&gt;
+&lt;p&gt;因为在 Deploy 虚机的时候，账户里没钱的话会转到充值页面，所以这里先做充值。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://owu6vks0s.bkt.clouddn.com/pay.png&quot; alt=&quot;enter image description here&quot; style=&quot;margin:0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;有4中支付方式，这里我选的是支付宝，比较方便。&lt;/p&gt;
+
+&lt;p&gt;默认有5个面额，当然你也可以选 Other。&lt;/p&gt;
+
+&lt;p&gt;充值成功会跳转到 Billing 页面，可以查看账户余额。&lt;/p&gt;
+
+&lt;h4 id=&quot;deploy&quot;&gt;1.3 Deploy虚机&lt;/h4&gt;
+
+&lt;p&gt;接下来就是部署虚机了，选左边导航的 Servers 。&lt;/p&gt;
+
+&lt;p&gt;首先选择设备节点。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;推荐选择&lt;span style=&quot;color:#409EFF&quot;&gt;洛杉矶&lt;/span&gt;节点，感觉速度不错，日本节点虽然更近，但是容易被墙。我第一个选的日本节点，SSH 上不去， Ping 都 Ping 不通。只好删掉重新建了一个洛杉矶的。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;建完虚机发现 IP 被墙的话，删掉重建就好了，会拿到一个新 IP。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://owu6vks0s.bkt.clouddn.com/node.png&quot; alt=&quot;enter image description here&quot; style=&quot;margin:0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;其次选择操作系统，按照自己的喜好来吧，不满意之后也可以换。这里我选的 CentOS 7。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://owu6vks0s.bkt.clouddn.com/os.png&quot; alt=&quot;enter image description here&quot; style=&quot;margin:0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;再次选择虚机规格，不同规格价格不一样，5刀那个我个人完全够用。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://owu6vks0s.bkt.clouddn.com/serve_size.png&quot; alt=&quot;enter image description here&quot; style=&quot;margin:0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;最后选填一些其他信息，默认就好了。不过这里我填了 SSH Key, 为了登录方便。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://owu6vks0s.bkt.clouddn.com/install_finish.png&quot; alt=&quot;enter image description here&quot; style=&quot;margin:0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;安装完成的话状态那一项会显示 Running。&lt;/p&gt;
+
+&lt;h3 id=&quot;shadowsocks&quot;&gt;2. 安装配置 Shadowsocks&lt;/h3&gt;
+
+&lt;h4 id=&quot;ssh--vps&quot;&gt;2.1 SSH 到 VPS&lt;/h4&gt;
+
+&lt;p&gt;选一款终端模拟软件， 比如： XShell 、 Putty 、 SecureCRT。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ssh root@&amp;lt;host&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;登录到 VPS。&lt;/p&gt;
+
+&lt;h4 id=&quot;server--shadowsocks&quot;&gt;2.2 安装 Server 端的 Shadowsocks&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/teddysun/shadowsocks_install&quot;&gt;teddysun@github&lt;/a&gt; 写了一个一键安装 Shadowsocks Server 的脚本。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;wget --no-check-certificate -O shadowsocks.sh https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks.sh
+chmod +x shadowsocks.sh
+./shadowsocks.sh 2&amp;gt;&amp;amp;1 | tee shadowsocks.log
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;安装过程中会提示选择加密方式，默认回车即可。&lt;/p&gt;
+
+&lt;p&gt;安装完成后，会有如下提示。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Congratulations, Shadowsocks-python server install completed!
+Your Server IP        :your_server_ip
+Your Server Port      :your_server_port
+Your Password         :your_password
+Your Encryption Method:your_encryption_method
+
+Welcome to visit:https://teddysun.com/342.html
+Enjoy it!
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;tfo&quot;&gt;2.2.1 配置 TFO&lt;/h4&gt;
+
+&lt;p&gt;TCP 三次握手会造成一个 RTT 的延时，因此 TFO 的目标就是去除这个延时，在三次握手期间也能交换数据。优化链接速度。&lt;/p&gt;
+
+&lt;p&gt;首先打开 /etc/rc.local ：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vi /etc/rc.local
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;在文本最下面添加：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;echo 3 &amp;gt; /proc/sys/net/ipv4/tcp_fastopen
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;其次打开 /etc/sysctl.conf ：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vi /etc/sysctl.conf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;在文本最下面添加：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;net.ipv4.tcp_fastopen = 3
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;最后，打开 Shadowsocks 的配置文件:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vi /etc/shadowsocks.json
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;把 &lt;code class=&quot;highlighter-rouge&quot;&gt;&quot;fast_open&quot;&lt;/code&gt; 的 false 替换成 true。&lt;/p&gt;
+
+&lt;p&gt;如果想配置多用户的话。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;server&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;0.0.0.0&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;#&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;   &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;server_port&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;8888&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; 
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;local_address&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;127.0.0.1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;local_port&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1080&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;port_password&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;port_a&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;password_1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;port_b&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;password_2&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;timeout&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;300&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;method&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;aes-256-gcm&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;fast_open&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;注释掉 &lt;code class=&quot;highlighter-rouge&quot;&gt;server_port&lt;/code&gt;,  key 由 &lt;code class=&quot;highlighter-rouge&quot;&gt;password&lt;/code&gt; 改为 &lt;code class=&quot;highlighter-rouge&quot;&gt;port_password&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;value 是一个 JSON， JSON 的 key 为用户登录的端口，value 为 用户登录的密码。即一个端口对应一个密码。&lt;/p&gt;
+
+&lt;p&gt;且配置了多用户之后，需要对新增的端口更改防火墙规则 (tcp 和 udp)。 替换 &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;port&amp;gt;&lt;/code&gt; 为自己新加的端口号。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport &amp;lt;port&amp;gt; -j ACCEPT
+iptables -I INPUT -m state --state NEW -m udp -p udp --dport &amp;lt;port&amp;gt; -j ACCEPT 
+/etc/init.d/iptables save
+/etc/init.d/iptables restart
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;最后重启 Shadowsocks。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/etc/init.d/shadowsocks restart
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;启动：/etc/init.d/shadowsocks start         &lt;br /&gt;
+停止：/etc/init.d/shadowsocks stop    &lt;br /&gt;
+重启：/etc/init.d/shadowsocks restart       &lt;br /&gt;
+状态：/etc/init.d/shadowsocks status&lt;/p&gt;
+
+&lt;h4 id=&quot;shadowsocks-1&quot;&gt;2.3 安装客户端的 Shadowsocks&lt;/h4&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;a href=&quot;https://github.com/shadowsocks/shadowsocks-windows/releases&quot; style=&quot;color:#409EFF&quot;&gt;windows 版&lt;/a&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;a href=&quot;https://sourceforge.net/projects/shadowsocksgui/&quot; style=&quot;color:#409EFF&quot;&gt;Mac 版&lt;/a&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;windows 版如下， 配置好 IP、端口、密码、加密方式，就全都搞定了。&lt;/p&gt;
+
+&lt;p&gt;如果配置信息忘了就去 VPS 上 /etc/shadowsocks.json 目录下看配置文件吧。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://owu6vks0s.bkt.clouddn.com/ss_client.png&quot; alt=&quot;enter image description here&quot; style=&quot;margin:0; width:400px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Enjoy ~&lt;/p&gt;
+</description>
+        <pubDate>Fri, 23 Mar 2018 00:00:00 +0800</pubDate>
+        <link>http://ciscochina.github.io/engineering/python/2018/03/23/shadowsocks.html</link>
+        <guid isPermaLink="true">http://ciscochina.github.io/engineering/python/2018/03/23/shadowsocks.html</guid>
+        
+        
+        <category>python</category>
+        
+      </item>
     
       <item>
         <title>Mariadb Installation &amp; Master-Master Replication</title>
@@ -1880,330 +2076,6 @@ class Myreq(extensions.ExtensionDescriptor):
         <pubDate>Wed, 12 Jul 2017 16:43:59 +0800</pubDate>
         <link>http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-request-ext.html</link>
         <guid isPermaLink="true">http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-request-ext.html</guid>
-        
-        
-        <category>openstack</category>
-        
-      </item>
-    
-      <item>
-        <title>How to read OpenStack code part 6 - core plugin and extension</title>
-        <description>&lt;p&gt;本章我们将写一个自己的core plugin 和一个resource extension来加深理解。(阅读本文的前提是你已经理解了restful以及stevedore等内容)&lt;/p&gt;
-
-&lt;h1 id=&quot;core-plugin&quot;&gt;什么是 core plugin&lt;/h1&gt;
-
-&lt;p&gt;neutron的plugin有core和service两种。core plugin实现core resource的增删改查，service plugin我们在本文暂不讨论。&lt;/p&gt;
-
-&lt;p&gt;core resource 有network/subnet/port/subnet-pool。每种资源对应CURD和index5种操作。以network资源为例，相关操作和HTTP请求的对应关系如下&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;create_network    POST networks
-delete_network    DELETE networks/network_id
-update_network    PUT networks/network_id
-get_network       GET networks/network_id
-get_networks      GET networks
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;因此，core plugin中对各种核心资源都有如下的函数对应：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;create_{resource_name}
-update_{resource_name}
-delete_{resource_name}
-get_{resource_name}
-get_{resource_names}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h1 id=&quot;how-to-write-core-plugin&quot;&gt;how to write core plugin&lt;/h1&gt;
-
-&lt;p&gt;既然是plugin，也就是我们前面说过的third-party code，那就应该定义一些接口，好让第三方的组织可以参与开发。&lt;/p&gt;
-
-&lt;p&gt;neutron中定义的接口在neutron.neutron_plugin_base_v2.NeutronPluginBaseV2。要实现一个core plugin，你需要实现这个class。&lt;/p&gt;
-
-&lt;p&gt;下面是我写的一个core plugin 代码&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from neutron import neutron_plugin_base_v2
-from oslo_log import log
-LOG = log.getLogger(__name__)
-
-
-class MyNeutronPlugin(neutron_plugin_base_v2.NeutronPluginBaseV2):
-	supported_extension_aliases = ['gold']
-	def __init__(self):
-		super(MyNeutronPlugin,self).__init__()
-	#### network ####
-	def create_network(self, context, network):
-		LOG.info(&quot;network is %s&quot; %network)
-		return network
-	def update_network(self, context, id, network):
-		return network
-	def get_network(self, context, id, fields=None):
-		network = {}
-		return network
-	def get_networks(self, context, filters=None, fields=None):
-		network = {}
-		LOG.info(&quot;return network %s&quot; %network)
-		return network
-	def delete_network(self, context, id):
-		return id
-            ...
-            #### gold ####
-	def create_gold(self, context, gold):
-		LOG.info(&quot;gold is %s&quot; %gold)
-		return gold
-	def update_gold(self, context, id, gold):
-		return gold
-	def get_gold(self, context, id, fields=None):
-		gold = {}
-		return gold
-	def get_golds(self, context, filters=None, fields=None):
-		gold = {}
-		LOG.info(&quot;return gold %s&quot; %gold)
-		return gold
-	def delete_gold(self, context, id):
-		return id
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;请注意，除了network等核心资源，我们还实现了一个gold资源。 上面粘贴的内容省略了subnet/port/subnet-pool的相关代码。 既然是thirty-party code,就应该可以独立安装。所以我们的代码结构如下：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;myPlugin/
-├── myPluginPKG
-│   ├── __init__.py
-│   └── myPluginModule.py
-└── setup.py
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;&lt;strong&gt;init&lt;/strong&gt;.py的内容为&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import myPluginModule
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;setup.py内容如下：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from setuptools import setup, find_packages
-
-setup(
-	name='myPluginPKG',
-	version='1.0',
-
-	packages=find_packages(),
-
-	entry_points={
-		'neutron.core_plugins': [
-			'myNeutronPlugin = myPluginPKG.myPluginModule:MyNeutronPlugin',
-		],
-	},
-)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;这样在运行python setup.py install 后，我们的plugin就注册到了neutron.core_plugins这个namespace下。这部分内容其实就是前面stevedore中driver开发的内容。neutron通过stevedore在这个namespace下加载core_plugin&lt;/p&gt;
-
-&lt;p&gt;OK。在python setup.py install 后，我们的core plugin安装完成了，这时要修改/etc/neutron/neutron.conf，让neutron使用我们的core plugin。&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[default]
-core_plugin = myNeutronPlugin
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;然后重启neutron服务&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;systemctl restart neutron-server
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;接下来你就可以通过API 尝试了， 我们创建一个network 如下：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl -g -i -X POST &quot;http://liberty-controller01:9696/v2.0/networks&quot; -H &quot;Content-Type: application/json&quot; -H &quot;Accept: application/json&quot; -H &quot;X-Auth-Token:$token&quot; -d '{&quot;network&quot;: {&quot;name&quot;: &quot;n2&quot;, &quot;admin_state_up&quot;: true}}'
-HTTP/1.1 201 Created
-Content-Type: application/json; charset=UTF-8
-Content-Length: 15
-X-Openstack-Request-Id: req-a8cfde05-6425-42fe-b516-0bb2d264cf61
-Date: Tue, 07 Feb 2017 08:01:47 GMT
-
-    {&quot;network&quot;: {}}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;可以看到成功返回，因为我们的plugin中什么也没做，所以返回的其实是一个空的字典。但至少证明该api成功了。&lt;/p&gt;
-
-&lt;p&gt;之前我们还在plugin中增加了gold资源对应的函数，我们试试访问gold资源：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl -g -i  &quot;http://liberty-controller01:9696/v2.0/golds&quot; -H &quot;Content-Type: application/json&quot; -H &quot;Accept: application/json&quot; -H &quot;X-Auth-Token:$token&quot; 
-HTTP/1.1 404 NOT FOUND
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;为什么gold资源的API不好使呢。这是因为要想在neutron core plugin中定义一个资源，不仅要提供该资源的CURD 函数，还要有对应的RESOURCE_ATTRIBUTE_MAP.&lt;/p&gt;
-
-&lt;h1 id=&quot;resourceattributemap&quot;&gt;RESOURCE_ATTRIBUTE_MAP&lt;/h1&gt;
-
-&lt;p&gt;RESOURCE_ATTRIBUTE_MAP是neutron/api/v2/attribute.py中的一个字典，其结构大概如下：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;RESOURCE_ATTRIBUTE_MAP = {
-	NETWORKS: {
-		'id': {'allow_post': False, 'allow_put': False,
-			   'validate': {'type:uuid': None},
-			   'is_visible': True,
-			   'primary_key': True},
-		'name': {'allow_post': True, 'allow_put': True,
-				 'validate': {'type:string': NAME_MAX_LEN},
-				 'default': '', 'is_visible': True},
-		'subnets': {'allow_post': False, 'allow_put': False,
-					'default': [],
-					'is_visible': True},
-		'admin_state_up': {'allow_post': True, 'allow_put': True,
-						   'default': True,
-						   'convert_to': convert_to_boolean,
-						   'is_visible': True},
-		'status': {'allow_post': False, 'allow_put': False,
-				   'is_visible': True},
-		'tenant_id': {'allow_post': True, 'allow_put': False,
-					  'validate': {'type:string': TENANT_ID_MAX_LEN},
-					  'required_by_policy': True,
-					  'is_visible': True},
-		SHARED: {'allow_post': True,
-				 'allow_put': True,
-				 'default': False,
-				 'convert_to': convert_to_boolean,
-				 'is_visible': True,
-				 'required_by_policy': True,
-				 'enforce_policy': True},
-	},
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;该字典定义了资源以及资源对应的属性，我们这里只列出了network。所以，要想定义gold资源，除了在core plugin中添加对应的函数，还有在这个attribute map中添加相关的信息。不过，我们不建议直接修改这里的代码，正确的方法是通过resource extension来实现。&lt;/p&gt;
-
-&lt;h1 id=&quot;how-to-code-an-extension-resource-extension&quot;&gt;how to code an extension (resource extension)&lt;/h1&gt;
-
-&lt;p&gt;之前提到了extension有3种类型，resource，action，request。我们这里要实现一个新的资源，就是用resource extension。无论是哪种extension 都要遵守一些特定的规则，或者说接口，这些规则如下：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1. extension应该放在neutron/extensions文件夹下，或者在配置文件中设置api_extensions_path
-2. extension的class名应该和文件同名，当然首字母应该大写
-3. 应该实现neutron.api.extensions.py中ExtensionDescriptor定义的接口
-4. 在对应的plugin的supported_extension_aliases 中增加我们extension的别名。前面我们写的core plugin就有这个属性，当时没有做说明，其实是这里应该添加的。所谓别名是该extension要实现的一个接口，后面会看到。
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;另外很重要的一点是，因为我们要实现的是resource extension，所以还要实现&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;get_resources 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;这个接口。&lt;/p&gt;
-
-&lt;p&gt;下面我们实现一个自己的resource extension来增加 gold 资源。&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;from neutron.api import extensions
-from neutron import manager
-from neutron.api.v2 import base
-
-# You have to specify the attributes neutron-server should expect when
-# someone invokes this plugin. Let's say you want
-# 'name', 'priority', 'credential' for your extension /golds
-# then following dictionary must be declared.
-# I am following the naming convention used by other extensions.
-
-RESOURCE_ATTRIBUTE_MAP = {
-	'golds': {
-	'name': {'allow_post': True, 'allow_put': True,
-				 'is_visible': True},
-	'priority': {'allow_post': True, 'allow_put': True,
-				 'is_visible': True},
-	'credential': {'allow_post': True, 'allow_put': True,
-				 'is_visible': True},
-	# tenant_id is the user id used by keystone for authorisation
-	# It's good to use the following as it is and it is necessary
-	# for every extension 
-	'tenant_id': {'allow_post': True, 'allow_put': False,
-				  'required_by_policy': True,
-				  'validate': {'type:string': None},
-				  'is_visible': True}
-	}
-}
-
-# Great! Now you have the defined the attributes that you need for your
-# extensions. You need to store this dictionary in the neutron-server
-# by the following class
-
-class Golds(extensions.ExtensionDescriptor):
-	# The name of this class should be the same as the file name
-	# There are a couple of methods and their properties defined in the
-	# parent class of this class, ExtensionDescriptor you can check them
-
-	@classmethod
-	def get_name(cls):
-		# You can coin a name for this extension
-		return &quot;Name of golds&quot;
-
-	@classmethod
-	def get_alias(cls):
-		# This alias will be used by your core_plugin class to load
-		# the extension
-		return &quot;gold&quot;
-
-	@classmethod
-	def get_description(cls):
-		# A small description about this extension
-		return &quot;A quick brown fox jumped over a lazy dog&quot;
-
-	@classmethod
-	def get_namespace(cls):
-		# The XML namespace for this extension
-		# but as we move on to use JSON over XML based request
-		# this is not that important, correct me if I am wrong.
-		return &quot;namespace of xml&quot;
-
-	@classmethod
-	def get_updated(cls):
-		# Specify when was this extension last updated,
-		# good for management when there are changes in the design
-		return &quot;2017-02-07T10:00:00-00:00&quot;
-
-	@classmethod
-	def get_resources(cls):
-		# This method registers the URL and the dictionary  of
-		# attributes on the neutron-server.
-		exts = list()
-		plugin = manager.NeutronManager.get_plugin()
-		resource_name = 'gold'
-		collection_name = resource_name + 's'
-		params = RESOURCE_ATTRIBUTE_MAP.get(resource_name + 's', dict())
-		controller = base.create_resource(collection_name, resource_name,
-										  plugin, params, allow_bulk=False)
-		ex = extensions.ResourceExtension(collection_name, controller)
-		exts.append(ex)
-
-		return exts
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;代码的大部分解释都包含在注释里，因此请详细阅读每一行。这里只重点说一下RESOURCE_ATTRIBUTE_MAP 和 get_resources。 我们的extension就是通过这个函数来在resource attribute map中增加了gold资源。
-另外要注意的是get_alias，该函数返回extension的别名，plugin的supported_extension_alias中用该别名来找extension。&lt;/p&gt;
-
-&lt;p&gt;ok，我们现在尝试一下访问gold 资源&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl -g -i http://liberty-controller01:9696/v2.0/golds.json -H &quot;Content-Type: application/json&quot; -H &quot;Accept: application/json&quot; -H &quot;X-Auth-Token:$token&quot;
-HTTP/1.1 200 OK
-Content-Type: application/json; charset=UTF-8
-Content-Length: 13
-X-Openstack-Request-Id: req-7b925f97-4df0-49ee-bb6a-fd7c86fda9aa
-Date: Tue, 07 Feb 2017 08:29:34 GMT
-
-{&quot;golds&quot;: []}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;这次成功了。 以上就是core plugin和resource extension&lt;/p&gt;
-</description>
-        <pubDate>Wed, 12 Jul 2017 16:43:59 +0800</pubDate>
-        <link>http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-plugin.html</link>
-        <guid isPermaLink="true">http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-plugin.html</guid>
         
         
         <category>openstack</category>
