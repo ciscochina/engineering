@@ -108,6 +108,8 @@
         
           
         
+          
+        
       </ul>
     </nav>
   </div>
@@ -128,6 +130,28 @@
 
 <div class="wrapper">
 <ul class="post-list">
+  
+  <li>
+    <h2>
+      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-plugin.html">How to read OpenStack code part 6 - core plugin and extension</a>
+    </h2>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p>本章我们将写一个自己的core plugin 和一个resource extension来加深理解。(阅读本文的前提是你已经理解了restful以及stevedore等内容)</p> <h1 id="core-plugin">什么是 core plugin</h1> <p>neutron的plugin有core和service两种。core plugin实现core resource的增删改查，service plugin我们在本文暂不讨论。</p> <p>core resource 有network/subnet/port/subnet-pool。每种资源对应CURD和index5种操作。以network资源为例，相关操作和HTTP请求的对应关系如下</p> <div class="highlighter-rouge"><pre class="highlight"><code>create_network POST networks delete_network DELETE networks/network_id update_network PUT networks/network_id get_network GET networks/network_id get_networks GET networks </code></pre> </div> <p>因此，core plugin中对各种核心资源都有如下的函数对应：</p> <div class="highlighter-rouge"><pre class="highlight"><code>create_{resource_name} update_{resource_name} delete_{resource_name} get_{resource_name} get_{resource_names} </code></pre> </div> <h1 id="how-to-write-core-plugin">how to write core...</p>
+    </section> -->
+    <section class="post-meta">
+      <div class="post-date">July 12, 2017, Mingwei Li</div>
+      <div class="post-categories">
+      in 
+        
+        <a href="/engineering/category/openstack">Openstack</a>
+        
+      
+      </div>
+    </section>
+  </li>
+  
+  <hr>
+  
   
   <li>
     <h2>
@@ -324,28 +348,6 @@
     </section>
   </li>
   
-  <hr>
-  
-  
-  <li>
-    <h2>
-      <a class="post-link" href="/engineering/network/2017/07/06/gre-ovs.html">GRE and VXLAN with Open vSwitch</a>
-    </h2>
-    <!--<section class="post-excerpt" itemprop="description">
-      <p><p><img src="/engineering/assets/gre-vxlan-openvswitch.png" alt="topo" /></p> <p>试了下OVS的一些隧道封装功能（GRE，VXLAN）。</p> <p>实验:实现两个虚机之间的Network namespace之间通信。如下图所示：</p> <h4 id="host-1">配置host 1</h4> <p>在host1中创建一个network namespace <code class="highlighter-rouge">red</code>，以及一对veth（veth0，veth1） ，其中veth0添加到<code class="highlighter-rouge">red</code>里，配置IP并且up起来。</p> <div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>sudo ip netns add red <span class="gp">$ </span>sudo ip link add veth0 <span class="nb">type </span>veth peer name veth1 <span class="gp">$ </span>sudo ip link <span class="nb">set </span>veth0 netns red <span...</p>
-    </section> -->
-    <section class="post-meta">
-      <div class="post-date">July 6, 2017, Peng Xiao</div>
-      <div class="post-categories">
-      in 
-        
-        <a href="/engineering/category/network">Network</a>
-        
-      
-      </div>
-    </section>
-  </li>
-  
   
 </ul>
 
@@ -361,12 +363,14 @@
       </a>
 			
 		
-		<span class="page-number">Page 2 of 2</span>
+		<span class="page-number">Page 2 of 3</span>
 		
-		<span class="fa-stack fa-lg">
-      <i class="fa fa-square fa-stack-2x"></i>
-      <i class="fa fa-angle-double-right fa-stack-1x fa-inverse"></i>
-    </span>
+		<a class="newer-posts" href="/engineering/page3">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-square fa-stack-2x"></i>
+        <i class="fa fa-angle-double-right fa-stack-1x fa-inverse"></i>
+      </span>
+    </a>
 		
 	</p>
 </nav>
@@ -403,6 +407,8 @@
         
         
           <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+        
+        
         
         
         
@@ -486,6 +492,14 @@ $(document).ready(function() {
 
 
 
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-5530101703628975",
+    enable_page_level_ads: true
+  });
+</script>
 
 
   </body>

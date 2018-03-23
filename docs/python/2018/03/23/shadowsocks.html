@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>租用 VPS 搭建 Shadowsocks</title>
+  <meta name="description" content="">
+  
+  <meta name="author" content="Peng Xiao">
+  <meta name="copyright" content="&copy; Peng Xiao 2018">
+  
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/engineering/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/engineering/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/engineering/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/engineering/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/engineering/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/engineering/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/engineering/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/engineering/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/engineering/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/engineering/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/engineering/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/engineering/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/engineering/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/engineering/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/engineering/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+  <!-- Facebook OGP cards -->
+  <meta property="og:description" content="" />
+  <meta property="og:url" content="http://ciscochina.github.io" />
+  <meta property="og:site_name" content="Cisco China ADC Engineering Blog" />
+  <meta property="og:title" content="租用 VPS 搭建 Shadowsocks" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="612" />
+  <meta property="og:image:height" content="605" />
+  
+
+  
+  <!-- Twitter: card tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="租用 VPS 搭建 Shadowsocks">
+  <meta name="twitter:description" content="">
+  <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
+  <meta name="twitter:url" content="http://ciscochina.github.io">
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/engineering/css/main.css">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/python/2018/03/23/shadowsocks.html">
+  <link rel="alternate" type="application/rss+xml" title="Cisco China ADC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/engineering/" class="logo">
+      
+      <img src="/engineering/assets/logo.png" alt="Cisco China ADC Engineering Blog">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+          
+        
+          
+        
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container " >
+  <div class="scrim ">
+    <header class="post-header">
+      <h1 class="title">租用 VPS 搭建 Shadowsocks</h1>
+      <p class="info">by <strong>Meng Yu</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+ <span class="page-divider">
+  <span class="one"></span>
+  <span class="two"></span>
+</span>
+ 
+
+<section class="post-meta">
+  <div class="post-date">March 23, 2018</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/engineering/category/python">Python</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <p><img src="http://owu6vks0s.bkt.clouddn.com/develo_2.png" alt="enter image description here" style="margin:auto;border:none;width:400px" /></p>
+
+<p>由于个人的 PC 貌似加不到 Cisco 的域了，所以自己的电脑无法享受到 Anyconnect 的优质服务，加上平时又不喜欢走哪都拖着公司那个沉沉 T450 。那就索性自己搭一个吧，以下是对搭建过程的记录，有需要的同学可以参阅。</p>
+
+<h3 id="vps">1. 搭建一个 VPS</h3>
+
+<p>VPS 的提供商有很多，例如：Vultr 、Bandwagon 、DigitalOcean 、 virmach … 。</p>
+
+<p>我大概的搜了一下，Vultr 的口碑相对好于其他的，最便宜的虚机是2.5刀一个月，用于上上 Google 完全够用，但是经常处于售罄状态，次便宜的是5刀一个月，性价比很高，而且还支持 Aalipay，那就选它了。</p>
+
+<h4 id="vultr-">1.1 注册 Vultr 账号</h4>
+
+<p><a href="https://www.vultr.com/?ref=7368626" style="color:#409EFF">注册链接</a> 如果用我推荐的这个 link 注册，貌似会送我10刀，不过无所谓啦，哈哈哈。</p>
+
+<h4 id="section">1.2 充值</h4>
+<p>因为在 Deploy 虚机的时候，账户里没钱的话会转到充值页面，所以这里先做充值。</p>
+
+<p><img src="http://owu6vks0s.bkt.clouddn.com/pay.png" alt="enter image description here" style="margin:0" /></p>
+
+<p>有4中支付方式，这里我选的是支付宝，比较方便。</p>
+
+<p>默认有5个面额，当然你也可以选 Other。</p>
+
+<p>充值成功会跳转到 Billing 页面，可以查看账户余额。</p>
+
+<h4 id="deploy">1.3 Deploy虚机</h4>
+
+<p>接下来就是部署虚机了，选左边导航的 Servers 。</p>
+
+<p>首先选择设备节点。</p>
+
+<p><strong>推荐选择<span style="color:#409EFF">洛杉矶</span>节点，感觉速度不错，日本节点虽然更近，但是容易被墙。我第一个选的日本节点，SSH 上不去， Ping 都 Ping 不通。只好删掉重新建了一个洛杉矶的。</strong></p>
+
+<p>建完虚机发现 IP 被墙的话，删掉重建就好了，会拿到一个新 IP。</p>
+
+<p><img src="http://owu6vks0s.bkt.clouddn.com/node.png" alt="enter image description here" style="margin:0" /></p>
+
+<p>其次选择操作系统，按照自己的喜好来吧，不满意之后也可以换。这里我选的 CentOS 7。</p>
+
+<p><img src="http://owu6vks0s.bkt.clouddn.com/os.png" alt="enter image description here" style="margin:0" /></p>
+
+<p>再次选择虚机规格，不同规格价格不一样，5刀那个我个人完全够用。</p>
+
+<p><img src="http://owu6vks0s.bkt.clouddn.com/serve_size.png" alt="enter image description here" style="margin:0" /></p>
+
+<p>最后选填一些其他信息，默认就好了。不过这里我填了 SSH Key, 为了登录方便。</p>
+
+<p><img src="http://owu6vks0s.bkt.clouddn.com/install_finish.png" alt="enter image description here" style="margin:0" /></p>
+
+<p>安装完成的话状态那一项会显示 Running。</p>
+
+<h3 id="shadowsocks">2. 安装配置 Shadowsocks</h3>
+
+<h4 id="ssh--vps">2.1 SSH 到 VPS</h4>
+
+<p>选一款终端模拟软件， 比如： XShell 、 Putty 、 SecureCRT。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>ssh root@&lt;host&gt;
+</code></pre>
+</div>
+
+<p>登录到 VPS。</p>
+
+<h4 id="server--shadowsocks">2.2 安装 Server 端的 Shadowsocks</h4>
+
+<p><a href="https://github.com/teddysun/shadowsocks_install">teddysun@github</a> 写了一个一键安装 Shadowsocks Server 的脚本。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>wget --no-check-certificate -O shadowsocks.sh https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks.sh
+chmod +x shadowsocks.sh
+./shadowsocks.sh 2&gt;&amp;1 | tee shadowsocks.log
+</code></pre>
+</div>
+
+<p>安装过程中会提示选择加密方式，默认回车即可。</p>
+
+<p>安装完成后，会有如下提示。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Congratulations, Shadowsocks-python server install completed!
+Your Server IP        :your_server_ip
+Your Server Port      :your_server_port
+Your Password         :your_password
+Your Encryption Method:your_encryption_method
+
+Welcome to visit:https://teddysun.com/342.html
+Enjoy it!
+
+</code></pre>
+</div>
+
+<h4 id="tfo">2.2.1 配置 TFO</h4>
+
+<p>TCP 三次握手会造成一个 RTT 的延时，因此 TFO 的目标就是去除这个延时，在三次握手期间也能交换数据。优化链接速度。</p>
+
+<p>首先打开 /etc/rc.local ：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>vi /etc/rc.local
+</code></pre>
+</div>
+
+<p>在文本最下面添加：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>echo 3 &gt; /proc/sys/net/ipv4/tcp_fastopen
+</code></pre>
+</div>
+
+<p>其次打开 /etc/sysctl.conf ：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>vi /etc/sysctl.conf
+</code></pre>
+</div>
+
+<p>在文本最下面添加：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>net.ipv4.tcp_fastopen = 3
+</code></pre>
+</div>
+
+<p>最后，打开 Shadowsocks 的配置文件:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>vi /etc/shadowsocks.json
+</code></pre>
+</div>
+
+<p>把 <code class="highlighter-rouge">"fast_open"</code> 的 false 替换成 true。</p>
+
+<p>如果想配置多用户的话。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nt">"server"</span><span class="p">:</span><span class="s2">"0.0.0.0"</span><span class="p">,</span><span class="w">
+</span><span class="err">#</span><span class="w">   </span><span class="nt">"server_port"</span><span class="p">:</span><span class="w"> </span><span class="s2">"8888"</span><span class="w"> 
+    </span><span class="s2">"local_address"</span><span class="err">:</span><span class="s2">"127.0.0.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"local_port"</span><span class="p">:</span><span class="mi">1080</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"port_password"</span><span class="p">:{</span><span class="w">
+        </span><span class="nt">"port_a"</span><span class="p">:</span><span class="w"> </span><span class="s2">"password_1"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"port_b"</span><span class="p">:</span><span class="w"> </span><span class="s2">"password_2"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nt">"timeout"</span><span class="p">:</span><span class="mi">300</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"method"</span><span class="p">:</span><span class="s2">"aes-256-gcm"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"fast_open"</span><span class="p">:</span><span class="kc">true</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+</div>
+<p>注释掉 <code class="highlighter-rouge">server_port</code>,  key 由 <code class="highlighter-rouge">password</code> 改为 <code class="highlighter-rouge">port_password</code>。</p>
+
+<p>value 是一个 JSON， JSON 的 key 为用户登录的端口，value 为 用户登录的密码。即一个端口对应一个密码。</p>
+
+<p>且配置了多用户之后，需要对新增的端口更改防火墙规则 (tcp 和 udp)。 替换 <code class="highlighter-rouge">&lt;port&gt;</code> 为自己新加的端口号。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport &lt;port&gt; -j ACCEPT
+iptables -I INPUT -m state --state NEW -m udp -p udp --dport &lt;port&gt; -j ACCEPT 
+/etc/init.d/iptables save
+/etc/init.d/iptables restart
+</code></pre>
+</div>
+
+<p>最后重启 Shadowsocks。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>/etc/init.d/shadowsocks restart
+</code></pre>
+</div>
+
+<p>启动：/etc/init.d/shadowsocks start         <br />
+停止：/etc/init.d/shadowsocks stop    <br />
+重启：/etc/init.d/shadowsocks restart       <br />
+状态：/etc/init.d/shadowsocks status</p>
+
+<h4 id="shadowsocks-1">2.3 安装客户端的 Shadowsocks</h4>
+
+<table>
+  <tbody>
+    <tr>
+      <td><a href="https://github.com/shadowsocks/shadowsocks-windows/releases" style="color:#409EFF">windows 版</a></td>
+      <td><a href="https://sourceforge.net/projects/shadowsocksgui/" style="color:#409EFF">Mac 版</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>windows 版如下， 配置好 IP、端口、密码、加密方式，就全都搞定了。</p>
+
+<p>如果配置信息忘了就去 VPS 上 /etc/shadowsocks.json 目录下看配置文件吧。</p>
+
+<p><img src="http://owu6vks0s.bkt.clouddn.com/ss_client.png" alt="enter image description here" style="margin:0; width:400px" /></p>
+
+<p>Enjoy ~</p>
+
+</article>
+
+
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+      <a href="//twitter.com/share?text=%E7%A7%9F%E7%94%A8+VPS+%E6%90%AD%E5%BB%BA+Shadowsocks&url=http%3A%2F%2Fciscochina.github.io%2Fengineering%2Fpython%2F2018%2F03%2F23%2Fshadowsocks.html&via=cisco"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=255');return false;">
+        <i class="fa fa-twitter-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+      <a href="//plus.google.com/share?title=%E7%A7%9F%E7%94%A8+VPS+%E6%90%AD%E5%BB%BA+Shadowsocks&url=http%3A%2F%2Fciscochina.github.io%2Fengineering%2Fpython%2F2018%2F03%2F23%2Fshadowsocks.html"
+        onclick="window.open(this.href, 'google-plus-share', 'width=550,height=255');return false;">
+        <i class="fa fa-google-plus-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+<section class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'ciscochina';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">Cisco China ADC Engineering Blog</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+        
+        
+        
+        
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:penxiao@cisco.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">penxiao@cisco.com</span>
+          </a>
+        </li>
+
+        
+          
+          <li>
+            <a href="https://github.com/ciscochina" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">ciscochina</span>
+            </a>
+          </li>
+          
+        
+          
+          <li>
+            <a href="https://twitter.com/cisco" title="Follow me on Twitter">
+              <i class="fa fa-twitter"></i>
+              <span class="username">cisco</span>
+            </a>
+          </li>
+          
+        
+          
+        
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+      <p class="text">Cisco China ADC Engineering Blog.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-5530101703628975",
+    enable_page_level_ads: true
+  });
+</script>
+
+
+  </body>
+
+</html>

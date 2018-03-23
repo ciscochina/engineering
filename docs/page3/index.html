@@ -6,8 +6,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>How to read OpenStack code part 9 - request extension</title>
-  <meta name="description" content="We have learned resource extension and action extension. This post we will write a request extension">
+  <title>Cisco China ADC Engineering Blog</title>
+  <meta name="description" content="Cisco China ADC Engineering Blog.
+">
   
   <meta name="author" content="Peng Xiao">
   <meta name="copyright" content="&copy; Peng Xiao 2018">
@@ -41,10 +42,11 @@
 
   
   <!-- Facebook OGP cards -->
-  <meta property="og:description" content="We have learned resource extension and action extension. This post we will write a request extension" />
+  <meta property="og:description" content="Cisco China ADC Engineering Blog.
+" />
   <meta property="og:url" content="http://ciscochina.github.io" />
   <meta property="og:site_name" content="Cisco China ADC Engineering Blog" />
-  <meta property="og:title" content="How to read OpenStack code part 9 - request extension" />
+  <meta property="og:title" content="Cisco China ADC Engineering Blog" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
   <meta property="og:image:type" content="image/png" />
@@ -55,8 +57,9 @@
   
   <!-- Twitter: card tags -->
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="How to read OpenStack code part 9 - request extension">
-  <meta name="twitter:description" content="We have learned resource extension and action extension. This post we will write a request extension">
+  <meta name="twitter:title" content="Cisco China ADC Engineering Blog">
+  <meta name="twitter:description" content="Cisco China ADC Engineering Blog.
+">
   <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
   <meta name="twitter:url" content="http://ciscochina.github.io">
   
@@ -65,7 +68,7 @@
 
   <!-- Site styles -->
   <link rel="stylesheet" href="/engineering/css/main.css">
-  <link rel="canonical" href="http://ciscochina.github.io/engineering/openstack/2017/07/12/openstack-request-ext.html">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/page3/">
   <link rel="alternate" type="application/rss+xml" title="Cisco China ADC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
 </head>
 
@@ -114,178 +117,63 @@
 
 
     <div class="page-content">
-        <div class="post">
+        <div class="home">
 
-<div class="post-header-container " >
-  <div class="scrim ">
-    <header class="post-header">
-      <h1 class="title">How to read OpenStack code part 9 - request extension</h1>
-      <p class="info">by <strong>Mingwei Li</strong></p>
+<div class="site-header-container has-cover" style="background-image: url(/engineering/assets/header_image.jpg);">
+  <div class="scrim has-cover">
+    <header class="site-header">
+      <h1 class="title">Cisco China ADC Engineering Blog</h1>
+      <p class="subtitle">Never stop learning and sharing</p>
     </header>
   </div>
 </div>
 
 <div class="wrapper">
-
- <span class="page-divider">
-  <span class="one"></span>
-  <span class="two"></span>
-</span>
- 
-
-<section class="post-meta">
-  <div class="post-date">July 12, 2017</div>
-  <div class="post-categories">
-  in 
-    
-    <a href="/engineering/category/openstack">Openstack</a>
-    
+<ul class="post-list">
   
-  </div>
-</section>
-
-<article class="post-content">
-  <p>We have learned resource extension and action extension. This post we will write a request extension</p>
-
-<p>First see two API call</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>curl -X POST http://liberty-controller01:9696/v2.0/networks.json -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Auth-Token: $token" -d '{"network": {"name": "net3", "admin_state_up": true}}'
-
-{"network": {"status": "ACTIVE", "subnets": [], "name": "net3", "provider:physical_network": "physnet1", "admin_state_up": true, "tenant_id": "8c5f13ee6a404759839e48537bdf69ac", "mtu": 0, "router:external": false, "shared": false, "port_security_enabled": true, "provider:network_type": "vlan", "id": "95c955ac-c963-4f53-ab4a-d721fa0cda51", "provider:segmentation_id": 490}}
-</code></pre>
-</div>
-
-<p>It run successful. Nothing to say. Then this one</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>curl -X POST http://liberty-controller01:9696/v2.0/networks.json -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Auth-Token: $token" -d '{"network": {"name": "net3", "admin_state_up": true, "some_attr":"some_value"}}'
-
-{"NeutronError": {"message": "Unrecognized attribute(s) 'some_attr'", "type": "HTTPBadRequest", "detail": ""}}[root@liberty-controller01 myPluginPKG]# 
-</code></pre>
-</div>
-
-<p>This one is bad request. But the only difference is the POST body. Neutron think the some_attr is not a attribute of network and it is right. Because this is a core resource and the attribute map of this resource do not have some_attr</p>
-
-<p>To solve this we need an request extension which actually update the resource attribute map of network. Below are the code</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>from neutron.api import extensions
-
-EXTENDED_ATTRIBUTES_2_0 = {
-    'networks': {
-        'some_attr': {'allow_post': True,
-                 'allow_put': False,
-                 'is_visible': True,
-                 'default': ''}
-    }
-}
-
-
-class Myreq(extensions.ExtensionDescriptor):
-    @classmethod
-    def get_name(cls):
-        return "myreq"
-
-    @classmethod
-    def get_alias(cls):
-        return 'myreq'
-
-    @classmethod
-    def get_description(cls):
-        return "myreq"
-
-    @classmethod
-    def get_updated(cls):
-        return "2017-02-08T10:00:00-00:00"
-
-    def get_extended_resources(self, *args, **kwargs):
-        return EXTENDED_ATTRIBUTES_2_0
-</code></pre>
-</div>
-
-<p>You can see we defined a dict in the extension and return it with method get_extended_resources.</p>
-
-<p>So to implement an request extension is very easy. Define a method called get_extended_resources and return some attributes that you want to added to the original reosurce</p>
-
-</article>
-
-
-
-
-
-<section class="rss">
-  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
-</section>
-
-<section class="share">
-  <span>Share: </span>
+  <li>
+    <h2>
+      <a class="post-link" href="/engineering/network/2017/07/06/gre-ovs.html">GRE and VXLAN with Open vSwitch</a>
+    </h2>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p><img src="/engineering/assets/gre-vxlan-openvswitch.png" alt="topo" /></p> <p>试了下OVS的一些隧道封装功能（GRE，VXLAN）。</p> <p>实验:实现两个虚机之间的Network namespace之间通信。如下图所示：</p> <h4 id="host-1">配置host 1</h4> <p>在host1中创建一个network namespace <code class="highlighter-rouge">red</code>，以及一对veth（veth0，veth1） ，其中veth0添加到<code class="highlighter-rouge">red</code>里，配置IP并且up起来。</p> <div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>sudo ip netns add red <span class="gp">$ </span>sudo ip link add veth0 <span class="nb">type </span>veth peer name veth1 <span class="gp">$ </span>sudo ip link <span class="nb">set </span>veth0 netns red <span...</p>
+    </section> -->
+    <section class="post-meta">
+      <div class="post-date">July 6, 2017, Peng Xiao</div>
+      <div class="post-categories">
+      in 
+        
+        <a href="/engineering/category/network">Network</a>
+        
+      
+      </div>
+    </section>
+  </li>
   
-    
-    
-    
-    
-    
-    
-    
-    
   
-    
-    
-      <a href="//twitter.com/share?text=How+to+read+OpenStack+code+part+9+-+request+extension&url=http%3A%2F%2Fciscochina.github.io%2Fengineering%2Fopenstack%2F2017%2F07%2F12%2Fopenstack-request-ext.html&via=cisco"
-        onclick="window.open(this.href, 'twitter-share', 'width=550,height=255');return false;">
-        <i class="fa fa-twitter-square fa-lg"></i>
-      </a>
-    
-    
-    
-    
-    
-    
-    
-  
-    
-    
-    
-    
-    
-    
-    
-    
-  
-    
-    
-    
-    
-      <a href="//plus.google.com/share?title=How+to+read+OpenStack+code+part+9+-+request+extension&url=http%3A%2F%2Fciscochina.github.io%2Fengineering%2Fopenstack%2F2017%2F07%2F12%2Fopenstack-request-ext.html"
-        onclick="window.open(this.href, 'google-plus-share', 'width=550,height=255');return false;">
-        <i class="fa fa-google-plus-square fa-lg"></i>
-      </a>
-    
-    
-    
-    
-    
-  
-</section>
+</ul>
 
-
-
-
-<section class="disqus">
-  <div id="disqus_thread"></div>
-  <script type="text/javascript">
-    var disqus_shortname = 'ciscochina';
-
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-  </script>
-  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-</section>
-
-
+<nav class="pagination" role="navigation">
+	<p>
+    
+			
+			<a class="newer-posts" href="/engineering/page2">
+				<span class="fa-stack fa-lg">
+					<i class="fa fa-square fa-stack-2x"></i>
+					<i class="fa fa-angle-double-left fa-stack-1x fa-inverse"></i>
+				</span>
+			</a>
+			
+		
+		<span class="page-number">Page 3 of 3</span>
+		
+		<span class="fa-stack fa-lg">
+      <i class="fa fa-square fa-stack-2x"></i>
+      <i class="fa fa-angle-double-right fa-stack-1x fa-inverse"></i>
+    </span>
+		
+	</p>
+</nav>
 
 </div>
 </div>
