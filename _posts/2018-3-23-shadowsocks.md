@@ -175,12 +175,23 @@ iptables -I INPUT -m state --state NEW -m udp -p udp --dport <port> -j ACCEPT
 
 #### 2.3 安装客户端的 Shadowsocks 
 
-[windows 版](https://github.com/shadowsocks/shadowsocks-windows/releases){:style="color:#409EFF"} | [Mac 版](https://sourceforge.net/projects/shadowsocksgui/){:style="color:#409EFF"} 
+[windows 版](https://github.com/shadowsocks/shadowsocks-windows/releases){:style="color:#409EFF"}
+ | [Mac 版](https://github.com/shadowsocks/ShadowsocksX-NG/releases/){:style="color:#409EFF"} 
+ | [Android 版](https://github.com/shadowsocks/shadowsocks-android/releases){:style="color:#409EFF"} 
 
 windows 版如下， 配置好 IP、端口、密码、加密方式，就全都搞定了。    
 
 如果配置信息忘了就去 VPS 上 /etc/shadowsocks.json 目录下看配置文件吧。
 
 ![enter image description here](http://owu6vks0s.bkt.clouddn.com/ss_client.png){:style="margin:0; width:400px"}
+
+Mac 版如下。
+
+![enter image description here](http://owu6vks0s.bkt.clouddn.com/mac_ss.png){:style="margin:0;width:450px"}
+
+Android 版由于没有 Android 手机，就不上图了，和 PC 版唯一的区别就是 Android 版没有PAC代理，只有全局和分 APP 代理。
+
+IOS 版没有对应的 SS，有兴趣的同学可以参考[这篇文章。](https://medium.com/@scomper/surge-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6-a1533c10e80b){:style="color:#409EFF"} ( 如果我哪天买了这个 APP 或发现其它靠谱的方式再来补这个地方吧。 )
+
 
 Enjoy ~
