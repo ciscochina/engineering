@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>git cherry-pick for backport</title>
+  <meta name="description" content="本文主要介绍Git cherry-pick的用法。首先我们看看什么是 backport 。">
+  
+  <meta name="author" content="Peng Xiao">
+  <meta name="copyright" content="&copy; Peng Xiao 2018">
+  
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/engineering/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/engineering/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/engineering/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/engineering/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/engineering/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/engineering/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/engineering/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/engineering/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/engineering/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/engineering/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/engineering/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/engineering/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/engineering/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/engineering/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/engineering/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/engineering/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+  <!-- Facebook OGP cards -->
+  <meta property="og:description" content="本文主要介绍Git cherry-pick的用法。首先我们看看什么是 backport 。" />
+  <meta property="og:url" content="http://ciscochina.github.io" />
+  <meta property="og:site_name" content="Cisco China ADC Engineering Blog" />
+  <meta property="og:title" content="git cherry-pick for backport" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="http://ciscochina.github.io/engineering/assets/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="612" />
+  <meta property="og:image:height" content="605" />
+  
+
+  
+  <!-- Twitter: card tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="git cherry-pick for backport">
+  <meta name="twitter:description" content="本文主要介绍Git cherry-pick的用法。首先我们看看什么是 backport 。">
+  <meta name="twitter:image" content="http://ciscochina.github.io/engineering/assets/logo.png">
+  <meta name="twitter:url" content="http://ciscochina.github.io">
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/engineering/css/main.css">
+  <link rel="canonical" href="http://ciscochina.github.io/engineering/linux/2018/03/30/git-backport.html">
+  <link rel="alternate" type="application/rss+xml" title="Cisco China ADC Engineering Blog" href="http://ciscochina.github.io/engineering/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/engineering/" class="logo">
+      
+      <img src="/engineering/assets/logo.png" alt="Cisco China ADC Engineering Blog">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+          
+        
+          
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+          
+        
+          
+        
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container " >
+  <div class="scrim ">
+    <header class="post-header">
+      <h1 class="title">git cherry-pick for backport</h1>
+      <p class="info">by <strong>Peng Xiao</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+ <span class="page-divider">
+  <span class="one"></span>
+  <span class="two"></span>
+</span>
+ 
+
+<section class="post-meta">
+  <div class="post-date">March 30, 2018</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/engineering/category/linux">Linux</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <p>本文主要介绍Git cherry-pick的用法。首先我们看看什么是 <code class="highlighter-rouge">backport</code> 。</p>
+
+<p>假如我们当前在master分支进行开发，开发到一定程度，我们release了1.0， 这时候我们一般会为其创建一个 <code class="highlighter-rouge">stable</code> 的分支，比如叫 <code class="highlighter-rouge">stable/1.0</code></p>
+
+<p>这时候用户在测试或者使用1.0版本代码的时候发现一个bug，这个bug可能在 stable/1.0分支和master分支都存在，这时候我们想在master和stable/1.0上都修复这个bug怎么办？</p>
+
+<p>我们肯定不能在master分支上修复完，以后把master分支merge到stable/1.0, 这不被允许，因为master分支有太多新的feature，并不稳定, 而且会导致版本紊乱。</p>
+
+<p>有一种操作就是我们把代码分别在master和stable/1.0上进行修改，但是这样非常不方便。</p>
+
+<p>这时候我们可以使用cherry-pick, 把在master分支提交的修复bug的commit 提交到其他旧的分支用于修复bug，这就叫 <code class="highlighter-rouge">backport</code> ,  怎么用呢，给大家举例</p>
+
+<h4 id="section">准备代码库和分支</h4>
+
+<p>首先我们先准备一个代码库.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>➜  tmp mkdir cherry-pick-demo
+➜  tmp
+➜  tmp cd cherry-pick-demo
+➜  cherry-pick-demo git init
+Initialized empty Git repository in /Users/penxiao/tmp/cherry-pick-demo/.git/
+➜  cherry-pick-demo git:(master) echo "this is a test file" &gt; test.txt
+➜  cherry-pick-demo git:(master) ✗ ls
+test.txt
+➜  cherry-pick-demo git:(master) ✗ git add test.txt
+➜  cherry-pick-demo git:(master) ✗ git commit -m "init commit"
+[master (root-commit) 39ee3a7] init commit
+ 1 file changed, 1 insertion(+)
+ create mode 100644 test.txt
+➜  cherry-pick-demo git:(master)
+</code></pre>
+</div>
+
+<p>然后我们基于当前master创建一个分支 stable/1.0 , 然后回到master</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>➜  cherry-pick-demo git:(master) git checkout  -b stable/1.0
+Switched to a new branch 'stable/1.0'
+➜  cherry-pick-demo git:(stable/1.0) git checkout master
+Switched to branch 'master'
+➜  cherry-pick-demo git:(master)
+</code></pre>
+</div>
+
+<h4 id="bugmasterfix">发现bug并在master分支fix</h4>
+
+<p>这时候，用户使用stable/1.0发现一个bug，这个bug也在master分支上存在。我们在master分支做一个bugfix的提交</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>➜  cherry-pick-demo git:(master) ✗ echo "this is a test file" &gt; test.txt
+➜  cherry-pick-demo git:(master)
+➜  cherry-pick-demo git:(master) echo "this is a bug fix" &gt;&gt; test.txt
+➜  cherry-pick-demo git:(master) ✗ more test.txt
+this is a test file
+this is a bug fix
+➜  cherry-pick-demo git:(master) ✗ git add test.txt
+➜  cherry-pick-demo git:(master) ✗ git commit -m "this is a bug fix commit"
+[master 095e9ec] this is a bug fix commit
+ 1 file changed, 1 insertion(+)
+➜  cherry-pick-demo git:(master) git log
+➜  cherry-pick-demo git:(master)
+</code></pre>
+</div>
+
+<p>git log我们能看到这次bug fix的commit hash</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>commit 095e9ec7633e841cabc9c9c9f8b22687ba324da4 (HEAD -&gt; master)
+Author: Peng Xiao &lt;xiaoquwl@gmail.com&gt;
+Date:   Fri Mar 30 13:28:23 2018 +0800
+
+    this is a bug fix commit
+
+commit 39ee3a7fef1726b3a7bbc9a16a642d290922327a (stable/1.0)
+Author: Peng Xiao &lt;xiaoquwl@gmail.com&gt;
+Date:   Fri Mar 30 13:20:05 2018 +0800
+
+    init commit
+</code></pre>
+</div>
+
+<h4 id="bug-fixcommit-backport">把bug fix的commit backport到其他分支</h4>
+
+<p>这时候如果我们想把在master分支提交的bugfix commit也弄到 stable/1.0分支上，可以这样操作。</p>
+
+<p>切换到stable/1.0分支，然后使用cherry-pick把bugfix的提交重新提交到 stable/1.0分支</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>➜  cherry-pick-demo git:(master) git checkout stable/1.0
+Switched to branch 'stable/1.0'
+➜  cherry-pick-demo git:(stable/1.0) more test.txt
+this is a test file
+➜  cherry-pick-demo git:(stable/1.0) git cherry-pick 095e9ec7633e841cabc9c9c9f8b22687ba324da4  # maste分支bugfix的commit ID
+[stable/1.0 eb173ea] this is a bug fix commit
+ Date: Fri Mar 30 13:28:23 2018 +0800
+ 1 file changed, 1 insertion(+)
+➜  cherry-pick-demo git:(stable/1.0) more test.txt
+this is a test file
+this is a bug fix
+➜  cherry-pick-demo git:(stable/1.0)
+</code></pre>
+</div>
+
+<p>当然，这是理想情况，<code class="highlighter-rouge">git cherry-pick</code> 这句运行的时候也可能会出现冲突，这时候我们和其它情况一样，手工处理下冲突，然后再commit就行了。</p>
+
+<p>好的，这就是所谓的backport了。</p>
+
+</article>
+
+
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+      <a href="//twitter.com/share?text=git+cherry-pick+for+backport&url=http%3A%2F%2Fciscochina.github.io%2Fengineering%2Flinux%2F2018%2F03%2F30%2Fgit-backport.html&via=cisco"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=255');return false;">
+        <i class="fa fa-twitter-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+      <a href="//plus.google.com/share?title=git+cherry-pick+for+backport&url=http%3A%2F%2Fciscochina.github.io%2Fengineering%2Flinux%2F2018%2F03%2F30%2Fgit-backport.html"
+        onclick="window.open(this.href, 'google-plus-share', 'width=550,height=255');return false;">
+        <i class="fa fa-google-plus-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+<section class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'ciscochina';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">Cisco China ADC Engineering Blog</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/engineering/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/blog/">Blogs</a>
+        
+        
+        
+          <li class="nav-link"><a href="/engineering/typography/">Typography</a>
+        
+        
+        
+        
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:penxiao@cisco.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">penxiao@cisco.com</span>
+          </a>
+        </li>
+
+        
+          
+          <li>
+            <a href="https://github.com/ciscochina" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">ciscochina</span>
+            </a>
+          </li>
+          
+        
+          
+          <li>
+            <a href="https://twitter.com/cisco" title="Follow me on Twitter">
+              <i class="fa fa-twitter"></i>
+              <span class="username">cisco</span>
+            </a>
+          </li>
+          
+        
+          
+        
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/engineering/feed.xml">via RSS</a></strong></p>
+      <p class="text">Cisco China ADC Engineering Blog.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-5530101703628975",
+    enable_page_level_ads: true
+  });
+</script>
+
+
+  </body>
+
+</html>

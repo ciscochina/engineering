@@ -133,6 +133,28 @@
   
   <li>
     <h2>
+      <a class="post-link" href="/engineering/linux/2018/03/30/git-backport.html">git cherry-pick for backport</a>
+    </h2>
+    <!--<section class="post-excerpt" itemprop="description">
+      <p><p>本文主要介绍Git cherry-pick的用法。首先我们看看什么是 <code class="highlighter-rouge">backport</code> 。</p> <p>假如我们当前在master分支进行开发，开发到一定程度，我们release了1.0， 这时候我们一般会为其创建一个 <code class="highlighter-rouge">stable</code> 的分支，比如叫 <code class="highlighter-rouge">stable/1.0</code></p> <p>这时候用户在测试或者使用1.0版本代码的时候发现一个bug，这个bug可能在 stable/1.0分支和master分支都存在，这时候我们想在master和stable/1.0上都修复这个bug怎么办？</p> <p>我们肯定不能在master分支上修复完，以后把master分支merge到stable/1.0, 这不被允许，因为master分支有太多新的feature，并不稳定, 而且会导致版本紊乱。</p> <p>有一种操作就是我们把代码分别在master和stable/1.0上进行修改，但是这样非常不方便。</p> <p>这时候我们可以使用cherry-pick, 把在master分支提交的修复bug的commit 提交到其他旧的分支用于修复bug，这就叫 <code class="highlighter-rouge">backport</code> , 怎么用呢，给大家举例</p> <h4 id="section">准备代码库和分支</h4> <p>首先我们先准备一个代码库.</p> <div class="highlighter-rouge"><pre class="highlight"><code>➜ tmp mkdir cherry-pick-demo ➜ tmp ➜ tmp cd cherry-pick-demo ➜ cherry-pick-demo git init Initialized empty Git repository in /Users/penxiao/tmp/cherry-pick-demo/.git/...</p>
+    </section> -->
+    <section class="post-meta">
+      <div class="post-date">March 30, 2018, Peng Xiao</div>
+      <div class="post-categories">
+      in 
+        
+        <a href="/engineering/category/linux">Linux</a>
+        
+      
+      </div>
+    </section>
+  </li>
+  
+  <hr>
+  
+  
+  <li>
+    <h2>
       <a class="post-link" href="/engineering/python/2018/03/23/shadowsocks.html">租用 VPS 搭建 Shadowsocks</a>
     </h2>
     <!--<section class="post-excerpt" itemprop="description">
@@ -199,13 +221,13 @@
   
   <li>
     <h2>
-      <a class="post-link" href="/engineering/python/2017/08/26/selenium-testing-framework.html">Sharing of Selenium Testing Framework</a>
+      <a class="post-link" href="/engineering/python/2017/08/27/selenium-testing-framework.html">Sharing of Selenium Testing Framework</a>
     </h2>
     <!--<section class="post-excerpt" itemprop="description">
       <p><h1 id="what-is-selenium">What is Selenium?</h1> <p>From the http://www.seleniumhq.org/, it gives a clear definition: Selenium automates browsers. That’s it!</p> <p>Please check out below links if you are interest:</p> <h3 id="getting-started">Getting started</h3> <p>http://selenium-python.readthedocs.io/getting-started.html (For Python)</p> <h3 id="source-code">Source Code</h3> <p>https://github.com/SeleniumHQ/selenium</p> <div class="highlighter-rouge"><pre class="highlight"><code>In generally, if your application is web-oriented and with using the Selenium...</p>
     </section> -->
     <section class="post-meta">
-      <div class="post-date">August 26, 2017, Ronghui Zhou</div>
+      <div class="post-date">August 27, 2017, Ronghui Zhou</div>
       <div class="post-categories">
       in 
         
@@ -313,28 +335,6 @@
     </h2>
     <!--<section class="post-excerpt" itemprop="description">
       <p><p>When coding a web system, you have to think about an important problem, how to map urls to logic.</p> <p>Openstack use routes to solve this problem.</p> <h1 id="what-is-routes">What is routes</h1> <p>Routes is a python package used to map urls to program logic. Normally this is the web framework`s responsibility, so...</p>
-    </section> -->
-    <section class="post-meta">
-      <div class="post-date">July 12, 2017, Mingwei Li</div>
-      <div class="post-categories">
-      in 
-        
-        <a href="/engineering/category/openstack">Openstack</a>
-        
-      
-      </div>
-    </section>
-  </li>
-  
-  <hr>
-  
-  
-  <li>
-    <h2>
-      <a class="post-link" href="/engineering/openstack/2017/07/12/openstack-request-ext.html">How to read OpenStack code part 9 - request extension</a>
-    </h2>
-    <!--<section class="post-excerpt" itemprop="description">
-      <p><p>We have learned resource extension and action extension. This post we will write a request extension</p> <p>First see two API call</p> <div class="highlighter-rouge"><pre class="highlight"><code>curl -X POST http://liberty-controller01:9696/v2.0/networks.json -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Auth-Token: $token" -d '{"network": {"name": "net3", "admin_state_up": true}}' {"network": {"status": "ACTIVE", "subnets": [], "name": "net3", "provider:physical_network":...</p>
     </section> -->
     <section class="post-meta">
       <div class="post-date">July 12, 2017, Mingwei Li</div>
